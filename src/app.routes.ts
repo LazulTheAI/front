@@ -6,18 +6,44 @@ import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 
 export const appRoutes: Routes = [
+    { 
+        path: '', 
+        redirectTo: () => {
+            const token = localStorage.getItem('auth_token');
+            return token ? '/dashboard' : '/auth/login';
+        }, 
+        pathMatch: 'full' 
+    },
     {
-        path: '',
+        path: 'dashboard',
         component: AppLayout,
         children: [
-            { path: '', component: Dashboard },
-            { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
-            { path: 'documentation', component: Documentation },
-            { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
+            { path: '', component: Dashboard }
+        ]
+    },
+    {
+        path: 'uikit',
+        component: AppLayout,
+        children: [
+            { path: '', loadChildren: () => import('./app/pages/uikit/uikit.routes') }
+        ]
+    },
+    {
+        path: 'pages',
+        component: AppLayout,
+        children: [
+            { path: '', loadChildren: () => import('./app/pages/pages.routes') }
+        ]
+    },
+    {
+        path: 'documentation',
+        component: AppLayout,
+        children: [
+            { path: '', component: Documentation }
         ]
     },
     { path: 'landing', component: Landing },
     { path: 'notfound', component: Notfound },
-    { path: 'auth', loadChildren: () => import('./app/pages/auth/auth.routes') },
-    { path: '**', redirectTo: '/notfound' }
+    { path: 'auth', loadChildren: () => import('./app/features/auth/auth.routes') },
+    { path: '**', component: Notfound }
 ];
