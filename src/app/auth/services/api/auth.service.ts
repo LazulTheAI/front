@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
@@ -30,14 +30,15 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthApiService {
-    private baseUrl = environment.baseUrl + '/login';
+    private baseUrl = environment.baseUrl;
 
 
 
   constructor(private http: HttpClient) {}
 
   login(request: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, request).pipe(
+
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, request).pipe(
       tap((response) => {
         if (response.token && response.refreshToken) {
           this.saveTokens(response.token, response.refreshToken);
@@ -46,18 +47,9 @@ export class AuthApiService {
     );
   }
 
-  register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, request).pipe(
-      tap((response) => {
-        if (response.token && response.refreshToken) {
-          this.saveTokens(response.token, response.refreshToken);
-        }
-      })
-    );
-  }
 
   refresh(request: RefreshRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/refresh`, request).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/refresh`, request).pipe(
       tap((response) => {
         if (response.token && response.refreshToken) {
           this.saveTokens(response.token, response.refreshToken);

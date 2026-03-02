@@ -1,10 +1,10 @@
 
+import { AuthApiService } from '@/app/auth/services/api/auth.service';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { AuthApiService } from '@/app/auth/services/api/auth.service';
+import { catchError } from 'rxjs/operators';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authService = inject(AuthApiService);
@@ -12,7 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const token = authService.getToken();
 
     // Skip interceptor logic for auth endpoints (login, register, refresh)
-    if (req.url.includes('/auth/login') || req.url.includes('/auth/register') || req.url.includes('/auth/refresh')) {
+    if (req.url.includes('/auth/login') || req.url.includes('/auth/refresh')|| req.url.includes('/auth/load')) {
         return next(req).pipe(
             catchError((error) => {
                 return throwError(() => error);

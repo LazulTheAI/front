@@ -4,6 +4,7 @@ import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
+import { AuthCallbackComponent } from './component/auth-callback.component';
 
 export const appRoutes: Routes = [
     { 
@@ -21,6 +22,12 @@ export const appRoutes: Routes = [
             { path: '', component: Dashboard }
         ]
     },
+    
+    { 
+        path: 'auth/callback', 
+        component: AuthCallbackComponent 
+    },
+
     {
         path: 'uikit',
         component: AppLayout,
