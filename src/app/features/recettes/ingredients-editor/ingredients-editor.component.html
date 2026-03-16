@@ -1,0 +1,113 @@
+<div class="flex flex-column gap-3">
+
+  <!-- En-tête -->
+  <div class="flex justify-content-between align-items-center">
+    <div class="flex align-items-center gap-2">
+      <span class="font-medium text-900">Ingrédients</span>
+      @if (ingredients.length > 0) {
+        <p-tag [value]="ingredients.length + ' ligne(s)'" severity="secondary" />
+      }
+      @if (hasDuplicates()) {
+        <p-tag value="Doublons détectés" severity="warn" />
+      }
+    </div>
+    <p-button
+      label="Ajouter un ingrédient"
+      icon="pi pi-plus"
+      severity="secondary"
+      size="small"
+      (onClick)="addIngredient()"
+    />
+  </div>
+
+  <!-- Lignes -->
+  @if (ingredients.length === 0) {
+    <div class="surface-100 border-round p-4 text-center text-400">
+      <i class="pi pi-list text-2xl mb-2 block"></i>
+      Aucun ingrédient ajouté. Cliquez sur "Ajouter" pour commencer.
+    </div>
+  }
+
+  @for (ligne of ingredients; track $index; let i = $index) {
+    <div class="surface-50 border-round border-1 surface-border p-3">
+      <div class="grid align-items-end">
+
+        <!-- Matériau -->
+        <div class="col-12 md:col-5 flex flex-column gap-1">
+          @if (i === 0) {
+            <label class="text-xs text-500 font-medium">MATÉRIAU</label>
+          }
+          <p-select
+            [name]="'materiau_' + i"
+            [(ngModel)]="ligne.materiauId"
+            [options]="materiauOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Sélectionner un matériau..."
+            [filter]="true"
+            filterPlaceholder="Rechercher..."
+            [loading]="loadingMateriaux"
+            (onChange)="onMateriauChange(i, $event.value)"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Quantité -->
+        <div class="col-12 md:col-3 flex flex-column gap-1">
+          @if (i === 0) {
+            <label class="text-xs text-500 font-medium">QUANTITÉ</label>
+          }
+          <p-inputNumber
+            [name]="'quantite_' + i"
+            [(ngModel)]="ligne.quantite"
+            [min]="0.0001"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="4"
+            placeholder="0"
+            (onInput)="onFieldChange()"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Unité -->
+        <div class="col-12 md:col-3 flex flex-column gap-1">
+          @if (i === 0) {
+            <label class="text-xs text-500 font-medium">UNITÉ</label>
+          }
+          <input
+            pInputText
+            [name]="'unite_' + i"
+            [(ngModel)]="ligne.unite"
+            maxlength="20"
+            placeholder="kg, L, g..."
+            (ngModelChange)="onFieldChange()"
+            class="w-full"
+          />
+        </div>
+
+        <!-- Supprimer -->
+        <div class="col-12 md:col-1 flex justify-content-end">
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [rounded]="true"
+            size="small"
+            pTooltip="Supprimer cette ligne"
+            (onClick)="removeIngredient(i)"
+          />
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- Validation globale -->
+  @if (ingredients.length > 0 && !isValid()) {
+    <small class="text-orange-500">
+      <i class="pi pi-info-circle mr-1"></i>
+      Tous les ingrédients doivent avoir un matériau, une quantité et une unité.
+    </small>
+  }
+
+</div>

@@ -1,0 +1,130 @@
+<p-dialog
+  header="Planifier un run de production"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '540px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <!-- Recette -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="recette">
+        Recette <span class="text-red-500">*</span>
+      </label>
+      <p-select
+        inputId="recette"
+        name="recetteId"
+        [(ngModel)]="form.recetteId"
+        required
+        [options]="recetteOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner une recette..."
+        [filter]="true"
+        filterPlaceholder="Rechercher..."
+        (onChange)="onRecetteChange($event.value)"
+        styleClass="w-full"
+      />
+    </div>
+
+    <!-- Batches + Entrepôt -->
+    <div class="grid">
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="batches">
+          Nombre de batches <span class="text-red-500">*</span>
+        </label>
+        <p-inputNumber
+          inputId="batches"
+          name="batches"
+          [(ngModel)]="form.batches"
+          required
+          [min]="0.0001"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+          (onInput)="onBatchesChange()"
+        />
+        @if (selectedRecette && form.batches > 0) {
+          <small class="text-500">
+            → {{ unitesPrevues | number:'1.0-2' }} {{ selectedRecette.uniteProduite }} produit(es)
+          </small>
+        }
+      </div>
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="entrepot">
+          Entrepôt <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          inputId="entrepot"
+          name="entrepotId"
+          [(ngModel)]="form.entrepotId"
+          required
+          [options]="entrepotOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Sélectionner..."
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <!-- Coût théorique si recette sélectionnée -->
+    @if (selectedRecette?.coutTheorique) {
+      <div class="surface-50 border-round p-3 flex align-items-center gap-3">
+        <i class="pi pi-calculator text-primary"></i>
+        <div>
+          <span class="text-500 text-sm">Coût théorique estimé : </span>
+          <span class="font-semibold text-900">
+            {{ (selectedRecette!.coutTheorique! * form.batches) | currency:'EUR':'symbol':'1.2-2' }}
+          </span>
+          <span class="text-400 text-xs ml-1">
+            ({{ selectedRecette!.coutTheorique! | currency:'EUR':'symbol':'1.2-2' }} × {{ form.batches }} batch)
+          </span>
+        </div>
+      </div>
+    }
+
+    <p-divider />
+
+    <!-- Référence commande -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="orderId">Référence commande</label>
+      <input
+        pInputText
+        id="orderId"
+        name="orderId"
+        [(ngModel)]="form.orderId"
+        placeholder="N° commande associée..."
+      />
+    </div>
+
+    <!-- Notes -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="notes">Notes</label>
+      <textarea
+        pTextarea
+        id="notes"
+        name="notes"
+        [(ngModel)]="form.notes"
+        [rows]="2"
+        maxlength="1000"
+        placeholder="Instructions, remarques..."
+        class="w-full"
+      ></textarea>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button
+      label="Planifier"
+      icon="pi pi-calendar-plus"
+      severity="secondary"
+      [outlined]="true"
+      [loading]="saving"
+      (onClick)="submit(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

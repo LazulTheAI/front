@@ -1,0 +1,149 @@
+<p-toast />
+
+<p-dialog
+  [header]="dialogTitle"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: dialogWidth }"
+  [draggable]="false"
+>
+
+  <!-- Steps (création uniquement) -->
+  @if (!isEdit) {
+    <p-steps [model]="steps" [activeIndex]="activeStep" styleClass="mb-4" />
+  }
+
+  <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <!-- ======= ÉTAPE 1 / Formulaire edit : Métadonnées ======= -->
+    @if (activeStep === 0 || isEdit) {
+      <!-- Nom -->
+      <div class="flex flex-column gap-2">
+        <label class="font-medium text-900" for="nom">
+          Nom de la recette <span class="text-red-500">*</span>
+        </label>
+        <input
+          pInputText
+          id="nom"
+          name="nom"
+          [(ngModel)]="meta.nom"
+          required
+          maxlength="255"
+          placeholder="Ex: Pain au levain, Sauce tomate..."
+          [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
+        />
+        @if (ngForm.submitted && ngForm.controls['nom']?.invalid) {
+          <small class="text-red-500">Le nom est requis</small>
+        }
+      </div>
+
+      <!-- Quantité produite + Unité -->
+      <div class="grid">
+        <div class="col-6 flex flex-column gap-2">
+          <label class="font-medium text-900" for="qte">
+            Quantité produite / batch <span class="text-red-500">*</span>
+          </label>
+          <p-inputNumber
+            inputId="qte"
+            name="quantiteProduite"
+            [(ngModel)]="meta.quantiteProduite"
+            required
+            [min]="0.0001"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="4"
+            placeholder="Ex: 12"
+            [class.ng-invalid]="ngForm.submitted && ngForm.controls['quantiteProduite']?.invalid"
+          />
+        </div>
+        <div class="col-6 flex flex-column gap-2">
+          <label class="font-medium text-900" for="unite">
+            Unité produite <span class="text-red-500">*</span>
+          </label>
+          <input
+            pInputText
+            id="unite"
+            name="uniteProduite"
+            [(ngModel)]="meta.uniteProduite"
+            required
+            maxlength="20"
+            placeholder="pièce, kg, L..."
+            [class.ng-invalid]="ngForm.submitted && ngForm.controls['uniteProduite']?.invalid"
+          />
+        </div>
+      </div>
+
+      <!-- Durée de fabrication -->
+      <div class="flex flex-column gap-2">
+        <label class="font-medium text-900" for="duree">Durée de fabrication</label>
+        <p-inputNumber
+          inputId="duree"
+          name="dureeFabricationMinutes"
+          [(ngModel)]="meta.dureeFabricationMinutes"
+          [min]="1"
+          [max]="100000"
+          suffix=" min"
+          placeholder="Durée en minutes..."
+        />
+        <small class="text-500">Utilisée pour la planification des runs de production</small>
+      </div>
+
+      <!-- Notes -->
+      <div class="flex flex-column gap-2">
+        <label class="font-medium text-900" for="notes">Notes / Instructions</label>
+        <textarea
+          pTextarea
+          id="notes"
+          name="notes"
+          [(ngModel)]="meta.notes"
+          [rows]="3"
+          maxlength="5000"
+          placeholder="Instructions de fabrication, précautions, conseils..."
+          class="w-full"
+        ></textarea>
+      </div>
+    }
+
+    <!-- ======= ÉTAPE 2 : Ingrédients (création uniquement) ======= -->
+    @if (!isEdit && activeStep === 1) {
+      <p-divider />
+      <app-ingredients-editor
+        [(ingredients)]="ingredients"
+      />
+    }
+
+  </form>
+
+  <ng-template pTemplate="footer">
+
+    <!-- Footer création étape 1 -->
+    @if (!isEdit && activeStep === 0) {
+      <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" />
+      <p-button
+        label="Suivant : Ingrédients"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        (onClick)="goToIngredients(ngForm)"
+      />
+    }
+
+    <!-- Footer création étape 2 -->
+    @if (!isEdit && activeStep === 1) {
+      <p-button label="Retour" icon="pi pi-arrow-left" severity="secondary" [text]="true" (onClick)="activeStep = 0" [disabled]="saving" />
+      <p-button
+        label="Créer la recette"
+        icon="pi pi-check"
+        [loading]="saving"
+        [disabled]="ingredients.length === 0"
+        (onClick)="submit(ngForm)"
+      />
+    }
+
+    <!-- Footer édition -->
+    @if (isEdit) {
+      <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+      <p-button label="Enregistrer" icon="pi pi-check" [loading]="saving" (onClick)="submit(ngForm)" />
+    }
+
+  </ng-template>
+</p-dialog>

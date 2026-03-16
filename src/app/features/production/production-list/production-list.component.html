@@ -1,0 +1,222 @@
+<p-toast />
+<p-confirmDialog />
+
+<!-- Toolbar -->
+<p-toolbar styleClass="mb-3">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <h2 class="m-0 text-900 font-semibold">Production</h2>
+      <p-tag [value]="runs.length + ' run(s)'" severity="secondary" />
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-2">
+      <p-button
+        label="Planifier"
+        icon="pi pi-calendar-plus"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="showPlanifierDialog = true"
+      />
+      <p-button
+        label="Lancer maintenant"
+        icon="pi pi-play"
+        (onClick)="showLancerDialog = true"
+      />
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<!-- Filtres entrepôt — boutons visuels -->
+@if (entrepots.length > 1) {
+  <div class="flex align-items-center gap-2 mb-3 flex-wrap">
+    <span class="text-500 text-sm font-medium mr-1">
+      <i class="pi pi-warehouse mr-1"></i>Entrepôt :
+    </span>
+    <p-button
+      label="Tous"
+      [severity]="filtreEntrepotId === null ? 'primary' : 'secondary'"
+      [outlined]="filtreEntrepotId !== null"
+      size="small"
+      (onClick)="filtreEntrepotId = null; onFiltreChange()"
+    />
+    @for (entrepot of entrepots; track entrepot.id) {
+      <p-button
+        [label]="entrepot.nom!"
+        [severity]="filtreEntrepotId === entrepot.id ? 'primary' : 'secondary'"
+        [outlined]="filtreEntrepotId !== entrepot.id"
+        size="small"
+        (onClick)="filtreEntrepotId = entrepot.id!; onFiltreChange()"
+      />
+    }
+  </div>
+}
+
+<!-- Filtre statut + badge filtres actifs -->
+<div class="flex align-items-center gap-3 mb-4">
+  <p-select
+    [(ngModel)]="filtreStatut"
+    [options]="statutOptions"
+    optionLabel="label"
+    optionValue="value"
+    (onChange)="onFiltreChange()"
+    styleClass="w-12rem"
+  />
+  @if (hasFiltresActifs) {
+    <div class="flex align-items-center gap-2 surface-100 border-round px-3 py-2">
+      <i class="pi pi-filter-fill text-primary text-sm"></i>
+      <span class="text-sm text-900">
+        Filtres actifs
+        @if (filtreEntrepotId) { — <strong>{{ filtreEntrepotLabel }}</strong> }
+        @if (filtreStatut) { — <strong>{{ getStatutLabel(filtreStatut) }}</strong> }
+      </span>
+      <p-button label="Effacer" severity="secondary" [text]="true" size="small" (onClick)="resetFiltres()" />
+    </div>
+  }
+</div>
+
+<!-- Table -->
+<div class="surface-card border-round shadow-1">
+  <p-table
+    [value]="runs"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="15"
+    [rowsPerPageOptions]="[10, 15, 25, 50]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first} à {last} sur {totalRecords}"
+    styleClass="p-datatable-sm p-datatable-hoverable-rows"
+    dataKey="id"
+    [rowHover]="true"
+    (onRowClick)="openDetail($event['data'])"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 80px">#</th>
+        <th pSortableColumn="recetteNom" style="min-width: 200px">
+          Recette <p-sortIcon field="recetteNom" />
+        </th>
+        <th style="width: 120px">Statut</th>
+        <th style="width: 110px" class="text-right">Batches</th>
+        <th style="width: 130px" class="text-right">Unités prod.</th>
+        <th pSortableColumn="createdAt" style="width: 150px">
+          Créé le <p-sortIcon field="createdAt" />
+        </th>
+        <th pSortableColumn="completeAt" style="width: 150px">
+          Terminé le <p-sortIcon field="completeAt" />
+        </th>
+        <th style="width: 130px"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-run>
+      <tr class="cursor-pointer">
+        <td>
+          <span class="text-400 font-mono text-sm">#{{ run.id }}</span>
+        </td>
+        <td>
+          <div class="flex align-items-center gap-2">
+            @if (run.stockInsuffisant) {
+              <i class="pi pi-exclamation-triangle text-orange-500 text-sm"
+                 pTooltip="Stock insuffisant lors du run"></i>
+            }
+            <span class="font-medium text-900">{{ run.recetteNom }}</span>
+          </div>
+          @if (run.notes) {
+            <div class="text-400 text-xs mt-1 white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                 style="max-width: 200px" [pTooltip]="run.notes">
+              {{ run.notes }}
+            </div>
+          }
+        </td>
+        <td>
+          <p-tag [value]="getStatutLabel(run.statut)" [severity]="getStatutSeverity(run.statut)" />
+        </td>
+        <td class="text-right">
+          <span class="font-mono text-sm">{{ run.batchsProduits | number:'1.0-2' }}</span>
+        </td>
+        <td class="text-right">
+          @if (run.unitesProduite != null) {
+            <span class="font-mono text-sm font-semibold text-900">{{ run.unitesProduite | number:'1.0-2' }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+        <td>
+          <span class="text-sm text-500">{{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </td>
+        <td>
+          @if (run.completeAt) {
+            <span class="text-sm text-500">{{ run.completeAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- Actions -->
+        <td>
+          <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
+            <p-button
+              icon="pi pi-eye"
+              severity="secondary"
+              [text]="true" [rounded]="true" size="small"
+              pTooltip="Détail"
+              (onClick)="openDetail(run)"
+            />
+            @if (canExecuter(run)) {
+              <p-button
+                icon="pi pi-play"
+                severity="success"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Exécuter ce run"
+                [loading]="executingRunId === run.id"
+                (onClick)="executerRun(run, $event)"
+              />
+            }
+            @if (canExport(run)) {
+              <p-button
+                icon="pi pi-download"
+                severity="info"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Export CSV traçabilité"
+                [loading]="exportingRunId === run.id"
+                (onClick)="exportCsv(run, $event)"
+              />
+            }
+            @if (canAnnuler(run)) {
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Annuler ce run"
+                (onClick)="openAnnuler(run, $event)"
+              />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center py-6 text-400">
+          <i class="pi pi-cog text-4xl mb-3 block"></i>
+          @if (hasFiltresActifs) {
+            Aucun run pour ces filtres
+            <div class="mt-2">
+              <p-button label="Effacer les filtres" severity="secondary" size="small" (onClick)="resetFiltres()" />
+            </div>
+          } @else {
+            Aucun run de production
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Dialogs -->
+<app-planifier-run-dialog [(visible)]="showPlanifierDialog" (saved)="onRunSaved($event)" />
+<app-lancer-run-dialog [(visible)]="showLancerDialog" (saved)="onRunSaved($event)" />
+<app-annuler-run-dialog [(visible)]="showAnnulerDialog" [run]="selectedRun" (saved)="onRunAnnule($event)" />
+<app-run-detail-dialog [(visible)]="showDetailDialog" [runId]="selectedRun?.id ?? null" />

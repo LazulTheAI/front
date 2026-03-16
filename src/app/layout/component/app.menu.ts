@@ -45,7 +45,10 @@ export class AppMenu {
                     { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/uikit/charts'] },
                     { label: 'Timeline', icon: 'pi pi-fw pi-calendar', routerLink: ['/uikit/timeline'] },
                     { label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] },
-                    { label: 'Matériaux', icon: 'pi pi-list', routerLink: ['materiaux'] }                
+                    { label: 'Matériaux', icon: 'pi pi-list', routerLink: ['materiaux'] },
+                    { label: 'Recettes', icon: 'pi pi-list', routerLink: ['recettes'] },
+                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] }
+                
                 ]
             },
             {

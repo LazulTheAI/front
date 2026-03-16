@@ -1,0 +1,237 @@
+<p-toast />
+
+<p-dialog
+  [header]="recette?.nom ?? 'Détail recette'"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '780px' }"
+  [draggable]="false"
+>
+
+  @if (loading) {
+    <div class="flex justify-content-center py-6">
+      <i class="pi pi-spinner pi-spin text-3xl text-400"></i>
+    </div>
+  }
+
+  @if (!loading && recette) {
+
+    <!-- En-tête récapitulatif -->
+    <div class="grid mb-3">
+      <div class="col-6 md:col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">PRODUCTION</div>
+          <div class="font-bold text-900">{{ recette.quantiteProduite | number:'1.0-2' }}</div>
+          <div class="text-500 text-xs">{{ recette.uniteProduite }} / batch</div>
+        </div>
+      </div>
+      <div class="col-6 md:col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">DURÉE</div>
+          <div class="font-bold text-900">{{ getDureeFabricationLabel() }}</div>
+          <div class="text-500 text-xs">de fabrication</div>
+        </div>
+      </div>
+      <div class="col-6 md:col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">COÛT THÉORIQUE</div>
+          <div class="font-bold text-primary">
+            {{ recette.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
+          </div>
+          <div class="text-500 text-xs">/ batch</div>
+        </div>
+      </div>
+      <div class="col-6 md:col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">INGRÉDIENTS</div>
+          <div class="font-bold text-900">{{ recette.ingredients?.length ?? 0 }}</div>
+          <div class="text-500 text-xs">référencé(s)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <p-tabs>
+
+      <!-- Onglet Ingrédients -->
+      <p-tabpanel>
+        <ng-template pTemplate="header">
+          <span>
+            Ingrédients
+            @if (recette.ingredients | ingredientsEnAlerte; as alertes) {
+              @if (alertes.length > 0) {
+                <p-tag value="!" severity="danger" styleClass="ml-2 text-xs" />
+              }
+            }
+          </span>
+        </ng-template>
+
+        <!-- Toolbar ingrédients -->
+        <div class="flex justify-content-between align-items-center mb-3">
+          <span class="text-500 text-sm">{{ recette.ingredients?.length ?? 0 }} ingrédient(s)</span>
+          @if (!recette.archive) {
+            @if (!editingIngredients) {
+              <p-button
+                label="Modifier les ingrédients"
+                icon="pi pi-pencil"
+                severity="secondary"
+                size="small"
+                (onClick)="startEditIngredients()"
+              />
+            }
+          }
+        </div>
+
+        <!-- Vue lecture -->
+        @if (!editingIngredients) {
+          <p-table [value]="recette.ingredients ?? []" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Matériau</th>
+                <th style="width: 130px" class="text-right">Quantité</th>
+                <th>Stock (par entrepôt)</th>
+                <th style="width: 120px" class="text-right">Coût ligne</th>
+                <th style="width: 80px" class="text-right">% coût</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ing>
+              <tr>
+                <td>
+                  <div class="flex align-items-center gap-2">
+                    @if (ing.enAlerte) {
+                      <i class="pi pi-exclamation-circle text-red-500 text-sm" pTooltip="Stock insuffisant"></i>
+                    }
+                    <span class="font-medium text-900">{{ ing.materiauNom }}</span>
+                  </div>
+                </td>
+                <td class="text-right">
+                  <span class="font-mono text-sm">{{ ing.quantite | number:'1.0-4' }}</span>
+                  <span class="text-400 text-xs ml-1">{{ ing.unite }}</span>
+                </td>
+                <td>
+                  <div class="flex flex-wrap gap-1">
+                    @for (stock of ing.stocks; track stock.entrepotId) {
+                      <span
+                        class="border-round surface-100 px-2 py-1 text-xs font-mono"
+                        [pTooltip]="stock.entrepotNom"
+                      >
+                        {{ stock.stockActuel | number:'1.0-2' }} {{ ing.materiauUnite }}
+                      </span>
+                    }
+                  </div>
+                </td>
+                <td class="text-right">
+                  @if (ing.coutLigne != null) {
+                    <span class="font-mono text-sm">{{ ing.coutLigne | currency:'EUR':'symbol':'1.2-4' }}</span>
+                  } @else {
+                    <span class="text-400">—</span>
+                  }
+                </td>
+                <td class="text-right">
+                  @if (getTotalCout() > 0) {
+                    <span class="text-xs text-500">{{ getPctCout(ing) | number:'1.0-1' }}%</span>
+                  } @else {
+                    <span class="text-400">—</span>
+                  }
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+              <tr>
+                <td colspan="3" class="text-right font-medium text-500">Total coût théorique</td>
+                <td class="text-right font-bold text-900">
+                  {{ recette.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
+                </td>
+                <td></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        }
+
+        <!-- Vue édition -->
+        @if (editingIngredients) {
+          <app-ingredients-editor [(ingredients)]="editIngredients" />
+
+          <div class="flex justify-content-end gap-2 mt-4">
+            <p-button
+              label="Annuler"
+              severity="secondary"
+              [text]="true"
+              (onClick)="cancelEditIngredients()"
+              [disabled]="savingIngredients"
+            />
+            <p-button
+              label="Enregistrer les ingrédients"
+              icon="pi pi-check"
+              severity="success"
+              [loading]="savingIngredients"
+              [disabled]="editIngredients.length === 0"
+              (onClick)="saveIngredients()"
+            />
+          </div>
+        }
+      </p-tabpanel>
+
+      <!-- Onglet Notes -->
+      <p-tabpanel header="Notes">
+        @if (recette.notes) {
+          <div class="surface-50 border-round p-4 text-900 line-height-3 white-space-pre-line">{{ recette.notes }}</div>
+        } @else {
+          <div class="text-center py-5 text-400">
+            <i class="pi pi-file text-3xl mb-2 block"></i>
+            Aucune note pour cette recette
+          </div>
+        }
+      </p-tabpanel>
+
+      <!-- Onglet Infos -->
+      <p-tabpanel header="Informations">
+        <div class="flex flex-column gap-3">
+          <div class="flex justify-content-between py-2 border-bottom-1 surface-border">
+            <span class="text-500">Créée le</span>
+            <span class="text-900 font-medium">{{ recette.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="flex justify-content-between py-2 border-bottom-1 surface-border">
+            <span class="text-500">Modifiée le</span>
+            <span class="text-900 font-medium">{{ recette.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="flex justify-content-between py-2 border-bottom-1 surface-border">
+            <span class="text-500">ID</span>
+            <span class="text-900 font-mono">{{ recette.id }}</span>
+          </div>
+          <div class="flex justify-content-between py-2">
+            <span class="text-500">Statut</span>
+            @if (recette.archive) {
+              <p-tag value="Archivée" severity="secondary" />
+            } @else {
+              <p-tag value="Active" severity="success" />
+            }
+          </div>
+        </div>
+      </p-tabpanel>
+
+    </p-tabs>
+
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between w-full">
+      <p-button
+        label="Simuler le coût"
+        icon="pi pi-calculator"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="!recette || recette.archive"
+        (onClick)="showSimulation = true"
+      />
+      <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Simulation -->
+<app-simulation-dialog
+  [(visible)]="showSimulation"
+  [recette]="recette"
+/>

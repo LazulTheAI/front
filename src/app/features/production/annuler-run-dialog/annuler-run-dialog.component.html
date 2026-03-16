@@ -1,0 +1,56 @@
+<p-dialog
+  header="Annuler le run"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '440px' }"
+  [draggable]="false"
+>
+  <div class="flex flex-column gap-4 pt-2">
+
+    <!-- Info run -->
+    <div class="surface-100 border-round p-3 flex align-items-center gap-3">
+      <i class="pi pi-cog text-orange-500 text-2xl"></i>
+      <div>
+        <div class="font-semibold text-900">Run #{{ run?.id }} — {{ run?.recetteNom }}</div>
+        <div class="text-500 text-sm">
+          {{ run?.batchsProduits | number:'1.0-2' }} batch(es) · Statut : {{ run?.statut }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Avertissement -->
+    <div class="flex align-items-start gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200">
+      <i class="pi pi-exclamation-triangle text-orange-500 mt-1"></i>
+      <span class="text-sm text-orange-800">
+        L'annulation est irréversible. Le stock ne sera pas restitué automatiquement.
+      </span>
+    </div>
+
+    <!-- Raison -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="raison">Raison de l'annulation</label>
+      <textarea
+        pTextarea
+        id="raison"
+        [(ngModel)]="raison"
+        [rows]="3"
+        maxlength="500"
+        placeholder="Expliquez pourquoi ce run est annulé..."
+        class="w-full"
+      ></textarea>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Retour" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button
+      label="Confirmer l'annulation"
+      icon="pi pi-times"
+      severity="danger"
+      [loading]="saving"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>

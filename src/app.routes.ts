@@ -27,6 +27,8 @@ export const appRoutes: Routes = [
             },
             { path: 'dashboard', component: Dashboard },
             { path: 'materiaux', loadChildren: () => import('./app/features/materiaux/materiaux.routes').then(m => m.MATERIAUX_ROUTES) },
+            { path: 'recettes', loadChildren: () => import('./app/features/recettes/recettes.routes').then(r => r.RECETTES_ROUTES) },
+            { path: 'production', loadChildren: () => import('./app/features/production/production.routes').then(m => m.PRODUCTION_ROUTES) },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
             { path: 'documentation', component: Documentation },

@@ -19,7 +19,6 @@ import { AjustementDialogComponent } from '../ajustement-dialog/ajustement-dialo
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
 import { HistoriqueDialogComponent } from '../historique-dialog/historique-dialog.component';
 import { MateriauFormComponent } from '../materiau-form/materiau-form.component';
-import { AlertMateriauxPipe } from '../materiau.pipes';
 
 @Component({
   selector: 'app-materiaux-list',
@@ -39,8 +38,7 @@ import { AlertMateriauxPipe } from '../materiau.pipes';
     MateriauFormComponent,
     EntreeStockDialogComponent,
     AjustementDialogComponent,
-    HistoriqueDialogComponent,
-    AlertMateriauxPipe
+    HistoriqueDialogComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './materiaux-list.component.html',

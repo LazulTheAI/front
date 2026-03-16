@@ -1,0 +1,135 @@
+<p-dialog
+  [header]="'Run #' + (run?.id ?? runId) + ' — ' + (run?.recetteNom ?? '')"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '680px' }"
+  [draggable]="false"
+>
+
+  @if (loading) {
+    <div class="flex justify-content-center py-6">
+      <i class="pi pi-spinner pi-spin text-3xl text-400"></i>
+    </div>
+  }
+
+  @if (!loading && run) {
+
+    <!-- Statut + dates -->
+    <div class="flex align-items-center justify-content-between mb-4">
+      <p-tag
+        [value]="getStatutLabel(run.statut ?? '')"
+        [severity]="getStatutSeverity(run.statut ?? '')"
+        styleClass="text-sm px-3 py-1"
+      />
+      <div class="flex gap-4 text-sm text-500">
+        <span><i class="pi pi-calendar mr-1"></i>Créé : {{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        @if (run.completeAt) {
+          <span><i class="pi pi-check mr-1"></i>Terminé : {{ run.completeAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid mb-4">
+      <div class="col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">BATCHES</div>
+          <div class="font-bold text-900">{{ run.batchsProduits | number:'1.0-2' }}</div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">UNITÉS</div>
+          <div class="font-bold text-green-600">
+            {{ run.unitesProduite != null ? (run.unitesProduite | number:'1.0-2') : '—' }}
+          </div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">STOCK</div>
+          @if (run.stockInsuffisant) {
+            <div class="font-bold text-orange-500">Insuffisant</div>
+          } @else {
+            <div class="font-bold text-green-600">OK</div>
+          }
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="surface-50 border-round p-3 text-center">
+          <div class="text-400 text-xs font-medium mb-1">RECETTE ID</div>
+          <div class="font-bold font-mono text-900">#{{ run.recetteId }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    @if (run.notes) {
+      <div class="surface-50 border-round p-3 mb-4 flex gap-2">
+        <i class="pi pi-comment text-400 mt-1"></i>
+        <span class="text-900 text-sm line-height-3">{{ run.notes }}</span>
+      </div>
+    }
+
+    <!-- Manques de stock -->
+    @if (run.manques && run.manques.length > 0) {
+      <p-divider align="left">
+        <span class="text-orange-500 text-sm font-medium">
+          <i class="pi pi-exclamation-triangle mr-1"></i>
+          Manques de stock détectés
+        </span>
+      </p-divider>
+      <p-table [value]="run.manques" styleClass="p-datatable-sm mb-4">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Matériau</th>
+            <th class="text-right" style="width: 110px">Besoin</th>
+            <th class="text-right" style="width: 110px">Disponible</th>
+            <th class="text-right" style="width: 110px">Manque</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-m>
+          <tr>
+            <td><span class="font-medium text-900">{{ m.materiauNom }}</span></td>
+            <td class="text-right">
+              <span class="font-mono text-sm">{{ m.besoin | number:'1.0-3' }}</span>
+              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+            </td>
+            <td class="text-right">
+              <span class="font-mono text-sm" [class.text-red-600]="m.disponible === 0">
+                {{ m.disponible | number:'1.0-3' }}
+              </span>
+              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+            </td>
+            <td class="text-right">
+              <span class="font-mono text-sm text-red-600 font-semibold">
+                -{{ m.manque | number:'1.0-3' }}
+              </span>
+              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between w-full">
+      @if (run?.statut === 'TERMINE') {
+        <p-button
+          label="Export CSV traçabilité"
+          icon="pi pi-download"
+          severity="secondary"
+          [outlined]="true"
+          [loading]="exportingCsv"
+          (onClick)="exportCsv()"
+        />
+      } @else {
+        <span></span>
+      }
+      <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
+    </div>
+  </ng-template>
+</p-dialog>

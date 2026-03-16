@@ -1,0 +1,154 @@
+<p-toast />
+
+<p-dialog
+  [header]="'Simulation de coût — ' + (recette?.nom ?? '')"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '620px' }"
+  [draggable]="false"
+>
+
+  <!-- Paramètres de simulation -->
+  <div class="surface-50 border-round p-4 mb-4">
+    <div class="grid align-items-end">
+      <div class="col-12 md:col-5 flex flex-column gap-2">
+        <label class="font-medium text-900 text-sm" for="batches">Nombre de batches</label>
+        <p-inputNumber
+          inputId="batches"
+          [(ngModel)]="batches"
+          [min]="0.0001"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+          placeholder="1"
+        />
+        @if (recette?.quantiteProduite && recette?.uniteProduite) {
+          <small class="text-500">
+            = {{ (batches * recette!.quantiteProduite!) | number:'1.0-2' }} {{ recette!.uniteProduite }} produit(es)
+          </small>
+        }
+      </div>
+      <div class="col-12 md:col-5 flex flex-column gap-2">
+        <label class="font-medium text-900 text-sm" for="entrepot">Entrepôt</label>
+       <p-select
+          inputId="entrepot"
+          [(ngModel)]="entrepotId"
+          [options]="entrepotOptions"
+          placeholder="Sélectionner..."
+        />  
+      </div>
+      <div class="col-12 md:col-2">
+        <p-button
+          label="Simuler"
+          icon="pi pi-calculator"
+          [disabled]="!canSimulate"
+          [loading]="loading"
+          (onClick)="simuler()"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Résultats -->
+  @if (loading) {
+    <div class="flex justify-content-center py-5">
+      <p-progressSpinner strokeWidth="4" />
+    </div>
+  }
+
+  @if (simulation && !loading) {
+
+    <!-- KPIs -->
+    <div class="grid mb-4">
+      <div class="col-4">
+        <div class="surface-card border-round p-3 text-center border-1 surface-border">
+          <div class="text-500 text-xs font-medium mb-1">COÛT TOTAL</div>
+          <div class="text-2xl font-bold text-900">
+            {{ simulation.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
+          </div>
+          <div class="text-400 text-xs">{{ simulation.batches }} batch(es)</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="surface-card border-round p-3 text-center border-1 surface-border">
+          <div class="text-500 text-xs font-medium mb-1">COÛT / UNITÉ</div>
+          <div class="text-2xl font-bold text-primary">
+            {{ coutParUnite | currency:'EUR':'symbol':'1.2-4' }}
+          </div>
+          <div class="text-400 text-xs">par {{ recette?.uniteProduite }}</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div
+          class="border-round p-3 text-center border-1"
+          [class.surface-card]="!hasManques"
+          [class.bg-red-50]="hasManques"
+          [class.border-red-200]="hasManques"
+          [class.surface-border]="!hasManques"
+        >
+          <div class="text-500 text-xs font-medium mb-1">STOCK</div>
+          @if (hasManques) {
+            <div class="text-xl font-bold text-red-600">Insuffisant</div>
+            <div class="text-red-400 text-xs">{{ simulation.manques?.length }} manque(s)</div>
+          } @else {
+            <div class="text-xl font-bold text-green-600">Disponible</div>
+            <div class="text-400 text-xs">Stock OK</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Manques de stock -->
+    @if (hasManques) {
+      <p-divider align="left">
+        <span class="text-red-500 text-sm font-medium">
+          <i class="pi pi-exclamation-triangle mr-1"></i>
+          Manques de stock
+        </span>
+      </p-divider>
+      <p-table [value]="simulation.manques ?? []" styleClass="p-datatable-sm mb-4">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Matériau</th>
+            <th class="text-right" style="width: 110px">Besoin</th>
+            <th class="text-right" style="width: 110px">Disponible</th>
+            <th class="text-right" style="width: 110px">Manque</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-m>
+          <tr>
+            <td>
+              <span class="font-medium text-900">{{ m.materiauNom }}</span>
+            </td>
+            <td class="text-right">
+              <span class="text-sm font-mono">{{ m.besoin | number:'1.0-3' }}</span>
+              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+            </td>
+            <td class="text-right">
+              <span
+                class="text-sm font-mono"
+                [class.text-red-600]="m.disponible === 0"
+                [class.text-orange-500]="m.disponible > 0 && m.disponible < m.besoin"
+              >
+                {{ m.disponible | number:'1.0-3' }}
+              </span>
+              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+            </td>
+            <td class="text-right">
+              <span class="text-sm font-mono text-red-600 font-semibold">
+                -{{ m.manque | number:'1.0-3' }}
+              </span>
+              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
+  </ng-template>
+</p-dialog>
