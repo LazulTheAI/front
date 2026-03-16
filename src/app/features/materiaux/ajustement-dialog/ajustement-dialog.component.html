@@ -1,0 +1,108 @@
+<p-dialog
+  [header]="'Ajustement de stock — ' + (materiau?.nom ?? '')"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '460px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" (ngSubmit)="submit(ngForm)" class="flex flex-column gap-4 pt-2">
+
+    <!-- Info matériau -->
+    <div class="surface-100 border-round p-3 flex align-items-center gap-3">
+      <i class="pi pi-sliders-h text-orange-500 text-2xl"></i>
+      <div>
+        <div class="font-semibold text-900">{{ materiau?.nom }}</div>
+        <div class="text-500 text-sm">
+          Stock total actuel :
+          <strong class="text-900">
+            {{ (materiau?.stocks | stockTotal) | number:'1.0-2' }} {{ materiau?.unite }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Direction -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">Direction de l'ajustement <span class="text-red-500">*</span></label>
+      <p-selectButton
+        name="direction"
+        [(ngModel)]="form.direction"
+        required
+        [options]="directionOptions"
+        optionLabel="label"
+        optionValue="value"
+      />
+    </div>
+
+    <!-- Entrepôt -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="entrepot">Entrepôt concerné <span class="text-red-500">*</span></label>
+      <p-select
+        inputId="entrepot"
+        name="entrepotId"
+        [(ngModel)]="form.entrepotId"
+        required
+        [options]="entrepotOptions"
+        placeholder="Sélectionner un entrepôt..."
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['entrepotId']?.invalid"
+      />
+      @if (selectedEntrepotStock !== null) {
+        <small class="text-500">
+          Stock actuel dans cet entrepôt :
+          <strong>{{ selectedEntrepotStock | number:'1.0-2' }} {{ materiau?.unite }}</strong>
+        </small>
+      }
+    </div>
+
+    <!-- Quantité -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="quantite">
+        Quantité à {{ form.direction === 'positif' ? 'ajouter' : 'retirer' }}
+        <span class="text-red-500">*</span>
+      </label>
+      <p-inputNumber
+        inputId="quantite"
+        name="quantite"
+        [(ngModel)]="form.quantite"
+        required
+        [min]="0.0001"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="4"
+        [suffix]="' ' + (materiau?.unite ?? '')"
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['quantite']?.invalid"
+      />
+    </div>
+
+    <!-- Raison -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="raison">Raison de l'ajustement</label>
+      <input
+        pInputText
+        id="raison"
+        name="raison"
+        [(ngModel)]="form.raison"
+        maxlength="500"
+        placeholder="Inventaire physique, perte, correction..."
+      />
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Annuler"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onHide()"
+      [disabled]="saving"
+    />
+    <p-button
+      [label]="form.direction === 'positif' ? 'Enregistrer l\'ajout' : 'Enregistrer le retrait'"
+      [icon]="form.direction === 'positif' ? 'pi pi-plus' : 'pi pi-minus'"
+      [severity]="form.direction === 'positif' ? 'success' : 'warn'"
+      [loading]="saving"
+      (onClick)="submit(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

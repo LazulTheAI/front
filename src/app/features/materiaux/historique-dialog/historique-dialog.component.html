@@ -1,0 +1,164 @@
+<p-dialog
+  [header]="'Historique — ' + (materiau?.nom ?? '')"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '800px' }"
+  [draggable]="false"
+>
+
+  <!-- Filtres -->
+  <div class="flex align-items-center gap-3 mb-4 flex-wrap">
+    <div class="flex align-items-center gap-2">
+      <label class="text-sm text-500 white-space-nowrap">Du</label>
+      <p-datepicker
+        [(ngModel)]="filtreDepuis"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        placeholder="Depuis..."
+        (onSelect)="loadHistorique()"
+        (onClearClick)="loadHistorique()"
+        [showButtonBar]="true"
+        styleClass="w-10rem"
+      />
+    </div>
+    <div class="flex align-items-center gap-2">
+      <label class="text-sm text-500 white-space-nowrap">Au</label>
+      <p-datepicker
+        [(ngModel)]="filtreJusqu"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        placeholder="Jusqu'à..."
+        (onSelect)="loadHistorique()"
+        (onClearClick)="loadHistorique()"
+        [showButtonBar]="true"
+        styleClass="w-10rem"
+      />
+    </div>
+    <p-select
+      [(ngModel)]="filtreEntrepotId"
+      [options]="entrepotOptions"
+      placeholder="Tous les entrepôts"
+      (onChange)="loadHistorique()"
+      styleClass="w-12rem"
+    />
+    <p-button
+      icon="pi pi-refresh"
+      severity="secondary"
+      [text]="true"
+      pTooltip="Rafraîchir"
+      (onClick)="loadHistorique()"
+    />
+  </div>
+
+  <!-- Tableau mouvements -->
+  <p-table
+    [value]="mouvements"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords} mouvements"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 160px">Date</th>
+        <th style="width: 130px">Type</th>
+        <th style="width: 110px" class="text-right">Quantité</th>
+        <th style="width: 110px" class="text-right">Restant</th>
+        <th style="width: 100px" class="text-right">Coût unit.</th>
+        <th>Référence</th>
+        <th style="width: 90px">Lot</th>
+        <th style="width: 100px">Expiration</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-m>
+      <tr>
+        <td>
+          <span class="text-sm text-900">{{ m.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </td>
+        <td>
+          <p-tag
+            [value]="getTypeLabel(m.typeMouvement)"
+            [severity]="getTypeSeverity(m.typeMouvement)"
+          />
+        </td>
+        <td class="text-right">
+          <span
+            class="font-semibold font-mono text-sm"
+            [class.text-green-600]="!m.typeMouvement?.includes('SORTIE') && !m.typeMouvement?.includes('NEGATIF')"
+            [class.text-red-600]="m.typeMouvement?.includes('SORTIE') || m.typeMouvement?.includes('NEGATIF')"
+          >
+            {{ getQuantiteDisplay(m) }}
+          </span>
+          <span class="text-400 text-xs ml-1">{{ materiau?.unite }}</span>
+        </td>
+        <td class="text-right">
+          <span class="text-sm font-mono">{{ m.quantiteRestante | number:'1.0-2' }}</span>
+          <span class="text-400 text-xs ml-1">{{ materiau?.unite }}</span>
+        </td>
+        <td class="text-right">
+          @if (m.coutUnitaireSnapshot != null) {
+            <span class="text-sm font-mono">{{ m.coutUnitaireSnapshot | currency:'EUR':'symbol':'1.4-4' }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+        <td>
+          @if (m.referenceId) {
+            <span class="text-sm text-500" [pTooltip]="m.referenceType ?? ''">{{ m.referenceId }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+        <td>
+          @if (m.numeroLot) {
+            <span class="text-sm font-mono text-primary">{{ m.numeroLot }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+        <td>
+          @if (m.expiresAt) {
+            <span
+              class="text-sm"
+              [class.text-red-500]="isExpired(m.expiresAt)"
+              [pTooltip]="isExpired(m.expiresAt) ? 'Expiré' : ''"
+            >
+              {{ m.expiresAt | date:'dd/MM/yy' }}
+            </span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center py-5 text-400">
+          <i class="pi pi-history text-3xl mb-2 block"></i>
+          Aucun mouvement trouvé
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="summary">
+      <div class="flex justify-content-end">
+        <span class="text-500 text-sm">{{ mouvements.length }} mouvement(s)</span>
+      </div>
+    </ng-template>
+  </p-table>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Fermer"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onHide()"
+    />
+  </ng-template>
+</p-dialog>

@@ -1,16 +1,16 @@
+import { AuthApiService } from '@/app/auth/services/api/auth.service';
+import { AppFloatingConfigurator } from '@/app/layout/component/app.floatingconfigurator';
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { CommonModule } from '@angular/common';
-import { AuthApiService } from '@/app/auth/services/api/auth.service';
-import { AppFloatingConfigurator } from '@/app/layout/component/app.floatingconfigurator';
 
 @Component({
     selector: 'app-login',
@@ -57,18 +57,11 @@ export class Login {
         this.isLoading = true;
         this.authApi.login({ email: this.email, password: this.password }).subscribe({
             next: (response: any) => {
+                console.log('Login response:', response);  // ← ajoutez ça
+                console.log('Token in storage:', localStorage.getItem('jwt'));  // ← et ça
                 this.isLoading = false;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'Login successful!',
-                    life: 2000
-                });
-                // Redirect to dashboard after short delay
-                setTimeout(() => {
-                    this.router.navigate(['/dashboard']);
-                }, 500);
-            },
+                this.router.navigate(['/dashboard']); // ← direct, sans setTimeout
+            },  
             error: (err: any) => {
                 this.isLoading = false;
                 const errorMsg = err.error?.errors?.[0] || 'Login failed. Please try again.';

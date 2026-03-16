@@ -3,43 +3,45 @@ import { AuthApiService } from '@/app/auth/services/api/auth.service';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { throwError } from 'rxjs';
+import { EMPTY, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authService = inject(AuthApiService);
     const router = inject(Router);
+
+    // Skip pour les endpoints sans auth
+    const skipUrls = [
+        '/auth/login',
+        '/auth/refresh',
+        '/auth/load',
+        '/api/bc/',         // ← BigCommerce OAuth
+        '/api/mobile/auth/login',  // ← login mobile
+    ];
+
+    if (skipUrls.some(url => req.url.includes(url))) {
+        return next(req);
+    }
+
     const token = authService.getToken();
 
-    // Skip interceptor logic for auth endpoints (login, register, refresh)
-    if (req.url.includes('/auth/login') || req.url.includes('/auth/refresh')|| req.url.includes('/auth/load')) {
-        return next(req).pipe(
-            catchError((error) => {
-                return throwError(() => error);
-            })
-        );
-    }
-
-    // If no token and trying to access protected routes, redirect to login
     if (!token) {
+        // Ne pas throw, juste laisser passer — le backend renverra 401
+        // et l'utilisateur sera redirigé proprement
         router.navigate(['/auth/login']);
-        return throwError(() => new Error('No authentication token found'));
+        return EMPTY;  // ← import { EMPTY } from 'rxjs'
     }
 
-    // Clone request and add Authorization header with Bearer token
     req = req.clone({
-        setHeaders: {
-            Authorization: `Bearer ${token}`
-        }
+        setHeaders: { Authorization: `Bearer ${token}` }
     });
 
     return next(req).pipe(
         catchError((error) => {
-            // If 401 Unauthorized, clear localStorage and redirect to login
             if (error.status === 401) {
                 authService.logout();
                 router.navigate(['/auth/login']);
-                return throwError(() => new Error('Session expired. Please login again.'));
+                return EMPTY;  // ← au lieu de throwError
             }
             return throwError(() => error);
         })

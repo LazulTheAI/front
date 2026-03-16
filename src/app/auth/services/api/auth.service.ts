@@ -22,8 +22,9 @@ export interface RefreshRequest {
 }
 
 export interface AuthResponse {
-  token: string;
-  refreshToken: string;
+  accessToken: string;  
+  tokenType: string;
+  expiresInSeconds: number;
 }
 
 @Injectable({
@@ -37,43 +38,41 @@ export class AuthApiService {
   constructor(private http: HttpClient) {}
 
   login(request: LoginRequest): Observable<AuthResponse> {
-
-    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, request).pipe(
+    return this.http.post<AuthResponse>(`${this.baseUrl}/api/mobile/auth/login`, request).pipe(
       tap((response) => {
-        if (response.token && response.refreshToken) {
-          this.saveTokens(response.token, response.refreshToken);
+        if (response.accessToken) {          // ← était response.token
+          localStorage.setItem('jwt', response.accessToken);  // ← direct, pas de refreshToken
         }
       })
     );
   }
 
-
-  refresh(request: RefreshRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/auth/refresh`, request).pipe(
+  refresh(): Observable<AuthResponse> {
+    const token = this.getToken();
+    return this.http.post<AuthResponse>(
+      `${this.baseUrl}/api/mobile/auth/refresh`,  // ← URL corrigée
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).pipe(
       tap((response) => {
-        if (response.token && response.refreshToken) {
-          this.saveTokens(response.token, response.refreshToken);
+        if (response.accessToken) {              // ← était response.token
+          localStorage.setItem('jwt', response.accessToken);
         }
       })
     );
   }
 
   private saveTokens(token: string, refreshToken: string): void {
-    localStorage.setItem('auth_token', token);
+    localStorage.setItem('jwt', token);
     localStorage.setItem('refresh_token', refreshToken);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('auth_token');
-  }
-
-  getRefreshToken(): string | null {
-    return localStorage.getItem('refresh_token');
+    return localStorage.getItem('jwt');
   }
 
   logout(): void {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('jwt');
   }
 
   isAuthenticated(): boolean {

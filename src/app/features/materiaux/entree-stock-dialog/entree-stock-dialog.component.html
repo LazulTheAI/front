@@ -1,0 +1,144 @@
+<p-dialog
+  [header]="'Entrée de stock — ' + (materiau?.nom ?? '')"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '520px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" (ngSubmit)="submit(ngForm)" class="flex flex-column gap-4 pt-2">
+
+    <!-- Info matériau -->
+    <div class="surface-100 border-round p-3 flex align-items-center gap-3">
+      <i class="pi pi-box text-primary text-2xl"></i>
+      <div>
+        <div class="font-semibold text-900">{{ materiau?.nom }}</div>
+        <div class="text-500 text-sm">Unité : {{ materiau?.unite }}</div>
+      </div>
+    </div>
+
+    <!-- Quantité + Entrepôt (côte à côte) -->
+    <div class="grid">
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="quantite">Quantité <span class="text-red-500">*</span></label>
+        <p-inputNumber
+          inputId="quantite"
+          name="quantite"
+          [(ngModel)]="form.quantite"
+          required
+          [min]="0.0001"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="4"
+          [suffix]="' ' + (materiau?.unite ?? '')"
+          placeholder="0"
+          [class.ng-invalid]="ngForm.submitted && ngForm.controls['quantite']?.invalid"
+        />
+      </div>
+
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="entrepot">Entrepôt <span class="text-red-500">*</span></label>
+        <p-select
+          inputId="entrepot"
+          name="entrepotId"
+          [(ngModel)]="form.entrepotId"
+          required
+          [options]="entrepotOptions"
+          placeholder="Sélectionner..."
+          [class.ng-invalid]="ngForm.submitted && ngForm.controls['entrepotId']?.invalid"
+        />
+      </div>
+    </div>
+
+    <p-divider align="left">
+      <span class="text-500 text-sm font-medium">Informations optionnelles</span>
+    </p-divider>
+
+    <!-- Coût unitaire -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="cout">Coût unitaire à l'achat</label>
+      <p-inputNumber
+        inputId="cout"
+        name="coutUnitaire"
+        [(ngModel)]="form.coutUnitaire"
+        mode="currency"
+        currency="EUR"
+        locale="fr-FR"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="4"
+        [min]="0"
+        placeholder="Laisser vide pour utiliser le coût par défaut"
+      />
+    </div>
+
+    <!-- Référence + Lot -->
+    <div class="grid">
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="ref">Référence</label>
+        <input
+          pInputText
+          id="ref"
+          name="referenceId"
+          [(ngModel)]="form.referenceId"
+          maxlength="255"
+          placeholder="N° bon de livraison..."
+        />
+      </div>
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="lot">N° de lot</label>
+        <input
+          pInputText
+          id="lot"
+          name="numeroLot"
+          [(ngModel)]="form.numeroLot"
+          maxlength="100"
+          placeholder="Lot fournisseur..."
+        />
+      </div>
+    </div>
+
+    <!-- Date expiration -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="expiration">Date d'expiration</label>
+      <p-datepicker
+        inputId="expiration"
+        name="expiresAt"
+        [(ngModel)]="form.expiresAt"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        [minDate]="today"
+        placeholder="JJ/MM/AAAA"
+      />
+    </div>
+
+    <!-- Notes -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="notes">Notes</label>
+      <input
+        pInputText
+        id="notes"
+        name="notes"
+        [(ngModel)]="form.notes"
+        maxlength="1000"
+        placeholder="Remarques..."
+      />
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Annuler"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onHide()"
+      [disabled]="saving"
+    />
+    <p-button
+      label="Enregistrer l'entrée"
+      icon="pi pi-arrow-down"
+      severity="success"
+      [loading]="saving"
+      (onClick)="submit(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

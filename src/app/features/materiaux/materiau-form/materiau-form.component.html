@@ -1,0 +1,101 @@
+<p-toast />
+
+<p-dialog
+  [header]="dialogTitle"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" (ngSubmit)="submit(ngForm)" class="flex flex-column gap-4 pt-2">
+
+    <!-- Nom -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="nom">Nom <span class="text-red-500">*</span></label>
+      <input
+        pInputText
+        id="nom"
+        name="nom"
+        [(ngModel)]="form.nom"
+        required
+        maxlength="255"
+        placeholder="Ex: Farine de blé T55"
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
+      />
+      @if (ngForm.submitted && ngForm.controls['nom']?.invalid) {
+        <small class="text-red-500">Le nom est requis</small>
+      }
+    </div>
+
+    <!-- Unité -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="unite">Unité de mesure <span class="text-red-500">*</span></label>
+      <input
+        pInputText
+        id="unite"
+        name="unite"
+        [(ngModel)]="form.unite"
+        required
+        maxlength="20"
+        placeholder="Ex: kg, L, pièce, g..."
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['unite']?.invalid"
+      />
+      @if (ngForm.submitted && ngForm.controls['unite']?.invalid) {
+        <small class="text-red-500">L'unité est requise</small>
+      }
+    </div>
+
+    <p-divider />
+
+    <!-- Coût unitaire -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="cout">Coût unitaire</label>
+      <p-inputNumber
+        inputId="cout"
+        name="coutUnitaire"
+        [(ngModel)]="form.coutUnitaire"
+        mode="currency"
+        currency="EUR"
+        locale="fr-FR"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="4"
+        [min]="0"
+        placeholder="0,00 €"
+      />
+      <small class="text-500">Coût par unité de mesure (utilisé pour le calcul COGS)</small>
+    </div>
+
+    <!-- Seuil d'alerte -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="seuil">Seuil d'alerte stock</label>
+      <p-inputNumber
+        inputId="seuil"
+        name="seuilAlerte"
+        [(ngModel)]="form.seuilAlerte"
+        [min]="0"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="2"
+        placeholder="Ex: 10"
+      />
+      <small class="text-500">Une alerte est déclenchée si le stock total descend sous ce seuil</small>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Annuler"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onHide()"
+      [disabled]="saving"
+    />
+    <p-button
+      [label]="isEdit ? 'Enregistrer' : 'Créer'"
+      icon="pi pi-check"
+      [loading]="saving"
+      (onClick)="submit(ngForm)"
+    />
+  </ng-template>
+</p-dialog>
