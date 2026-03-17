@@ -64,7 +64,7 @@ export class SimulationDialogComponent implements OnChanges, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
       next: (data: EntrepotResponse[]) => {
         this.entrepots = data.filter((e: EntrepotResponse) => e.actif);
         this.entrepotOptions = this.entrepots.map(e => ({ label: e.nom!, value: e.id! }));
@@ -94,7 +94,7 @@ export class SimulationDialogComponent implements OnChanges, OnInit {
     if (!this.recette?.id || !this.entrepotId) return;
 
     this.loading = true;
-    this.recetteService.simulation(this.recette.id, this.batches, this.entrepotId).subscribe({
+    this.recetteService.simulationRecette(this.recette.id, this.batches, this.entrepotId).subscribe({
       next: (data: SimulationCoutResponse) => {
         this.simulation = data;
         this.loading = false;

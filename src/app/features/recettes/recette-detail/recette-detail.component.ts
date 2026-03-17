@@ -74,7 +74,7 @@ export class RecetteDetailComponent implements OnChanges {
   loadRecette(): void {
     if (!this.recetteId) return;
     this.loading = true;
-    this.recetteService.detail(this.recetteId).subscribe({
+    this.recetteService.detailRecette(this.recetteId).subscribe({
       next: (data: RecetteResponse) => {
         this.recette = data;
         this.loading = false;
@@ -115,7 +115,7 @@ export class RecetteDetailComponent implements OnChanges {
       })),
     };
 
-    this.recetteService.modifierIngredients(this.recette.id, req).subscribe({
+    this.recetteService.modifierIngredientsRecette(this.recette.id, req).subscribe({
       next: (data: RecetteResponse) => {
         this.recette = data;
         this.savingIngredients = false;

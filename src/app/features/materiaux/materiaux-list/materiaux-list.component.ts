@@ -69,7 +69,7 @@ export class MateriauxListComponent implements OnInit {
 
   loadMateriaux(): void {
     this.loading = true;
-    this.materiauService.lister2(this.inclureArchives).subscribe({
+    this.materiauService.listerMateriau(this.inclureArchives).subscribe({
       next: (data: any) => {
         this.materiaux = Array.isArray(data) ? data : data.content ?? data.items ?? [];
         this.loading = false;
@@ -126,7 +126,7 @@ export class MateriauxListComponent implements OnInit {
   }
 
   private archiveMateriau(id: number): void {
-    this.materiauService.archiver1(id).subscribe({
+    this.materiauService.archiverMateriau(id).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Archivé', detail: 'Matériau archivé avec succès' });
         this.loadMateriaux();

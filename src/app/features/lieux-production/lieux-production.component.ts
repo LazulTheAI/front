@@ -1,25 +1,25 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { ToastModule } from 'primeng/toast';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { InputTextModule } from 'primeng/inputtext';
+import { TagModule } from 'primeng/tag';
+import { TextareaModule } from 'primeng/textarea';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
 import {
-  EntrepotControllerService,
-  UtilisateurMarchandControllerService,
-  EntrepotResponse,
-  UtilisateurResponse,
   CreateEntrepotRequest,
+  EntrepotControllerService,
+  EntrepotResponse,
   UpdateEntrepotRequest,
+  UtilisateurMarchandControllerService,
+  UtilisateurResponse,
 } from '@/app/modules/openapi';
 
 interface LieuVm extends EntrepotResponse {
@@ -64,7 +64,7 @@ export class LieuxProductionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.utilisateurService.lister().subscribe({
+    this.utilisateurService.listerUtilisateurMarchand().subscribe({
       next: (data: UtilisateurResponse[]) => {
         this.tousUtilisateurs = data.filter(u => u.actif);
         this.cdr.detectChanges();
@@ -75,7 +75,7 @@ export class LieuxProductionComponent implements OnInit {
 
   loadLieux(): void {
     this.loading = true;
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
       next: (data: EntrepotResponse[]) => {
         // On conserve l'état expanded si déjà ouvert
         const prevExpanded = new Map(this.lieux.map(l => [l.id, l.expanded]));
@@ -117,7 +117,7 @@ export class LieuxProductionComponent implements OnInit {
 
     if (this.editingLieu?.id) {
       const req: UpdateEntrepotRequest = { nom: this.formData.nom, adresse: this.formData.adresse || undefined };
-      this.entrepotService.modifier3(this.editingLieu.id, req).subscribe({
+      this.entrepotService.modifierEntrepot(this.editingLieu.id, req).subscribe({
         next: () => {
           this.savingForm = false;
           this.showFormDialog = false;
@@ -128,7 +128,7 @@ export class LieuxProductionComponent implements OnInit {
       });
     } else {
       const req: CreateEntrepotRequest = { nom: this.formData.nom, adresse: this.formData.adresse || undefined };
-      this.entrepotService.creer4(req).subscribe({
+      this.entrepotService.creerEntrepot(req).subscribe({
         next: () => {
           this.savingForm = false;
           this.showFormDialog = false;
@@ -147,7 +147,7 @@ export class LieuxProductionComponent implements OnInit {
       header: 'Désactiver ce lieu',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.entrepotService.desactiver1(lieu.id!).subscribe({
+        this.entrepotService.desactiverEntrepot(lieu.id!).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Désactivé', detail: lieu.nom });
             this.loadLieux();
@@ -175,8 +175,8 @@ export class LieuxProductionComponent implements OnInit {
 
     const assigne = this.isAssigne(lieu, user);
     const action$ = assigne
-      ? this.entrepotService.desassigner(lieu.id, user.id)
-      : this.entrepotService.assigner(lieu.id, user.id);
+      ? this.entrepotService.desassignerEntrepot(lieu.id, user.id)
+      : this.entrepotService.assignerEntrepot(lieu.id, user.id);
 
     action$.subscribe({
       next: () => {

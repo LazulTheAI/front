@@ -142,7 +142,7 @@ export class RecetteFormComponent implements OnChanges {
       notes: this.meta.notes || undefined,
     };
 
-    this.recetteService.modifierMeta(this.recette!.id!, req).subscribe({
+    this.recetteService.modifierMetaRecette(this.recette!.id!, req).subscribe({
       next: () => this.handleSuccess('Recette modifiée avec succès'),
       error: () => this.handleError(),
     });
@@ -168,7 +168,7 @@ export class RecetteFormComponent implements OnChanges {
       })),
     };
 
-    this.recetteService.creer1(req).subscribe({
+    this.recetteService.creerRecette(req).subscribe({
       next: () => this.handleSuccess('Recette créée avec succès'),
       error: () => this.handleError(),
     });

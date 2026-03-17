@@ -56,14 +56,14 @@ export class HistoriqueDialogComponent implements OnChanges {
   }
  
   loadEntrepots(): void {
-    this.entrepotService.lister4().subscribe({ next: (d: EntrepotResponse[]) => (this.entrepots = d) });
+    this.entrepotService.listerEntrepot().subscribe({ next: (d: EntrepotResponse[]) => (this.entrepots = d) });
   }
  
   loadHistorique(): void {
     if (!this.materiau?.id) return;
     this.loading = true;
     this.materiauService
-      .historique(
+      .historiqueMouvementStock(
         this.materiau.id,
         this.filtreDepuis?.toISOString(),
         this.filtreJusqu?.toISOString(),

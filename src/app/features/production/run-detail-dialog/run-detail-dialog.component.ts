@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
@@ -51,7 +51,7 @@ export class RunDetailDialogComponent implements OnChanges {
   loadRun(): void {
     if (!this.runId) return;
     this.loading = true;
-    this.productionService.detail3(this.runId).subscribe({
+    this.productionService.detailProduction(this.runId).subscribe({
       next: (data: RunProductionResponse) => {
         this.run = data;
         this.loading = false;

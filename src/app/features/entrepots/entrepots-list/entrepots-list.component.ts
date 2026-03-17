@@ -71,7 +71,7 @@ export class EntrepotsListComponent implements OnInit {
   }
 
   loadUtilisateurs(): void {
-    this.utilisateurService.lister().subscribe({
+    this.utilisateurService.listerUtilisateurMarchand().subscribe({
       next: (data: UtilisateurResponse[]) => {
         this.utilisateurs = data;
         this.cdr.detectChanges();
@@ -81,7 +81,7 @@ export class EntrepotsListComponent implements OnInit {
 
   loadEntrepots(): void {
     this.loading = true;
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
       next: (data: EntrepotResponse[]) => {
         this.entrepots = data;
         this.loading = false;
@@ -125,7 +125,7 @@ export class EntrepotsListComponent implements OnInit {
   }
 
   private desactiverEntrepot(id: number): void {
-    this.entrepotService.desactiver1(id).subscribe({
+    this.entrepotService.desactiverEntrepot(id).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Désactivé', detail: 'Entrepôt désactivé' });
         this.loadEntrepots();

@@ -66,7 +66,7 @@ export class RecettesListComponent implements OnInit {
     
   loadRecettes(): void {
     this.loading = true;
-    this.recetteService.lister1(this.inclureArchives).subscribe({
+    this.recetteService.listerRecetteResponse(this.inclureArchives).subscribe({
       next: (data: RecetteResponse[]) => {
         this.recettes = data;
         this.recettesEnAlerte = data.filter(
@@ -109,7 +109,7 @@ export class RecettesListComponent implements OnInit {
   }
 
   private archiveRecette(id: number): void {
-    this.recetteService.archiver(id).subscribe({
+    this.recetteService.archiverRecette(id).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Archivée', detail: 'Recette archivée avec succès' });
         this.loadRecettes();

@@ -1,0 +1,216 @@
+<p-toast />
+<p-confirmDialog />
+
+<!-- Toolbar -->
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <h2 class="m-0 text-900 font-semibold">Bons de commande</h2>
+      <p-tag [value]="bons.length + ' bon(s)'" severity="secondary" />
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-3">
+      <p-select
+        [(ngModel)]="filtreStatut"
+        [options]="statutOptions"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="onFiltreChange()"
+        styleClass="w-14rem"
+      />
+      <p-button label="Nouveau bon" icon="pi pi-plus" (onClick)="openCreate()" />
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<!-- Table -->
+<div class="surface-card border-round shadow-1">
+  <p-table
+    [value]="bons"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="15"
+    [rowsPerPageOptions]="[10, 15, 25]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first} à {last} sur {totalRecords}"
+    styleClass="p-datatable-sm p-datatable-hoverable-rows"
+    dataKey="id"
+    [rowHover]="true"
+    (onRowClick)="openDetail($event['data'])"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 80px">#</th>
+        <th pSortableColumn="fournisseurNom" style="min-width: 180px">
+          Fournisseur <p-sortIcon field="fournisseurNom" />
+        </th>
+        <th style="width: 150px">Statut</th>
+        <th style="width: 120px">Réception</th>
+        <th pSortableColumn="dateCommande" style="width: 130px">
+          Date <p-sortIcon field="dateCommande" />
+        </th>
+        <th style="width: 140px">Livraison prévue</th>
+        <th style="width: 120px" class="text-right">Montant</th>
+        <th style="width: 150px">Référence</th>
+        <th style="width: 120px"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-bon>
+      <tr class="cursor-pointer">
+
+        <td>
+          <span class="text-400 font-mono text-sm">#{{ bon.id }}</span>
+        </td>
+
+        <td>
+          <span class="font-medium text-900">{{ bon.fournisseurNom ?? '—' }}</span>
+        </td>
+
+        <td>
+          <p-tag
+            [value]="getStatutLabel(bon.statut)"
+            [severity]="getStatutSeverity(bon.statut)"
+          />
+        </td>
+
+        <!-- Progression réception -->
+        <td>
+          @if (bon.statut === 'RECU') {
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-check-circle text-green-500 text-sm"></i>
+              <span class="text-green-600 text-sm font-medium">Complet</span>
+            </div>
+          } @else if (bon.statut === 'PARTIELLEMENT_RECU') {
+            <div class="flex align-items-center gap-2">
+              <div class="flex-1" style="min-width: 60px">
+                <div class="bg-200 border-round" style="height: 6px">
+                  <div
+                    class="bg-orange-400 border-round"
+                    style="height: 6px; transition: width 0.3s"
+                    [style.width]="getProgressionReception(bon) + '%'"
+                  ></div>
+                </div>
+              </div>
+              <span class="text-orange-500 text-xs font-mono">{{ getProgressionReception(bon) }}%</span>
+            </div>
+          } @else if (bon.statut === 'ENVOYE') {
+            <span class="text-400 text-sm">En attente</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <td>
+          <span class="text-sm text-500">{{ bon.dateCommande | date:'dd/MM/yyyy' }}</span>
+        </td>
+
+        <td>
+          @if (bon.dateLivraisonPrevue) {
+            <span
+              class="text-sm"
+              [class.text-red-500]="isEnRetard(bon)"
+              [class.text-500]="!isEnRetard(bon)"
+            >
+              @if (isEnRetard(bon)) {
+                <i class="pi pi-exclamation-triangle mr-1 text-xs"></i>
+              }
+              {{ bon.dateLivraisonPrevue | date:'dd/MM/yyyy' }}
+            </span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <td class="text-right">
+          @if (getTotalBC(bon) > 0) {
+            <span class="font-semibold text-900 font-mono text-sm">
+              {{ getTotalBC(bon) | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <td>
+          @if (bon.numeroReference) {
+            <span class="text-sm font-mono text-500">{{ bon.numeroReference }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- Actions -->
+        <td>
+          <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
+            <p-button
+              icon="pi pi-eye"
+              severity="secondary"
+              [text]="true" [rounded]="true" size="small"
+              pTooltip="Voir le détail"
+              (onClick)="openDetail(bon, $event)"
+            />
+            @if (canEnvoyer(bon)) {
+              <p-button
+                icon="pi pi-send"
+                severity="info"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Marquer comme envoyé"
+                (onClick)="envoyerBon(bon, $event)"
+              />
+            }
+            @if (canReceptionner(bon)) {
+              <p-button
+                icon="pi pi-arrow-down"
+                severity="success"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Réceptionner"
+                (onClick)="openDetail(bon, $event)"
+              />
+            }
+            @if (canAnnuler(bon)) {
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Annuler"
+                (onClick)="confirmAnnuler(bon, $event)"
+              />
+            }
+            @if (canSupprimer(bon)) {
+              <p-button
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Supprimer le brouillon"
+                (onClick)="confirmSupprimer(bon, $event)"
+              />
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" class="text-center py-6 text-400">
+          <i class="pi pi-shopping-cart text-4xl mb-3 block"></i>
+          Aucun bon de commande
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Dialogs -->
+<app-bon-commande-form
+  [(visible)]="showFormDialog"
+  (saved)="onFormSaved($event)"
+/>
+
+<app-bon-commande-detail
+  [(visible)]="showDetailDialog"
+  [bonId]="selectedBon?.id ?? null"
+  (closed)="onDetailClosed()"
+/>

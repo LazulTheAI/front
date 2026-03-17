@@ -90,7 +90,7 @@ export class ProductionListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
       next: (data: EntrepotResponse[]) => {
         this.entrepots = data.filter(e => e.actif);
         this.entrepotOptions = [
@@ -105,7 +105,7 @@ export class ProductionListComponent implements OnInit {
 
   loadRuns(): void {
     this.loading = true;
-    this.productionService.lister7(
+    this.productionService.listerProductions(
       this.filtreStatut ?? undefined,
       this.filtreEntrepotId ?? undefined
     ).subscribe({
@@ -161,7 +161,7 @@ export class ProductionListComponent implements OnInit {
     this.executingRunId = run.id;
     this.cdr.detectChanges();
 
-    this.productionService.executer(run.id).subscribe({
+    this.productionService.executerRunProduction(run.id).subscribe({
       next: () => {
         this.executingRunId = null;
         this.messageService.add({

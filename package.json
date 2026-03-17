@@ -8,7 +8,8 @@
         "watch": "ng build --watch --configuration development",
         "format": "prettier --write \"**/*.{js,mjs,ts,mts,d.ts,html}\" --cache",
         "test": "ng test",
-        "generate": "openapi-generator-cli generate -i ./openapiSwagger.yml -g typescript-angular -o src/app/modules/openapi --additional-properties fileNaming=kebab-case,withInterfaces=true,responseType=json --generate-alias-as-model"    },
+        "generate": "openapi-generator-cli generate -i ./openapiSwagger.yml -g typescript-angular -o src/app/modules/openapi --additional-properties fileNaming=kebab-case,withInterfaces=true,useTags=true --generate-alias-as-model"
+    },
     "private": true,
     "dependencies": {
         "@angular/common": "^21",

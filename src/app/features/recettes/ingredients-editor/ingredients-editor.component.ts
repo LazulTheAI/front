@@ -47,7 +47,7 @@ export class IngredientsEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingMateriaux = true;
-    this.materiauService.lister2(false).subscribe({
+    this.materiauService.listerMateriau(false).subscribe({
       next: (data: MateriauResponse[]) => {
         this.materiaux = data.filter((m: MateriauResponse) => !m.archive);
         this.loadingMateriaux = false;

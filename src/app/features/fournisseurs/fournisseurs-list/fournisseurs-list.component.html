@@ -1,0 +1,341 @@
+<p-toast />
+<p-confirmDialog />
+
+<!-- Header -->
+<div class="flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="m-0 text-900 font-bold text-2xl">Fournisseurs</h2>
+    <p class="mt-1 mb-0 text-500">
+      {{ fournisseursActifs.length }} fournisseur(s) actif(s)
+    </p>
+  </div>
+  <p-button label="Nouveau fournisseur" icon="pi pi-plus" (onClick)="openCreate()" />
+</div>
+
+<!-- Layout split : liste + panel détail -->
+<div class="flex gap-4 align-items-start">
+
+  <!-- Liste fournisseurs -->
+  <div [class]="showDetailPanel ? 'flex-1' : 'w-full'">
+
+    @if (loading) {
+      <div class="flex justify-content-center py-8">
+        <i class="pi pi-spinner pi-spin text-4xl text-400"></i>
+      </div>
+    }
+
+    @if (!loading && fournisseursActifs.length === 0 && fournisseursArchives.length === 0) {
+      <div class="surface-card border-round-xl p-8 text-center">
+        <div class="text-6xl mb-4">🚚</div>
+        <div class="text-900 font-semibold text-xl mb-2">Aucun fournisseur</div>
+        <div class="text-500 mb-4">Ajoutez vos fournisseurs pour créer des bons de commande.</div>
+        <p-button label="Ajouter un fournisseur" icon="pi pi-plus" (onClick)="openCreate()" />
+      </div>
+    }
+
+    <!-- Fournisseurs actifs -->
+    @if (fournisseursActifs.length > 0) {
+      <div class="flex flex-column gap-2">
+        @for (f of fournisseursActifs; track f.id) {
+          <div
+            class="surface-card border-round-xl p-4 cursor-pointer border-2 transition-all transition-duration-150"
+            [class.border-primary]="selectedFournisseur?.id === f.id"
+            [class.border-transparent]="selectedFournisseur?.id !== f.id"
+            [class.shadow-2]="selectedFournisseur?.id === f.id"
+            (click)="openDetail(f)"
+          >
+            <div class="flex align-items-center justify-content-between">
+
+              <!-- Avatar + infos -->
+              <div class="flex align-items-center gap-3">
+                <div
+                  class="border-circle flex align-items-center justify-content-center text-white font-bold flex-shrink-0 text-sm"
+                  style="width:44px;height:44px;background:var(--primary-500)"
+                >
+                  {{ getInitiales(f.nom) }}
+                </div>
+                <div>
+                  <div class="font-bold text-900">{{ f.nom }}</div>
+                  <div class="flex align-items-center gap-3 mt-1">
+                    @if (f.email) {
+                      <span class="text-500 text-sm flex align-items-center gap-1">
+                        <i class="pi pi-envelope text-xs"></i>{{ f.email }}
+                      </span>
+                    }
+                    @if (f.telephone) {
+                      <span class="text-500 text-sm flex align-items-center gap-1">
+                        <i class="pi pi-phone text-xs"></i>{{ f.telephone }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Délai + actions -->
+              <div class="flex align-items-center gap-3">
+                @if (f.delaiLivraisonJours) {
+                  <div class="text-center">
+                    <div class="text-xs text-400 mb-1">Délai livraison</div>
+                    <p-tag
+                      [value]="getDelaiLabel(f.delaiLivraisonJours)"
+                      severity="info"
+                      styleClass="text-xs"
+                    />
+                  </div>
+                }
+                <div class="flex gap-1" (click)="$event.stopPropagation()">
+                  <p-button
+                    icon="pi pi-pencil"
+                    severity="secondary"
+                    [text]="true" [rounded]="true" size="small"
+                    pTooltip="Modifier"
+                    (onClick)="openEdit(f, $event)"
+                  />
+                  <p-button
+                    icon="pi pi-inbox"
+                    severity="danger"
+                    [text]="true" [rounded]="true" size="small"
+                    pTooltip="Archiver"
+                    (onClick)="confirmArchiver(f, $event)"
+                  />
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Fournisseurs archivés -->
+    @if (fournisseursArchives.length > 0) {
+      <p-divider align="left" styleClass="mt-4">
+        <span class="text-400 text-sm">{{ fournisseursArchives.length }} fournisseur(s) archivé(s)</span>
+      </p-divider>
+      <div class="flex flex-column gap-2">
+        @for (f of fournisseursArchives; track f.id) {
+          <div class="surface-card border-round-lg p-3 opacity-50 flex align-items-center justify-content-between border-1 surface-border">
+            <div class="flex align-items-center gap-3">
+              <div
+                class="border-circle flex align-items-center justify-content-center bg-300 text-600 font-bold text-sm flex-shrink-0"
+                style="width:36px;height:36px"
+              >
+                {{ getInitiales(f.nom) }}
+              </div>
+              <div>
+                <span class="text-600 font-medium">{{ f.nom }}</span>
+                @if (f.email) {
+                  <span class="text-400 text-sm ml-3">{{ f.email }}</span>
+                }
+              </div>
+            </div>
+            <p-tag value="Archivé" severity="secondary" styleClass="text-xs" />
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- Panel détail fournisseur -->
+  @if (showDetailPanel && selectedFournisseur) {
+    <div class="surface-card border-round-xl shadow-2 p-5 flex-shrink-0" style="width: 340px">
+
+      <!-- Header panel -->
+      <div class="flex justify-content-between align-items-start mb-4">
+        <div class="flex align-items-center gap-3">
+          <div
+            class="border-circle flex align-items-center justify-content-center text-white font-bold text-lg flex-shrink-0"
+            style="width:52px;height:52px;background:var(--primary-500)"
+          >
+            {{ getInitiales(selectedFournisseur.nom) }}
+          </div>
+          <div>
+            <div class="font-bold text-900 text-lg">{{ selectedFournisseur.nom }}</div>
+            <p-tag value="Actif" severity="success" styleClass="text-xs mt-1" />
+          </div>
+        </div>
+        <p-button
+          icon="pi pi-times"
+          severity="secondary"
+          [text]="true" [rounded]="true" size="small"
+          (onClick)="showDetailPanel = false; selectedFournisseur = null"
+        />
+      </div>
+
+      <p-divider />
+
+      <!-- Infos de contact -->
+      <div class="flex flex-column gap-3">
+
+        @if (selectedFournisseur.email) {
+          <div class="flex align-items-center gap-3">
+            <div class="surface-100 border-round p-2">
+              <i class="pi pi-envelope text-primary"></i>
+            </div>
+            <div>
+              <div class="text-400 text-xs mb-1">Email</div>
+              <a [href]="'mailto:' + selectedFournisseur.email"
+                 class="text-900 text-sm font-medium no-underline hover:underline">
+                {{ selectedFournisseur.email }}
+              </a>
+            </div>
+          </div>
+        }
+
+        @if (selectedFournisseur.telephone) {
+          <div class="flex align-items-center gap-3">
+            <div class="surface-100 border-round p-2">
+              <i class="pi pi-phone text-primary"></i>
+            </div>
+            <div>
+              <div class="text-400 text-xs mb-1">Téléphone</div>
+              <a [href]="'tel:' + selectedFournisseur.telephone"
+                 class="text-900 text-sm font-medium no-underline hover:underline">
+                {{ selectedFournisseur.telephone }}
+              </a>
+            </div>
+          </div>
+        }
+
+        @if (selectedFournisseur.delaiLivraisonJours) {
+          <div class="flex align-items-center gap-3">
+            <div class="surface-100 border-round p-2">
+              <i class="pi pi-clock text-primary"></i>
+            </div>
+            <div>
+              <div class="text-400 text-xs mb-1">Délai de livraison</div>
+              <span class="text-900 text-sm font-medium">
+                {{ getDelaiLabel(selectedFournisseur.delaiLivraisonJours) }}
+              </span>
+            </div>
+          </div>
+        }
+
+        <div class="flex align-items-center gap-3">
+          <div class="surface-100 border-round p-2">
+            <i class="pi pi-calendar text-primary"></i>
+          </div>
+          <div>
+            <div class="text-400 text-xs mb-1">Fournisseur depuis</div>
+            <span class="text-900 text-sm font-medium">
+              {{ selectedFournisseur.createdAt | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+        </div>
+
+        @if (selectedFournisseur.notes) {
+          <p-divider />
+          <div>
+            <div class="text-400 text-xs mb-2 font-medium uppercase">Notes</div>
+            <div class="text-700 text-sm line-height-3 surface-50 border-round p-3 white-space-pre-line">
+              {{ selectedFournisseur.notes }}
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <p-divider />
+
+      <!-- Actions -->
+      <div class="flex gap-2">
+        <p-button
+          label="Modifier"
+          icon="pi pi-pencil"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          styleClass="flex-1"
+          (onClick)="openEdit(selectedFournisseur, $event)"
+        />
+        <p-button
+          icon="pi pi-inbox"
+          severity="danger"
+          [text]="true" [rounded]="true" size="small"
+          pTooltip="Archiver"
+          (onClick)="confirmArchiver(selectedFournisseur, $event)"
+        />
+      </div>
+
+    </div>
+  }
+
+</div>
+
+<!-- Dialog création / édition -->
+<p-dialog
+  [header]="editingFournisseur ? 'Modifier ' + editingFournisseur.nom : 'Nouveau fournisseur'"
+  [(visible)]="showFormDialog"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="nom">Nom <span class="text-red-500">*</span></label>
+      <input
+        pInputText id="nom" name="nom"
+        [(ngModel)]="formData.nom"
+        required maxlength="255"
+        placeholder="Nom du fournisseur..."
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
+      />
+    </div>
+
+    <div class="grid">
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="email">Email</label>
+        <input
+          pInputText id="email" name="email"
+          [(ngModel)]="formData.email"
+          type="email" maxlength="255"
+          placeholder="contact@fournisseur.com"
+        />
+      </div>
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="tel">Téléphone</label>
+        <input
+          pInputText id="tel" name="telephone"
+          [(ngModel)]="formData.telephone"
+          maxlength="50"
+          placeholder="+33 1 23 45 67 89"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="delai">Délai de livraison</label>
+      <p-inputNumber
+        inputId="delai" name="delaiLivraisonJours"
+        [(ngModel)]="formData.delaiLivraisonJours"
+        [min]="1" suffix=" jour(s)"
+        placeholder="Ex: 5"
+      />
+      <small class="text-500">Délai moyen en jours ouvrés</small>
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="notes">Notes</label>
+      <textarea
+        pTextarea id="notes" name="notes"
+        [(ngModel)]="formData.notes"
+        [rows]="3" maxlength="2000"
+        placeholder="Conditions particulières, contacts, remarques..."
+        class="w-full"
+      ></textarea>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="showFormDialog = false" [disabled]="savingForm" />
+    <p-button
+      [label]="editingFournisseur ? 'Enregistrer' : 'Créer'"
+      icon="pi pi-check"
+      [loading]="savingForm"
+      (onClick)="submitForm(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

@@ -95,7 +95,7 @@ export class MateriauFormComponent implements OnChanges {
         coutUnitaire: this.form.coutUnitaire ?? undefined,
         seuilAlerte: this.form.seuilAlerte ?? undefined,
       };
-      this.materiauService.modifier(this.materiau.id, req).subscribe({
+      this.materiauService.modifierMateriau(this.materiau.id, req).subscribe({
         next: () => this.handleSuccess('Matériau modifié avec succès'),
         error: () => this.handleError(),
       });
@@ -106,7 +106,7 @@ export class MateriauFormComponent implements OnChanges {
         coutUnitaire: this.form.coutUnitaire ?? undefined,
         seuilAlerte: this.form.seuilAlerte ?? undefined,
       };
-      this.materiauService.creer2(req).subscribe({
+      this.materiauService.creerMateriau(req).subscribe({
         next: () => this.handleSuccess('Matériau créé avec succès'),
         error: () => this.handleError(),
       });

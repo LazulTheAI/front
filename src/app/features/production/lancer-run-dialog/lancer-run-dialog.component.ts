@@ -1,24 +1,24 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
-import { DividerModule } from 'primeng/divider';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TextareaModule } from 'primeng/textarea';
 
 import {
-  ProductionControllerService,
-  RecetteControllerService,
   EntrepotControllerService,
-  RecetteResponse,
   EntrepotResponse,
   LancerRunRequest,
+  ProductionControllerService,
+  RecetteControllerService,
+  RecetteResponse,
   ResultatProductionResponse,
 } from '@/app/modules/openapi';
 
@@ -65,7 +65,7 @@ export class LancerRunDialogComponent implements OnChanges, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.recetteService.lister1(false).subscribe({
+    this.recetteService.listerRecetteResponse(false).subscribe({
       next: (data: RecetteResponse[]) => {
         this.recettes = data.filter(r => !r.archive);
         this.recetteOptions = this.recettes.map(r => ({
@@ -76,7 +76,7 @@ export class LancerRunDialogComponent implements OnChanges, OnInit {
       },
     });
 
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
       next: (data: EntrepotResponse[]) => {
         this.entrepots = data.filter(e => e.actif);
         this.entrepotOptions = this.entrepots.map(e => ({ label: e.nom!, value: e.id! }));
@@ -126,7 +126,7 @@ export class LancerRunDialogComponent implements OnChanges, OnInit {
       orderId: this.form.orderId || undefined,
     };
 
-    this.productionService.lancer(req).subscribe({
+    this.productionService.lancerRunProduction(req).subscribe({
       next: (data: ResultatProductionResponse) => {
         this.saving = false;
         this.resultat = data;

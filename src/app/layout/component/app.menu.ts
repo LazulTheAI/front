@@ -30,6 +30,17 @@ export class AppMenu {
             {
                 label: 'UI Components',
                 items: [
+                    
+                    { label: 'Matériaux', icon: 'pi pi-list', routerLink: ['materiaux'] },
+                    { label: 'Recettes', icon: 'pi pi-list', routerLink: ['recettes'] },
+                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] },
+                    { label: 'Entrepôts', icon: 'pi pi-warehouse', routerLink: ['entrepots'] },
+                    { label: 'Ateliers', icon: 'pi pi-warehouse', routerLink: ['lieux-production'] },
+                    { label: 'Mon équipe', icon: 'pi pi-warehouse', routerLink: ['utilisateurs'] },
+                    { label: 'Fournisseurs', icon: 'pi pi-warehouse', routerLink: ['fournisseurs'] },
+                    { label: 'Produits', icon: 'pi pi-warehouse', routerLink: ['produits'] },
+                    { label: 'Bon de Comomande', icon: 'pi pi-warehouse', routerLink: ['bons-commande'] },
+
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },
                     { label: 'Input', icon: 'pi pi-fw pi-check-square', routerLink: ['/uikit/input'] },
                     { label: 'Button', icon: 'pi pi-fw pi-mobile', class: 'rotated-icon', routerLink: ['/uikit/button'] },
@@ -45,12 +56,6 @@ export class AppMenu {
                     { label: 'Chart', icon: 'pi pi-fw pi-chart-bar', routerLink: ['/uikit/charts'] },
                     { label: 'Timeline', icon: 'pi pi-fw pi-calendar', routerLink: ['/uikit/timeline'] },
                     { label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] },
-                    { label: 'Matériaux', icon: 'pi pi-list', routerLink: ['materiaux'] },
-                    { label: 'Recettes', icon: 'pi pi-list', routerLink: ['recettes'] },
-                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] },
-                    { label: 'Entrepôts', icon: 'pi pi-warehouse', routerLink: ['entrepots'] },
-                    { label: 'Ateliers', icon: 'pi pi-warehouse', routerLink: ['lieux-production'] },
-                    { label: 'Mon équipe', icon: 'pi pi-warehouse', routerLink: ['utilisateurs'] }
                 ]
             },
             {

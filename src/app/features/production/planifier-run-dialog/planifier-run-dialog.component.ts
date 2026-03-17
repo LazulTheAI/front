@@ -61,7 +61,7 @@ export class PlanifierRunDialogComponent implements OnChanges, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.recetteService.lister1(false).subscribe({
+    this.recetteService.listerRecetteResponse(false).subscribe({
       next: (data: RecetteResponse[]) => {
         this.recettes = data.filter(r => !r.archive);
         this.recetteOptions = this.recettes.map(r => ({
@@ -72,7 +72,7 @@ export class PlanifierRunDialogComponent implements OnChanges, OnInit {
       },
     });
 
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
       next: (data: EntrepotResponse[]) => {
         this.entrepots = data.filter(e => e.actif);
         this.entrepotOptions = this.entrepots.map(e => ({ label: e.nom!, value: e.id! }));
@@ -120,7 +120,7 @@ export class PlanifierRunDialogComponent implements OnChanges, OnInit {
       orderId: this.form.orderId || undefined,
     };
 
-    this.productionService.planifier(req).subscribe({
+    this.productionService.planifierRunProduction(req).subscribe({
       next: () => {
         this.saving = false;
         this.saved.emit({ success: true, message: 'Run planifié avec succès' });

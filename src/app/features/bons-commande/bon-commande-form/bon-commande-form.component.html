@@ -1,0 +1,181 @@
+<p-dialog
+  header="Nouveau bon de commande"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '780px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <!-- En-tête BC -->
+    <div class="grid">
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="fourn">
+          Fournisseur <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          inputId="fourn" name="fournisseurId"
+          [(ngModel)]="form.fournisseurId"
+          required
+          [options]="fournisseurOptions"
+          optionLabel="label" optionValue="value"
+          placeholder="Sélectionner un fournisseur..."
+          [filter]="true"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="ref">Numéro de référence</label>
+        <input
+          pInputText id="ref" name="numeroReference"
+          [(ngModel)]="form.numeroReference"
+          maxlength="100"
+          placeholder="BC-2024-001..."
+        />
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="dateCom">Date de commande</label>
+        <p-datepicker
+          inputId="dateCom" name="dateCommande"
+          [(ngModel)]="form.dateCommande"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="col-6 flex flex-column gap-2">
+        <label class="font-medium text-900" for="dateLiv">Livraison prévue</label>
+        <p-datepicker
+          inputId="dateLiv" name="dateLivraisonPrevue"
+          [(ngModel)]="form.dateLivraisonPrevue"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [showButtonBar]="true"
+          placeholder="Optionnel..."
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <p-divider align="left">
+      <div class="flex align-items-center gap-2">
+        <span class="font-medium text-900">Lignes de commande</span>
+        @if (lignes.length > 0) {
+          <p-tag [value]="lignes.length + ' ligne(s)'" severity="secondary" />
+        }
+      </div>
+    </p-divider>
+
+    <!-- Lignes -->
+    @if (lignes.length === 0) {
+      <div class="surface-50 border-round p-4 text-center text-400">
+        <i class="pi pi-list text-2xl mb-2 block"></i>
+        Aucune ligne. Cliquez sur "Ajouter" pour commencer.
+      </div>
+    }
+
+    @for (ligne of lignes; track $index; let i = $index) {
+      <div class="surface-50 border-round border-1 surface-border p-3">
+        <div class="grid align-items-end">
+          <div class="col-12 md:col-4 flex flex-column gap-1">
+            @if (i === 0) { <label class="text-xs text-500">MATÉRIAU</label> }
+            <p-select
+              [name]="'mat_' + i"
+              [(ngModel)]="ligne.materiauId"
+              [options]="materiauOptions"
+              optionLabel="label" optionValue="value"
+              placeholder="Matériau..."
+              [filter]="true"
+              (onChange)="onMateriauChange(i, $event.value)"
+              styleClass="w-full"
+            />
+          </div>
+          <div class="col-12 md:col-2 flex flex-column gap-1">
+            @if (i === 0) { <label class="text-xs text-500">QUANTITÉ</label> }
+            <p-inputNumber
+              [name]="'qty_' + i"
+              [(ngModel)]="ligne.quantiteCommandee"
+              [min]="0.0001" [minFractionDigits]="0" [maxFractionDigits]="4"
+              [suffix]="ligne.unite ? ' ' + ligne.unite : ''"
+              styleClass="w-full"
+            />
+          </div>
+          <div class="col-12 md:col-2 flex flex-column gap-1">
+            @if (i === 0) { <label class="text-xs text-500">UNITÉ</label> }
+            <input
+              pInputText [name]="'unite_' + i"
+              [(ngModel)]="ligne.unite"
+              maxlength="20" placeholder="kg, L..."
+              class="w-full"
+            />
+          </div>
+          <div class="col-12 md:col-3 flex flex-column gap-1">
+            @if (i === 0) { <label class="text-xs text-500">PRIX UNITAIRE</label> }
+            <p-inputNumber
+              [name]="'prix_' + i"
+              [(ngModel)]="ligne.prixUnitaireCents"
+              mode="currency" currency="EUR" locale="fr-FR"
+              [minFractionDigits]="2" [maxFractionDigits]="4"
+              [min]="0"
+              styleClass="w-full"
+            />
+            <small class="text-400 text-xs">En centimes d'euro</small>
+          </div>
+          <div class="col-12 md:col-1 flex justify-content-end">
+            <p-button
+              icon="pi pi-trash"
+              severity="danger" [text]="true" [rounded]="true" size="small"
+              (onClick)="removeLigne(i)"
+            />
+          </div>
+        </div>
+      </div>
+    }
+
+    <p-button
+      label="Ajouter une ligne"
+      icon="pi pi-plus"
+      severity="secondary"
+      size="small"
+      [outlined]="true"
+      (onClick)="addLigne()"
+    />
+
+    <!-- Total estimé -->
+    @if (lignes.length > 0 && totalEstime > 0) {
+      <div class="flex justify-content-end">
+        <div class="surface-100 border-round px-4 py-2 flex align-items-center gap-3">
+          <span class="text-500 text-sm">Total estimé :</span>
+          <span class="font-bold text-900 text-lg">{{ totalEstime | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Notes -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="notes">Notes</label>
+      <textarea
+        pTextarea id="notes" name="notes"
+        [(ngModel)]="form.notes"
+        [rows]="2" placeholder="Instructions de livraison, remarques..."
+        class="w-full"
+      ></textarea>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button
+      label="Créer le bon"
+      icon="pi pi-check"
+      [loading]="saving"
+      [disabled]="lignes.length === 0"
+      (onClick)="submit(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

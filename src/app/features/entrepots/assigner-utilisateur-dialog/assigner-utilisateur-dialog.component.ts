@@ -72,7 +72,7 @@ export class AssignerUtilisateurDialogComponent implements OnChanges {
 
     if (utilisateur.assigne) {
       // Désassigner
-      this.entrepotService.desassigner(this.entrepot.id, utilisateur.id).subscribe({
+      this.entrepotService.desassignerEntrepot(this.entrepot.id, utilisateur.id).subscribe({
         next: () => {
           utilisateur.assigne = false;
           utilisateur.loading = false;
@@ -87,7 +87,7 @@ export class AssignerUtilisateurDialogComponent implements OnChanges {
       });
     } else {
       // Assigner
-      this.entrepotService.assigner(this.entrepot.id, utilisateur.id).subscribe({
+      this.entrepotService.assignerEntrepot(this.entrepot.id, utilisateur.id).subscribe({
         next: () => {
           utilisateur.assigne = true;
           utilisateur.loading = false;

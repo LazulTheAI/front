@@ -1,0 +1,246 @@
+<p-toast />
+
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="close()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="w-full"
+  [style]="{ maxWidth: '860px' }"
+  [header]="produit?.nom ?? 'Détail produit'"
+>
+
+  <!-- Header custom avec badge statut et bouton BC -->
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-3 w-full">
+      <i class="pi pi-shopping-bag text-primary text-xl"></i>
+      <span class="font-bold text-900 text-lg">{{ produit?.nom ?? 'Produit' }}</span>
+      @if (produit?.stockPlateforme != null) {
+        <p-tag
+          [value]="(produit!.stockPlateforme ?? 0) > 0 ? 'En stock' : 'Rupture'"
+          [severity]="(produit!.stockPlateforme ?? 0) > 0 ? 'success' : 'danger'"
+        />
+      }
+      @if (produit?.sku) {
+        <span class="font-mono text-xs text-500 bg-gray-100 px-2 py-1 border-round ml-auto">{{ produit!.sku }}</span>
+      }
+    </div>
+  </ng-template>
+
+  <p-tabs>
+
+    <!-- ═══ Onglet 1 : Informations générales ═══ -->
+    <p-tabpanel header="Informations" leftIcon="pi pi-info-circle">
+
+      @if (loadingDetail) {
+        <div class="grid mt-2">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="col-6 mb-3">
+              <p-skeleton height="1.2rem" styleClass="mb-2" />
+              <p-skeleton height="2rem" />
+            </div>
+          }
+        </div>
+      } @else {
+
+        <div class="grid mt-2">
+
+          <!-- ID BigCommerce -->
+          <div class="col-6 mb-3">
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">ID BigCommerce</label>
+            <div class="flex align-items-center gap-2">
+              <span class="text-900 font-mono">#{{ (produitDetail ?? produit)?.platformProductId ?? '—' }}</span>
+              <p-button
+                icon="pi pi-external-link"
+                [text]="true"
+                size="small"
+                pTooltip="Voir dans BigCommerce"
+                (onClick)="openBigCommerce()"
+              />
+            </div>
+          </div>
+
+          <!-- Variant ID -->
+          <div class="col-6 mb-3">
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Variant ID</label>
+            <span class="text-900 font-mono">
+              {{ (produitDetail ?? produit)?.platformVariantId ?? '—' }}
+            </span>
+          </div>
+
+          <!-- Prix -->
+          <div class="col-6 mb-3">
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Prix de vente</label>
+            @if ((produitDetail ?? produit)?.prixCents != null) {
+              <span class="text-900 text-xl font-semibold">
+                {{ ((produitDetail ?? produit)!.prixCents! / 100) | currency:'EUR':'symbol':'1.2-2' }}
+              </span>
+            } @else {
+              <span class="text-400">—</span>
+            }
+          </div>
+
+          <!-- Stock plateforme -->
+          <div class="col-6 mb-3">
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Stock côté BigCommerce</label>
+            <div class="flex align-items-center gap-2">
+              @let stock = (produitDetail ?? produit)?.stockPlateforme;
+              <span
+                class="text-xl font-bold font-mono"
+                [class.text-green-600]="stock != null && stock > 5"
+                [class.text-orange-500]="stock != null && stock > 0 && stock <= 5"
+                [class.text-red-500]="stock === 0"
+              >
+                {{ stock ?? '—' }}
+              </span>
+              <span class="text-400 text-sm">unités</span>
+            </div>
+          </div>
+
+          <!-- Dernière sync -->
+          <div class="col-6 mb-3">
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Dernière synchronisation</label>
+            @if ((produitDetail ?? produit)?.derniereSyncAt) {
+              <span class="text-700 text-sm">
+                {{ (produitDetail ?? produit)!.derniereSyncAt | date:'dd/MM/yyyy à HH:mm' }}
+              </span>
+            } @else {
+              <span class="text-orange-400 text-sm flex align-items-center gap-1">
+                <i class="pi pi-exclamation-triangle"></i>
+                Jamais synchronisé
+              </span>
+            }
+          </div>
+
+          <!-- Plateforme -->
+          <div class="col-6 mb-3">
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Plateforme</label>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-shopping-cart text-primary"></i>
+              <span class="text-900 font-medium">BigCommerce</span>
+            </div>
+          </div>
+
+        </div>
+
+      }
+
+    </p-tabpanel>
+
+    <!-- ═══ Onglet 2 : Recettes liées ═══ -->
+    <p-tabpanel header="Recettes liées" leftIcon="pi pi-book">
+
+      <div class="flex justify-content-between align-items-center mb-3 mt-2">
+        <span class="text-500 text-sm">
+          {{ produit?.recettes?.length ?? 0 }} recette(s) associée(s)
+        </span>
+        <p-button
+          icon="pi pi-plus"
+          label="Lier une recette"
+          severity="primary"
+          size="small"
+          (onClick)="onLierRecette.emit($event)"
+        />
+      </div>
+
+      @if (!produit?.recettes || produit!.recettes!.length === 0) {
+        <div class="text-center py-5 text-400">
+          <i class="pi pi-book text-4xl block mb-3 opacity-30"></i>
+          <p>Aucune recette liée à ce produit.</p>
+          <p class="text-sm mt-1">Liez une recette pour activer la déduction automatique de stock matières.</p>
+        </div>
+      } @else {
+        <p-table [value]="produit!.recettes!" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Recette</th>
+              <th style="width: 140px" class="text-right">Batches / unité</th>
+              <th style="width: 120px" class="text-center">Principale</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-liaison>
+            <tr>
+              <td>
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-book text-primary"></i>
+                  <span class="font-medium text-900">{{ liaison.recetteNom }}</span>
+                </div>
+              </td>
+              <td class="text-right">
+                <span class="font-mono text-sm">{{ liaison.batchesParUnite | number:'1.0-4' }}</span>
+              </td>
+              <td class="text-center">
+                @if (liaison.estPrincipale) {
+                  <i class="pi pi-star-fill text-yellow-400" pTooltip="Recette principale"></i>
+                } @else {
+                  <i class="pi pi-star text-400" pTooltip="Recette secondaire"></i>
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+    </p-tabpanel>
+
+    <!-- ═══ Onglet 3 : Historique production ═══ -->
+    <p-tabpanel header="Productions" leftIcon="pi pi-cog">
+
+      @if (loadingProductions) {
+        <div class="mt-2">
+          @for (i of [1,2,3]; track i) {
+            <p-skeleton height="2.5rem" styleClass="mb-2" />
+          }
+        </div>
+      } @else if (productions.length === 0) {
+        <div class="text-center py-5 text-400 mt-2">
+          <i class="pi pi-cog text-4xl block mb-3 opacity-30"></i>
+          <p>Aucune production enregistrée.</p>
+          @if (!produit?.recettes?.length) {
+            <p class="text-sm text-orange-400 mt-1">Liez d'abord une recette pour activer les productions.</p>
+          }
+        </div>
+      } @else {
+        <p-table [value]="productions" styleClass="p-datatable-sm mt-2">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Date</th>
+              <th>Recette</th>
+              <th class="text-right">Batches</th>
+              <th class="text-right">Unités</th>
+              <th>Statut</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-run>
+            <tr>
+              <td>
+                <span class="text-sm text-500">
+                  {{ run.completedAt ?? run.startedAt ?? run.plannedAt | date:'dd/MM/yyyy' }}
+                </span>
+              </td>
+              <td>
+                <span class="text-sm text-900">{{ run.recetteNom }}</span>
+              </td>
+              <td class="text-right font-mono text-sm">{{ run.batchesProduits }}</td>
+              <td class="text-right font-mono text-sm font-semibold">{{ run.unitesProduits }}</td>
+              <td>
+                <p-tag
+                  [value]="getProductionStatusLabel(run.statut)"
+                  [severity]="getProductionStatusSeverity(run.statut)"
+                />
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+    </p-tabpanel>
+
+  </p-tabs>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Fermer" severity="secondary" (onClick)="close()" />
+  </ng-template>
+
+</p-dialog>

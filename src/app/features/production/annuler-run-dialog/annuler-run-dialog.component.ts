@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -8,9 +8,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 
 import {
+  AnnulerRunRequest,
   ProductionControllerService,
   RunProductionResponse,
-  AnnulerRunRequest,
 } from '@/app/modules/openapi';
 
 @Component({
@@ -56,7 +56,7 @@ export class AnnulerRunDialogComponent implements OnChanges {
       raison: this.raison || undefined,
     };
 
-    this.productionService.annuler(this.run.id, req).subscribe({
+    this.productionService.annulerRunProduction(this.run.id, req).subscribe({
       next: () => {
         this.saving = false;
         this.saved.emit({ success: true, message: `Run #${this.run!.id} annulé` });

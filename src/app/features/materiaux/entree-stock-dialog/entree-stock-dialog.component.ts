@@ -49,7 +49,7 @@ export class EntreeStockDialogComponent implements OnChanges, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
     next: (data) => {
       console.log('entrepots data:', data);
       this.entrepots = (Array.isArray(data) ? data : (data as any).content ?? (data as any).items ?? [])
@@ -90,7 +90,7 @@ export class EntreeStockDialogComponent implements OnChanges, OnInit {
       notes: this.form.notes || undefined,
       expiresAt: this.form.expiresAt?.toISOString() ?? undefined,
     };
-    this.materiauService.entreeStock(this.materiau.id, req).subscribe({
+    this.materiauService.entreeMouvementStock(this.materiau.id, req).subscribe({
       next: () => {
         this.saving = false;
         this.saved.emit({

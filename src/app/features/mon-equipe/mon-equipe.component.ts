@@ -70,7 +70,7 @@ export class MonEquipeComponent implements OnInit {
 
   loadUtilisateurs(): void {
     this.loading = true;
-    this.utilisateurService.lister().subscribe({
+    this.utilisateurService.listerUtilisateurMarchand().subscribe({
       next: (data: UtilisateurResponse[]) => {
         this.utilisateurs = data;
         this.loading = false;
@@ -125,7 +125,7 @@ export class MonEquipeComponent implements OnInit {
         role: this.formData.role,
         motDePasse: this.formData.motDePasse || undefined,
       };
-      this.utilisateurService.modifier2(this.editingUser.id, req).subscribe({
+      this.utilisateurService.modifieUtilisateurMarchandr(this.editingUser.id, req).subscribe({
         next: () => {
           this.savingForm = false;
           this.showFormDialog = false;
@@ -144,7 +144,7 @@ export class MonEquipeComponent implements OnInit {
         motDePasse: this.formData.motDePasse,
         role: this.formData.role,
       };
-      this.utilisateurService.creer(req).subscribe({
+      this.utilisateurService.creerUtilisateurMarchand(req).subscribe({
         next: () => {
           this.savingForm = false;
           this.showFormDialog = false;
@@ -166,7 +166,7 @@ export class MonEquipeComponent implements OnInit {
       header: 'Désactiver ce membre',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.utilisateurService.desactiver(user.id!).subscribe({
+        this.utilisateurService.desactiverUtilisateurMarchand(user.id!).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Désactivé', detail: user.nom });
             this.loadUtilisateurs();

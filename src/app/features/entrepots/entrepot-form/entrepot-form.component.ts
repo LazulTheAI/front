@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -8,9 +8,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 
 import {
+  CreateEntrepotRequest,
   EntrepotControllerService,
   EntrepotResponse,
-  CreateEntrepotRequest,
   UpdateEntrepotRequest,
 } from '@/app/modules/openapi';
 
@@ -73,7 +73,7 @@ export class EntrepotFormComponent implements OnChanges {
         nom: this.form.nom,
         adresse: this.form.adresse || undefined,
       };
-      this.entrepotService.modifier3(this.entrepot.id, req).subscribe({
+      this.entrepotService.modifierEntrepot(this.entrepot.id, req).subscribe({
         next: () => {
           this.saving = false;
           this.saved.emit({ success: true, message: 'Entrepôt modifié avec succès' });
@@ -88,7 +88,7 @@ export class EntrepotFormComponent implements OnChanges {
         nom: this.form.nom,
         adresse: this.form.adresse || undefined,
       };
-      this.entrepotService.creer4(req).subscribe({
+      this.entrepotService.creerEntrepot(req).subscribe({
         next: () => {
           this.saving = false;
           this.saved.emit({ success: true, message: 'Entrepôt créé avec succès' });

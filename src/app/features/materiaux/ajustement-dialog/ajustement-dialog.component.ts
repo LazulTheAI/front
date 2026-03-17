@@ -50,7 +50,7 @@ export class AjustementDialogComponent implements OnChanges, OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.entrepotService.lister4().subscribe({
+    this.entrepotService.listerEntrepot().subscribe({
       next: (data) => {
         console.log('entrepots data:', data);
         this.entrepots = (Array.isArray(data) ? data : (data as any).content ?? (data as any).items ?? [])
@@ -86,7 +86,7 @@ export class AjustementDialogComponent implements OnChanges, OnInit {
       entrepotId: this.form.entrepotId!,
       raison: this.form.raison || undefined,
     };
-    this.materiauService.ajustement(this.materiau.id, req).subscribe({
+    this.materiauService.ajustementMouvementStock(this.materiau.id, req).subscribe({
       next: () => {
         this.saving = false;
         this.saved.emit({ success: true, message: `Stock ajusté de ${this.form.direction === 'positif' ? '+' : '-'}${this.form.quantite} ${this.materiau?.unite}` });

@@ -1,0 +1,116 @@
+<p-toast />
+
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="close()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Lier une recette"
+  [style]="{ width: '520px' }"
+>
+
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-link text-primary"></i>
+      <span class="font-bold text-900">Lier une recette</span>
+    </div>
+  </ng-template>
+
+  @if (produit) {
+    <div class="mb-4 p-3 border-1 surface-border border-round surface-50">
+      <div class="text-400 text-xs font-semibold uppercase mb-1">Produit</div>
+      <div class="font-semibold text-900">{{ produit.nom }}</div>
+      @if (produit.sku) {
+        <div class="font-mono text-xs text-500 mt-1">SKU : {{ produit.sku }}</div>
+      }
+    </div>
+  }
+
+  <!-- Sélection recette -->
+  <div class="field mb-4">
+    <label class="font-semibold text-900 block mb-2">
+      Recette <span class="text-red-400">*</span>
+    </label>
+    <p-select
+      [(ngModel)]="selectedRecetteId"
+      [options]="recettesOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Sélectionner une recette..."
+      [loading]="loadingRecettes"
+      [filter]="true"
+      filterPlaceholder="Rechercher..."
+      styleClass="w-full"
+      appendTo="body"
+    >
+      <ng-template pTemplate="item" let-item>
+        <div>
+          <div class="font-medium">{{ item.label }}</div>
+          @if (item.description) {
+            <div class="text-xs text-400 mt-1">{{ item.description }}</div>
+          }
+        </div>
+      </ng-template>
+    </p-select>
+  </div>
+
+  <!-- Batches par unité -->
+  <div class="field mb-4">
+    <label class="font-semibold text-900 block mb-1">
+      Batches par unité vendue
+    </label>
+    <div class="text-400 text-xs mb-2">
+      Combien de batches de recette faut-il pour produire 1 unité de ce produit ?
+      (ex : 0.02 si 1 batch produit 50 unités)
+    </div>
+    <p-inputNumber
+      [(ngModel)]="batchesParUnite"
+      [min]="0.0001"
+      [max]="100"
+      [step]="0.01"
+      [minFractionDigits]="1"
+      [maxFractionDigits]="6"
+      styleClass="w-full"
+    />
+
+    <!-- Indicateur calcul -->
+    @if (selectedRecette) {
+      <div class="mt-2 p-2 bg-primary-50 border-round text-sm text-primary-700 flex align-items-center gap-2">
+        <i class="pi pi-calculator"></i>
+        1 batch produit
+        <strong>{{ unitesPourUnBatch }}</strong>
+        de produit fini
+      </div>
+    }
+  </div>
+
+  <!-- Recette principale -->
+  <div class="field mb-2">
+    <div class="flex align-items-center gap-2">
+      <p-checkbox
+        [(ngModel)]="estPrincipale"
+        [binary]="true"
+        inputId="estPrincipale"
+      />
+      <label for="estPrincipale" class="text-900 font-medium cursor-pointer">
+        Recette principale
+      </label>
+    </div>
+    <div class="text-400 text-xs mt-1 ml-6">
+      La recette principale est utilisée pour les déductions automatiques lors des ventes BigCommerce.
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" (onClick)="close()" />
+    <p-button
+      label="Lier la recette"
+      icon="pi pi-link"
+      [loading]="saving"
+      [disabled]="!selectedRecetteId"
+      (onClick)="save()"
+    />
+  </ng-template>
+
+</p-dialog>

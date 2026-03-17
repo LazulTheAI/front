@@ -1,0 +1,244 @@
+<p-toast />
+
+<p-dialog
+  [header]="'Bon de commande #' + (bon?.id ?? bonId)"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '820px' }"
+  [draggable]="false"
+>
+
+  @if (loading) {
+    <div class="flex justify-content-center py-6">
+      <i class="pi pi-spinner pi-spin text-3xl text-400"></i>
+    </div>
+  }
+
+  @if (!loading && bon) {
+
+    <!-- En-tête -->
+    <div class="flex align-items-start justify-content-between mb-4">
+      <div class="flex flex-column gap-2">
+        <div class="flex align-items-center gap-3">
+          <p-tag
+            [value]="getStatutLabel(bon.statut ?? '')"
+            [severity]="getStatutSeverity(bon.statut ?? '')"
+            styleClass="text-sm"
+          />
+          @if (bon.numeroReference) {
+            <span class="text-500 font-mono text-sm">Réf: {{ bon.numeroReference }}</span>
+          }
+        </div>
+        <div class="flex gap-4 text-sm text-500">
+          <span><i class="pi pi-building mr-1"></i>{{ bon.fournisseurNom }}</span>
+          @if (bon.dateCommande) {
+            <span><i class="pi pi-calendar mr-1"></i>Commandé le {{ bon.dateCommande | date:'dd/MM/yyyy' }}</span>
+          }
+          @if (bon.dateLivraisonPrevue) {
+            <span><i class="pi pi-truck mr-1"></i>Livraison prévue {{ bon.dateLivraisonPrevue | date:'dd/MM/yyyy' }}</span>
+          }
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-400 text-xs mb-1">TOTAL</div>
+        <div class="font-bold text-xl text-900">{{ getTotalBC() | currency:'EUR':'symbol':'1.2-2' }}</div>
+      </div>
+    </div>
+
+    <p-divider />
+
+    <!-- Mode normal : tableau des lignes -->
+    @if (!modeReception) {
+      <p-table [value]="bon.lignes ?? []" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Matériau</th>
+            <th style="width: 120px" class="text-right">Commandé</th>
+            <th style="width: 120px" class="text-right">Reçu</th>
+            <th style="width: 130px">Progression</th>
+            <th style="width: 120px" class="text-right">Prix unit.</th>
+            <th style="width: 120px" class="text-right">Total ligne</th>
+            <th style="width: 100px">Statut</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ligne>
+          <tr>
+            <td><span class="font-medium text-900">{{ ligne.materiauNom }}</span></td>
+            <td class="text-right">
+              <span class="font-mono text-sm">{{ ligne.quantiteCommandee | number:'1.0-3' }}</span>
+              <span class="text-400 text-xs ml-1">{{ ligne.unite }}</span>
+            </td>
+            <td class="text-right">
+              <span class="font-mono text-sm" [class.text-green-600]="ligne.quantiteRecue > 0">
+                {{ ligne.quantiteRecue | number:'1.0-3' }}
+              </span>
+              <span class="text-400 text-xs ml-1">{{ ligne.unite }}</span>
+            </td>
+            <td>
+              <div class="flex align-items-center gap-2">
+                <div class="flex-1">
+                  <div class="bg-200 border-round" style="height:6px">
+                    <div
+                      class="border-round transition-all"
+                      style="height:6px"
+                      [style.width]="getProgressionLigne(ligne) + '%'"
+                      [class.bg-green-500]="getProgressionLigne(ligne) === 100"
+                      [class.bg-orange-400]="getProgressionLigne(ligne) > 0 && getProgressionLigne(ligne) < 100"
+                      [class.bg-300]="getProgressionLigne(ligne) === 0"
+                    ></div>
+                  </div>
+                </div>
+                <span class="text-xs font-mono text-500">{{ getProgressionLigne(ligne) }}%</span>
+              </div>
+            </td>
+            <td class="text-right">
+              @if (ligne.prixUnitaireCents) {
+                <span class="font-mono text-sm">{{ ligne.prixUnitaireCents / 100 | currency:'EUR':'symbol':'1.2-4' }}</span>
+              } @else {
+                <span class="text-400">—</span>
+              }
+            </td>
+            <td class="text-right">
+              @if (ligne.prixUnitaireCents && ligne.quantiteCommandee) {
+                <span class="font-mono text-sm font-semibold">
+                  {{ (ligne.prixUnitaireCents * ligne.quantiteCommandee / 100) | currency:'EUR':'symbol':'1.2-2' }}
+                </span>
+              } @else {
+                <span class="text-400">—</span>
+              }
+            </td>
+            <td>
+              <p-tag
+                [value]="getLigneStatutLabel(ligne.statut ?? '')"
+                [severity]="getLigneStatutSeverity(ligne.statut ?? '')"
+                styleClass="text-xs"
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      @if (bon.notes) {
+        <div class="mt-3 surface-50 border-round p-3 flex gap-2">
+          <i class="pi pi-comment text-400 mt-1"></i>
+          <span class="text-700 text-sm line-height-3">{{ bon.notes }}</span>
+        </div>
+      }
+    }
+
+    <!-- Mode réception -->
+    @if (modeReception) {
+      <div class="flex flex-column gap-3">
+        <div class="flex align-items-center justify-content-between">
+          <div class="font-medium text-900">Enregistrer une réception</div>
+          <div class="flex flex-column gap-1">
+            <label class="text-xs text-500">Entrepôt de destination <span class="text-red-500">*</span></label>
+            <p-select
+              [(ngModel)]="entrepotReceptionId"
+              [options]="entrepotOptions"
+              optionLabel="label" optionValue="value"
+              placeholder="Sélectionner un entrepôt..."
+              styleClass="w-14rem"
+            />
+          </div>
+        </div>
+
+        <p-table [value]="lignesReception" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Matériau</th>
+              <th style="width: 120px" class="text-right">Commandé</th>
+              <th style="width: 120px" class="text-right">Déjà reçu</th>
+              <th style="width: 160px">Quantité à recevoir</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-ligne let-i="rowIndex">
+            <tr>
+              <td>
+                <span class="font-medium text-900">{{ ligne.materiauNom }}</span>
+                @if (ligne.statut === 'PARTIELLEMENT_RECU') {
+                  <p-tag value="Partiel" severity="warn" styleClass="text-xs ml-2" />
+                }
+              </td>
+              <td class="text-right">
+                <span class="font-mono text-sm">{{ ligne.quantiteCommandee | number:'1.0-3' }}</span>
+                <span class="text-400 text-xs ml-1">{{ ligne.unite }}</span>
+              </td>
+              <td class="text-right">
+                <span class="font-mono text-sm text-green-600">{{ ligne.quantiteRecue | number:'1.0-3' }}</span>
+                <span class="text-400 text-xs ml-1">{{ ligne.unite }}</span>
+              </td>
+              <td>
+                <p-inputNumber
+                  [(ngModel)]="ligne.quantiteARecevoir"
+                  [min]="0"
+                  [max]="ligne.quantiteCommandee - ligne.quantiteRecue"
+                  [minFractionDigits]="0" [maxFractionDigits]="4"
+                  [suffix]="' ' + ligne.unite"
+                  styleClass="w-full"
+                />
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <div class="surface-50 border-round p-3 flex align-items-center gap-2 text-sm text-500">
+          <i class="pi pi-info-circle text-primary"></i>
+          Les quantités reçues seront ajoutées au stock de l'entrepôt sélectionné.
+        </div>
+      </div>
+    }
+
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between w-full">
+
+      <!-- Actions gauche -->
+      <div class="flex gap-2">
+        @if (!modeReception && bon && canEnvoyer()) {
+          <p-button
+            label="Marquer comme envoyé"
+            icon="pi pi-send"
+            severity="info"
+            [outlined]="true"
+            (onClick)="envoyerBC()"
+          />
+        }
+        @if (!modeReception && bon && canReceptionner()) {
+          <p-button
+            label="Réceptionner"
+            icon="pi pi-arrow-down"
+            severity="success"
+            [outlined]="true"
+            (onClick)="startReception()"
+          />
+        }
+        @if (modeReception) {
+          <p-button
+            label="Annuler"
+            severity="secondary"
+            [text]="true"
+            (onClick)="cancelReception()"
+            [disabled]="savingReception"
+          />
+          <p-button
+            label="Enregistrer la réception"
+            icon="pi pi-check"
+            severity="success"
+            [loading]="savingReception"
+            [disabled]="!entrepotReceptionId"
+            (onClick)="submitReception()"
+          />
+        }
+      </div>
+
+      <!-- Fermer -->
+      @if (!modeReception) {
+        <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
+      }
+
+    </div>
+  </ng-template>
+</p-dialog>
