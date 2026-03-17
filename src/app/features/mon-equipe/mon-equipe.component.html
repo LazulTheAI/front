@@ -1,0 +1,253 @@
+<p-toast />
+<p-confirmDialog />
+
+<!-- Header -->
+<div class="flex justify-content-between align-items-center mb-5">
+  <div>
+    <h2 class="m-0 text-900 font-bold text-2xl">Mon équipe</h2>
+    <p class="mt-1 mb-0 text-500">
+      {{ nbActifs }} membre(s) actif(s) · {{ admins.length }} admin(s) · {{ operateurs.length }} opérateur(s)
+    </p>
+  </div>
+  <p-button
+    label="Inviter un membre"
+    icon="pi pi-user-plus"
+    (onClick)="openCreate()"
+  />
+</div>
+
+@if (loading) {
+  <div class="flex justify-content-center py-8">
+    <i class="pi pi-spinner pi-spin text-4xl text-400"></i>
+  </div>
+}
+
+@if (!loading) {
+
+  @if (utilisateurs.length === 0) {
+    <div class="surface-card border-round-xl p-8 text-center">
+      <div class="text-6xl mb-4">👥</div>
+      <div class="text-900 font-semibold text-xl mb-2">Aucun membre dans l'équipe</div>
+      <div class="text-500 mb-4">Invitez vos premiers opérateurs ou administrateurs.</div>
+      <p-button label="Inviter un membre" icon="pi pi-user-plus" (onClick)="openCreate()" />
+    </div>
+  }
+
+  <!-- Section Administrateurs -->
+  @if (admins.length > 0) {
+    <div class="mb-5">
+      <div class="flex align-items-center gap-2 mb-3">
+        <i class="pi pi-shield text-orange-500"></i>
+        <span class="font-semibold text-700 uppercase text-sm">Administrateurs</span>
+        <span class="text-400 text-sm">({{ admins.length }})</span>
+      </div>
+      <div class="grid">
+        @for (user of admins; track user.id; let i = $index) {
+          <div class="col-12 md:col-6 lg:col-4">
+            <ng-container *ngTemplateOutlet="userCard; context: { $implicit: user, index: getUserIndex(user) }" />
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Section Opérateurs -->
+  @if (operateurs.length > 0) {
+    <div class="mb-5">
+      <div class="flex align-items-center gap-2 mb-3">
+        <i class="pi pi-wrench text-blue-500"></i>
+        <span class="font-semibold text-700 uppercase text-sm">Opérateurs</span>
+        <span class="text-400 text-sm">({{ operateurs.length }})</span>
+      </div>
+      <div class="grid">
+        @for (user of operateurs; track user.id; let i = $index) {
+          <div class="col-12 md:col-6 lg:col-4">
+            <ng-container *ngTemplateOutlet="userCard; context: { $implicit: user, index: getUserIndex(user) }" />
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Membres inactifs -->
+  @if (utilisateurs | utilisateursInactifs; as inactifs) {
+    @if (inactifs.length > 0) {
+      <p-divider align="left">
+        <span class="text-400 text-sm">{{ inactifs.length }} membre(s) désactivé(s)</span>
+      </p-divider>
+      <div class="grid">
+        @for (user of inactifs; track user.id) {
+          <div class="col-12 md:col-6 lg:col-4">
+            <div class="surface-card border-round-xl p-4 opacity-50 flex align-items-center gap-3 border-1 surface-border">
+              <div
+                class="border-circle flex align-items-center justify-content-center bg-300 text-600 font-bold flex-shrink-0"
+                style="width:44px;height:44px;font-size:14px"
+              >
+                {{ getInitiales(user.nom) }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-medium text-600 text-sm">{{ user.nom }}</div>
+                <div class="text-400 text-xs truncate">{{ user.email }}</div>
+              </div>
+              <p-tag value="Inactif" severity="secondary" styleClass="text-xs" />
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+}
+
+<!-- Template card utilisateur actif -->
+<ng-template #userCard let-user let-index="index">
+  <div
+    class="surface-card border-round-xl p-4 h-full flex flex-column gap-3 border-1 surface-border hover:shadow-2 transition-all transition-duration-200"
+    [class.opacity-60]="!user.actif"
+  >
+    <!-- Avatar + nom + statut -->
+    <div class="flex align-items-start justify-content-between">
+      <div class="flex align-items-center gap-3">
+        <div
+          class="border-circle flex align-items-center justify-content-center text-white font-bold flex-shrink-0"
+          style="width:48px;height:48px;font-size:16px"
+          [style.background]="getAvatarColor(index)"
+        >
+          {{ getInitiales(user.nom) }}
+        </div>
+        <div>
+          <div class="font-bold text-900">{{ user.nom }}</div>
+          <div class="text-500 text-sm mt-1">{{ user.email }}</div>
+        </div>
+      </div>
+      <div class="flex flex-column align-items-end gap-1">
+        <p-tag
+          [value]="user.role === 'ADMIN' ? 'Admin' : 'Opérateur'"
+          [severity]="user.role === 'ADMIN' ? 'warn' : 'info'"
+          styleClass="text-xs"
+        />
+        <p-tag
+          [value]="user.actif ? 'Actif' : 'Inactif'"
+          [severity]="user.actif ? 'success' : 'secondary'"
+          styleClass="text-xs"
+        />
+      </div>
+    </div>
+
+    <!-- Date création -->
+    <div class="text-400 text-xs flex align-items-center gap-1">
+      <i class="pi pi-calendar"></i>
+      Membre depuis le {{ user.createdAt | date:'dd/MM/yyyy' }}
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-2 mt-auto pt-2 border-top-1 surface-border">
+      <p-button
+        label="Modifier"
+        icon="pi pi-pencil"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        styleClass="flex-1"
+        [disabled]="!user.actif"
+        (onClick)="openEdit(user, $event)"
+      />
+      @if (user.actif) {
+        <p-button
+          icon="pi pi-ban"
+          severity="danger"
+          [text]="true"
+          [rounded]="true"
+          size="small"
+          pTooltip="Désactiver"
+          (onClick)="confirmDesactiver(user, $event)"
+        />
+      }
+    </div>
+  </div>
+</ng-template>
+
+<!-- Dialog création / édition -->
+<p-dialog
+  [header]="editingUser ? 'Modifier ' + editingUser.nom : 'Inviter un membre'"
+  [(visible)]="showFormDialog"
+  [modal]="true"
+  [style]="{ width: '460px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="nom">Nom complet <span class="text-red-500">*</span></label>
+      <input
+        pInputText id="nom" name="nom"
+        [(ngModel)]="formData.nom"
+        required maxlength="255"
+        placeholder="Prénom Nom"
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
+      />
+    </div>
+
+    @if (!editingUser) {
+      <div class="flex flex-column gap-2">
+        <label class="font-medium text-900" for="email">Email <span class="text-red-500">*</span></label>
+        <input
+          pInputText id="email" name="email"
+          [(ngModel)]="formData.email"
+          required type="email"
+          placeholder="prenom.nom@exemple.com"
+          [class.ng-invalid]="ngForm.submitted && ngForm.controls['email']?.invalid"
+        />
+      </div>
+    }
+
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="role">Rôle <span class="text-red-500">*</span></label>
+      <p-select
+        inputId="role" name="role"
+        [(ngModel)]="formData.role"
+        required
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+      />
+      <small class="text-500">
+        @if (formData.role === 'ADMIN') {
+          L'admin peut gérer les recettes, les matériaux et les utilisateurs.
+        } @else {
+          L'opérateur peut consulter et exécuter des runs de production.
+        }
+      </small>
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="mdp">
+        Mot de passe
+        @if (!editingUser) { <span class="text-red-500">*</span> }
+        @if (editingUser) { <span class="text-400 font-normal text-sm">(laisser vide pour ne pas changer)</span> }
+      </label>
+      <p-password
+        inputId="mdp" name="motDePasse"
+        [(ngModel)]="formData.motDePasse"
+        [required]="!editingUser"
+        [feedback]="true"
+        [toggleMask]="true"
+        placeholder="Mot de passe"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="showFormDialog = false" [disabled]="savingForm" />
+    <p-button
+      [label]="editingUser ? 'Enregistrer' : 'Inviter'"
+      [icon]="editingUser ? 'pi pi-check' : 'pi pi-user-plus'"
+      [loading]="savingForm"
+      (onClick)="submitForm(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

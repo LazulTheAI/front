@@ -1,0 +1,76 @@
+<p-dialog
+  [header]="'Utilisateurs — ' + (entrepot?.nom ?? '')"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+>
+
+  <!-- Info entrepôt -->
+  <div class="surface-50 border-round p-3 mb-4 flex align-items-center gap-3">
+    <i class="pi pi-warehouse text-primary text-2xl"></i>
+    <div>
+      <div class="font-semibold text-900">{{ entrepot?.nom }}</div>
+      @if (entrepot?.adresse) {
+        <div class="text-500 text-sm">{{ entrepot!.adresse }}</div>
+      }
+      <div class="text-400 text-xs mt-1">{{ nbAssignes }} utilisateur(s) assigné(s)</div>
+    </div>
+  </div>
+
+  <!-- Liste utilisateurs -->
+  @if (utilisateursAvecStatut.length === 0) {
+    <div class="text-center py-4 text-400">
+      <i class="pi pi-users text-3xl mb-2 block"></i>
+      Aucun utilisateur actif dans le système
+    </div>
+  }
+
+  <div class="flex flex-column gap-2">
+    @for (user of utilisateursAvecStatut; track user.id; let i = $index) {
+      <div
+        class="flex align-items-center justify-content-between p-3 border-round border-1 transition-colors transition-duration-150"
+        [class.border-primary]="user.assigne"
+        [class.bg-primary-50]="user.assigne"
+        [class.surface-border]="!user.assigne"
+        [class.surface-50]="!user.assigne"
+      >
+        <!-- Avatar + infos -->
+        <div class="flex align-items-center gap-3">
+          <div
+            class="border-circle flex align-items-center justify-content-center text-white font-bold flex-shrink-0"
+            style="width: 38px; height: 38px; font-size: 13px"
+            [style.background]="getAvatarColor(i)"
+          >
+            {{ getInitiales(user.nom) }}
+          </div>
+          <div>
+            <div class="font-medium text-900">{{ user.nom }}</div>
+            <div class="text-500 text-sm">{{ user.email }}</div>
+          </div>
+          <p-tag
+            [value]="user.role === 'ADMIN' ? 'Admin' : 'Opérateur'"
+            [severity]="user.role === 'ADMIN' ? 'warn' : 'secondary'"
+            styleClass="text-xs"
+          />
+        </div>
+
+        <!-- Bouton toggle -->
+        <p-button
+          [icon]="user.assigne ? 'pi pi-minus' : 'pi pi-plus'"
+          [label]="user.assigne ? 'Désassigner' : 'Assigner'"
+          [severity]="user.assigne ? 'danger' : 'success'"
+          [outlined]="true"
+          size="small"
+          [loading]="user.loading"
+          (onClick)="toggleAssignation(user)"
+        />
+      </div>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
+  </ng-template>
+</p-dialog>

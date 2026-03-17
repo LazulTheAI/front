@@ -1,0 +1,260 @@
+<p-toast />
+<p-confirmDialog />
+
+<!-- Header -->
+<div class="flex justify-content-between align-items-center mb-5">
+  <div>
+    <h2 class="m-0 text-900 font-bold text-2xl">Lieux de production</h2>
+    <p class="mt-1 mb-0 text-500">Gérez vos ateliers, stocks et les opérateurs qui y travaillent</p>
+  </div>
+  <p-button
+    label="Nouveau lieu"
+    icon="pi pi-plus"
+    (onClick)="openCreate()"
+  />
+</div>
+
+@if (loading) {
+  <div class="flex justify-content-center py-8">
+    <i class="pi pi-spinner pi-spin text-4xl text-400"></i>
+  </div>
+}
+
+@if (!loading) {
+
+  <!-- Lieux actifs -->
+  @if (lieuxActifs.length === 0 && lieuxInactifs.length === 0) {
+    <div class="surface-card border-round-xl p-8 text-center">
+      <div class="text-6xl mb-4">🏭</div>
+      <div class="text-900 font-semibold text-xl mb-2">Aucun lieu de production</div>
+      <div class="text-500 mb-4">Créez votre premier atelier ou entrepôt pour commencer à gérer votre production.</div>
+      <p-button label="Créer un lieu" icon="pi pi-plus" (onClick)="openCreate()" />
+    </div>
+  }
+
+  <div class="flex flex-column gap-3">
+    @for (lieu of lieuxActifs; track lieu.id) {
+      <div class="surface-card border-round-xl shadow-1 overflow-hidden">
+
+        <!-- En-tête du lieu (toujours visible) -->
+        <div
+          class="flex align-items-center justify-content-between p-4 cursor-pointer"
+          [class.border-bottom-1]="lieu.expanded"
+          [class.surface-border]="lieu.expanded"
+          (click)="toggleExpand(lieu)"
+        >
+          <div class="flex align-items-center gap-4">
+            <!-- Icône lieu -->
+            <div class="border-round-xl flex align-items-center justify-content-center flex-shrink-0"
+                 style="width:48px;height:48px;background:var(--primary-100)">
+              <i class="pi pi-warehouse text-primary text-xl"></i>
+            </div>
+
+            <!-- Nom + adresse -->
+            <div>
+              <div class="flex align-items-center gap-2">
+                <span class="font-bold text-900 text-lg">{{ lieu.nom }}</span>
+                <p-tag value="Actif" severity="success" styleClass="text-xs" />
+              </div>
+              @if (lieu.adresse) {
+                <div class="text-500 text-sm mt-1">
+                  <i class="pi pi-map-marker text-xs mr-1"></i>{{ lieu.adresse }}
+                </div>
+              }
+            </div>
+
+            <!-- Avatars opérateurs assignés (aperçu) -->
+            @if (!lieu.expanded && lieu.utilisateursAssignes.length > 0) {
+              <div class="flex align-items-center gap-1 ml-2">
+                @for (user of lieu.utilisateursAssignes.slice(0, 4); track user.id; let i = $index) {
+                  <div
+                    class="border-circle flex align-items-center justify-content-center text-white font-bold border-2 border-white"
+                    style="width:30px;height:30px;font-size:11px;margin-left:-8px"
+                    [style.background]="getAvatarColor(getUserIndex(user))"
+                    [pTooltip]="user.nom"
+                  >
+                    {{ getInitiales(user.nom) }}
+                  </div>
+                }
+                @if (lieu.utilisateursAssignes.length > 4) {
+                  <div
+                    class="border-circle flex align-items-center justify-content-center bg-300 text-600 font-bold border-2 border-white text-xs"
+                    style="width:30px;height:30px;margin-left:-8px"
+                  >
+                    +{{ lieu.utilisateursAssignes.length - 4 }}
+                  </div>
+                }
+              </div>
+            }
+            @if (!lieu.expanded && lieu.utilisateursAssignes.length === 0) {
+              <span class="text-400 text-sm ml-2">Aucun opérateur assigné</span>
+            }
+          </div>
+
+          <!-- Actions + chevron -->
+          <div class="flex align-items-center gap-2" (click)="$event.stopPropagation()">
+            <p-button
+              icon="pi pi-pencil"
+              severity="secondary"
+              [text]="true" [rounded]="true" size="small"
+              pTooltip="Modifier"
+              (onClick)="openEdit(lieu, $event)"
+            />
+            <p-button
+              icon="pi pi-ban"
+              severity="danger"
+              [text]="true" [rounded]="true" size="small"
+              pTooltip="Désactiver ce lieu"
+              (onClick)="confirmDesactiver(lieu, $event)"
+            />
+            <i
+              class="pi text-400 text-lg ml-2 cursor-pointer"
+              [class.pi-chevron-down]="!lieu.expanded"
+              [class.pi-chevron-up]="lieu.expanded"
+              (click)="toggleExpand(lieu)"
+            ></i>
+          </div>
+        </div>
+
+        <!-- Panel expandable : gestion des opérateurs -->
+        @if (lieu.expanded) {
+          <div class="p-4">
+            <div class="text-500 text-sm font-medium mb-3 uppercase">
+              <i class="pi pi-users mr-2"></i>Opérateurs assignés à ce lieu
+            </div>
+
+            @if (tousUtilisateurs.length === 0) {
+              <div class="text-400 text-sm py-3">
+                Aucun utilisateur actif dans le système.
+              </div>
+            }
+
+            <div class="grid">
+              @for (user of tousUtilisateurs; track user.id; let i = $index) {
+                <div class="col-12 md:col-6 lg:col-4">
+                  <div
+                    class="flex align-items-center justify-content-between p-3 border-round-lg border-1 transition-all transition-duration-150"
+                    [class.border-primary]="isAssigne(lieu, user)"
+                    [class.bg-primary-50]="isAssigne(lieu, user)"
+                    [class.surface-border]="!isAssigne(lieu, user)"
+                    [class.surface-50]="!isAssigne(lieu, user)"
+                  >
+                    <!-- Avatar + infos -->
+                    <div class="flex align-items-center gap-2">
+                      <div
+                        class="border-circle flex align-items-center justify-content-center text-white font-bold flex-shrink-0"
+                        style="width:36px;height:36px;font-size:12px"
+                        [style.background]="getAvatarColor(i)"
+                      >
+                        {{ getInitiales(user.nom) }}
+                      </div>
+                      <div>
+                        <div class="font-medium text-900 text-sm">{{ user.nom }}</div>
+                        <div class="text-400 text-xs">
+                          {{ user.role === 'ADMIN' ? 'Admin' : 'Opérateur' }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Toggle -->
+                    <p-button
+                      [icon]="isAssigne(lieu, user) ? 'pi pi-check' : 'pi pi-plus'"
+                      [severity]="isAssigne(lieu, user) ? 'success' : 'secondary'"
+                      [text]="!isAssigne(lieu, user)"
+                      [rounded]="true"
+                      size="small"
+                      [loading]="isAssignationLoading(lieu.id!, user.id!)"
+                      [pTooltip]="isAssigne(lieu, user) ? 'Retirer de ce lieu' : 'Assigner à ce lieu'"
+                      (onClick)="toggleAssignation(lieu, user)"
+                    />
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Résumé assignés -->
+            @if (lieu.utilisateursAssignes.length > 0) {
+              <div class="mt-3 pt-3 border-top-1 surface-border flex align-items-center gap-2 text-sm text-500">
+                <i class="pi pi-check-circle text-green-500"></i>
+                <span>
+                  <strong class="text-900">{{ lieu.utilisateursAssignes.length }}</strong>
+                  opérateur(s) assigné(s) à ce lieu
+                </span>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    }
+  </div>
+
+  <!-- Lieux inactifs (section collapsée) -->
+  @if (lieuxInactifs.length > 0) {
+    <div class="mt-5">
+      <p-divider align="left">
+        <span class="text-400 text-sm">
+          {{ lieuxInactifs.length }} lieu(x) désactivé(s)
+        </span>
+      </p-divider>
+      <div class="flex flex-column gap-2">
+        @for (lieu of lieuxInactifs; track lieu.id) {
+          <div class="surface-card border-round-lg p-3 opacity-60 flex align-items-center justify-content-between">
+            <div class="flex align-items-center gap-3">
+              <i class="pi pi-warehouse text-400 text-lg"></i>
+              <span class="text-600 font-medium">{{ lieu.nom }}</span>
+              @if (lieu.adresse) {
+                <span class="text-400 text-sm">— {{ lieu.adresse }}</span>
+              }
+            </div>
+            <p-tag value="Inactif" severity="secondary" styleClass="text-xs" />
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+}
+
+<!-- Dialog création / édition -->
+<p-dialog
+  [header]="editingLieu ? 'Modifier ' + editingLieu.nom : 'Nouveau lieu de production'"
+  [(visible)]="showFormDialog"
+  [modal]="true"
+  [style]="{ width: '440px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="nom">
+        Nom du lieu <span class="text-red-500">*</span>
+      </label>
+      <input
+        pInputText id="nom" name="nom"
+        [(ngModel)]="formData.nom"
+        required maxlength="255"
+        placeholder="Ex: Atelier Principal, Stock Nord, Cuisine..."
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
+      />
+    </div>
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="adresse">Adresse</label>
+      <textarea
+        pTextarea id="adresse" name="adresse"
+        [(ngModel)]="formData.adresse"
+        [rows]="3"
+        placeholder="Adresse complète..."
+        class="w-full"
+      ></textarea>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="showFormDialog = false" [disabled]="savingForm" />
+    <p-button
+      [label]="editingLieu ? 'Enregistrer' : 'Créer'"
+      icon="pi pi-check"
+      [loading]="savingForm"
+      (onClick)="submitForm(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

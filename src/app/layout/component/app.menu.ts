@@ -47,8 +47,10 @@ export class AppMenu {
                     { label: 'Misc', icon: 'pi pi-fw pi-circle', routerLink: ['/uikit/misc'] },
                     { label: 'Matériaux', icon: 'pi pi-list', routerLink: ['materiaux'] },
                     { label: 'Recettes', icon: 'pi pi-list', routerLink: ['recettes'] },
-                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] }
-                
+                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] },
+                    { label: 'Entrepôts', icon: 'pi pi-warehouse', routerLink: ['entrepots'] },
+                    { label: 'Ateliers', icon: 'pi pi-warehouse', routerLink: ['lieux-production'] },
+                    { label: 'Mon équipe', icon: 'pi pi-warehouse', routerLink: ['utilisateurs'] }
                 ]
             },
             {
