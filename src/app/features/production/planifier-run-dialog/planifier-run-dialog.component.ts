@@ -57,7 +57,7 @@ export class PlanifierRunDialogComponent implements OnChanges, OnInit {
     private productionService: ProductionControllerService,
     private recetteService: RecetteControllerService,
     private entrepotService: EntrepotControllerService,
-    private cdr: ChangeDetectorRef,
+    public cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -94,10 +94,6 @@ export class PlanifierRunDialogComponent implements OnChanges, OnInit {
 
   onRecetteChange(recetteId: number): void {
     this.selectedRecette = this.recettes.find(r => r.id === recetteId) ?? null;
-    this.cdr.detectChanges();
-  }
-
-  onBatchesChange(): void {
     this.cdr.detectChanges();
   }
 

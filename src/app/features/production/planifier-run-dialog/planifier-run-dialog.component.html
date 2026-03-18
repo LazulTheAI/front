@@ -43,7 +43,7 @@
           [min]="0.0001"
           [minFractionDigits]="0"
           [maxFractionDigits]="2"
-          (onInput)="onBatchesChange()"
+          (onInput)="cdr.detectChanges()"
         />
         @if (selectedRecette && form.batches > 0) {
           <small class="text-500">

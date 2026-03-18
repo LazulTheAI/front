@@ -249,7 +249,6 @@ export class ProductionListComponent implements OnInit {
   }
 
   canAnnuler(run: RunProductionResponse): boolean {
-    console.log(run.statut);
     return run.statut === 'PLANIFIE' || run.statut === 'EN_COURS';
   }
 

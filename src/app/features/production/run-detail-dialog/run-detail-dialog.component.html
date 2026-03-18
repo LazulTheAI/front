@@ -1,9 +1,11 @@
+<p-toast />
+
 <p-dialog
-  [header]="'Run #' + (run?.id ?? runId) + ' — ' + (run?.recetteNom ?? '')"
+  [header]="'Run #' + (run?.id ?? runId) + (run?.recetteNom ? ' — ' + run?.recetteNom : '')"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
-  [style]="{ width: '680px' }"
+  [style]="{ width: '860px' }"
   [draggable]="false"
 >
 
@@ -15,17 +17,27 @@
 
   @if (!loading && run) {
 
-    <!-- Statut + dates -->
-    <div class="flex align-items-center justify-content-between mb-4">
-      <p-tag
-        [value]="getStatutLabel(run.statut ?? '')"
-        [severity]="getStatutSeverity(run.statut ?? '')"
-        styleClass="text-sm px-3 py-1"
-      />
+    <!-- Bandeau statut + métriques -->
+    <div class="flex align-items-center justify-content-between mb-4 p-3 surface-50 border-round-xl">
+      <div class="flex align-items-center gap-3">
+        <p-tag
+          [value]="getStatutLabel(run.statut ?? '')"
+          [severity]="getStatutSeverity(run.statut ?? '')"
+          styleClass="text-sm px-3 py-1"
+        />
+        @if (run.stockInsuffisant) {
+          <p-tag value="Stock insuffisant" severity="warn" styleClass="text-xs" />
+        }
+        @if (orderId) {
+          <span class="text-500 text-sm font-mono">
+            <i class="pi pi-shopping-cart mr-1"></i>{{ orderId }}
+          </span>
+        }
+      </div>
       <div class="flex gap-4 text-sm text-500">
-        <span><i class="pi pi-calendar mr-1"></i>Créé : {{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        <span><i class="pi pi-calendar mr-1"></i>{{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
         @if (run.completeAt) {
-          <span><i class="pi pi-check mr-1"></i>Terminé : {{ run.completeAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span><i class="pi pi-check mr-1"></i>{{ run.completeAt | date:'dd/MM/yyyy HH:mm' }}</span>
         }
       </div>
     </div>
@@ -33,98 +45,254 @@
     <!-- KPIs -->
     <div class="grid mb-4">
       <div class="col-3">
-        <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">BATCHES</div>
-          <div class="font-bold text-900">{{ run.batchsProduits | number:'1.0-2' }}</div>
+        <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
+          <div class="text-400 text-xs font-medium mb-2">BATCHES</div>
+          <div class="font-bold text-2xl text-900">{{ run.batchsProduits | number:'1.0-2' }}</div>
         </div>
       </div>
       <div class="col-3">
-        <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">UNITÉS</div>
-          <div class="font-bold text-green-600">
+        <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
+          <div class="text-400 text-xs font-medium mb-2">UNITÉS PRODUITES</div>
+          <div class="font-bold text-2xl text-green-600">
             {{ run.unitesProduite != null ? (run.unitesProduite | number:'1.0-2') : '—' }}
           </div>
         </div>
       </div>
       <div class="col-3">
-        <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">STOCK</div>
-          @if (run.stockInsuffisant) {
-            <div class="font-bold text-orange-500">Insuffisant</div>
+        <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
+          <div class="text-400 text-xs font-medium mb-2">COGS TOTAL</div>
+          @if (cogsTotal) {
+            <div class="font-bold text-2xl text-primary">
+              {{ cogsTotal | currency:'EUR':'symbol':'1.2-2' }}
+            </div>
           } @else {
-            <div class="font-bold text-green-600">OK</div>
+            <div class="font-bold text-2xl text-400">—</div>
           }
         </div>
       </div>
       <div class="col-3">
-        <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">RECETTE ID</div>
-          <div class="font-bold font-mono text-900">#{{ run.recetteId }}</div>
+        <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
+          <div class="text-400 text-xs font-medium mb-2">COÛT / UNITÉ</div>
+          @if (coutParUniteValue > 0) {
+            <div class="font-bold text-2xl text-900">
+              {{ coutParUniteValue | currency:'EUR':'symbol':'1.2-4' }}
+            </div>
+          } @else {
+            <div class="font-bold text-2xl text-400">—</div>
+          }
         </div>
       </div>
     </div>
 
-    <!-- Notes -->
-    @if (run.notes) {
-      <div class="surface-50 border-round p-3 mb-4 flex gap-2">
-        <i class="pi pi-comment text-400 mt-1"></i>
-        <span class="text-900 text-sm line-height-3">{{ run.notes }}</span>
-      </div>
-    }
+    <!-- Tabs -->
+    <p-tabs>
+      <p-tablist>
+        <p-tab value="0">
+          <i class="pi pi-list mr-2"></i>Matières consommées
+        </p-tab>
+        <p-tab value="1">
+          <i class="pi pi-exclamation-triangle mr-2"></i>
+          Manques de stock
+          @if ((run.manques?.length ?? 0) > 0) {
+            <p-tag [value]="run.manques!.length + ''" severity="warn" styleClass="text-xs ml-2" />
+          }
+        </p-tab>
+        <p-tab value="2">
+          <i class="pi pi-history mr-2"></i>Chronologie
+        </p-tab>
+        @if (run.notes) {
+          <p-tab value="3">
+            <i class="pi pi-comment mr-2"></i>Notes
+          </p-tab>
+        }
+      </p-tablist>
 
-    <!-- Manques de stock -->
-    @if (run.manques && run.manques.length > 0) {
-      <p-divider align="left">
-        <span class="text-orange-500 text-sm font-medium">
-          <i class="pi pi-exclamation-triangle mr-1"></i>
-          Manques de stock détectés
-        </span>
-      </p-divider>
-      <p-table [value]="run.manques" styleClass="p-datatable-sm mb-4">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Matériau</th>
-            <th class="text-right" style="width: 110px">Besoin</th>
-            <th class="text-right" style="width: 110px">Disponible</th>
-            <th class="text-right" style="width: 110px">Manque</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-m>
-          <tr>
-            <td><span class="font-medium text-900">{{ m.materiauNom }}</span></td>
-            <td class="text-right">
-              <span class="font-mono text-sm">{{ m.besoin | number:'1.0-3' }}</span>
-              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
-            </td>
-            <td class="text-right">
-              <span class="font-mono text-sm" [class.text-red-600]="m.disponible === 0">
-                {{ m.disponible | number:'1.0-3' }}
+      <p-tabpanels>
+
+        <!-- Onglet : Matières consommées -->
+        <p-tabpanel value="0">
+          @if (getDeductions().length > 0) {
+            <p-table [value]="getDeductions()" styleClass="p-datatable-sm mt-2">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Matière première</th>
+                  <th style="width: 130px" class="text-right">Quantité consommée</th>
+                  <th style="width: 120px" class="text-right">COGS</th>
+                  <th style="width: 100px" class="text-right">% du total</th>
+                  <th style="width: 180px">Répartition</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-d>
+                <tr>
+                  <td><span class="font-medium text-900">{{ d.materiauNom }}</span></td>
+                  <td class="text-right">
+                    <span class="font-mono text-sm">{{ d.quantite | number:'1.0-4' }}</span>
+                    <span class="text-400 text-xs ml-1">{{ d.unite }}</span>
+                  </td>
+                  <td class="text-right">
+                    <span class="font-mono text-sm font-semibold text-primary">
+                      {{ d.cogs | currency:'EUR':'symbol':'1.2-4' }}
+                    </span>
+                  </td>
+                  <td class="text-right">
+                    <span class="text-sm text-500">{{ getPctDeduction(d) }}%</span>
+                  </td>
+                  <td>
+                    <div class="bg-200 border-round" style="height:6px">
+                      <div
+                        class="bg-primary border-round"
+                        style="height:6px;transition:width 0.3s"
+                        [style.width]="getPctDeduction(d) + '%'"
+                      ></div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="footer">
+                <tr>
+                  <td class="text-right font-medium text-500" colspan="2">Total COGS</td>
+                  <td class="text-right font-bold text-900">
+                    {{ getTotalDeductions() | currency:'EUR':'symbol':'1.2-2' }}
+                  </td>
+                  <td colspan="2"></td>
+                </tr>
+              </ng-template>
+            </p-table>
+          } @else {
+            <div class="text-center py-5 text-400">
+              <i class="pi pi-info-circle text-2xl mb-2 block"></i>
+              @if (run.statut === 'PLANIFIE') {
+                Les matières consommées seront visibles après exécution du run.
+              } @else {
+                Aucune déduction de matières enregistrée.
+              }
+            </div>
+          }
+        </p-tabpanel>
+
+        <!-- Onglet : Manques de stock -->
+        <p-tabpanel value="1">
+          @if ((run.manques?.length ?? 0) > 0) {
+            <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round mb-3 mt-2 border-1 border-orange-200">
+              <i class="pi pi-exclamation-triangle text-orange-500"></i>
+              <span class="text-sm text-orange-800">
+                Ce run a été exécuté avec un stock insuffisant. Les quantités produites peuvent être inférieures à la prévision.
               </span>
-              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
-            </td>
-            <td class="text-right">
-              <span class="font-mono text-sm text-red-600 font-semibold">
-                -{{ m.manque | number:'1.0-3' }}
-              </span>
-              <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    }
+            </div>
+            <p-table [value]="run.manques ?? []" styleClass="p-datatable-sm">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Matériau</th>
+                  <th style="width: 120px" class="text-right">Besoin</th>
+                  <th style="width: 120px" class="text-right">Disponible</th>
+                  <th style="width: 120px" class="text-right">Manque</th>
+                  <th style="width: 120px">Couverture</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-m>
+                <tr>
+                  <td><span class="font-medium text-900">{{ m.materiauNom }}</span></td>
+                  <td class="text-right">
+                    <span class="font-mono text-sm">{{ m.besoin | number:'1.0-3' }}</span>
+                    <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+                  </td>
+                  <td class="text-right">
+                    <span
+                      class="font-mono text-sm"
+                      [class.text-red-600]="m.disponible === 0"
+                      [class.text-orange-500]="m.disponible > 0"
+                    >
+                      {{ m.disponible | number:'1.0-3' }}
+                    </span>
+                    <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+                  </td>
+                  <td class="text-right">
+                    <span class="font-mono text-sm font-bold text-red-600">
+                      -{{ m.manque | number:'1.0-3' }}
+                    </span>
+                    <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
+                  </td>
+                  <td>
+                    <div class="flex align-items-center gap-2">
+                      <div class="bg-200 border-round flex-1" style="height:6px">
+                        <div
+                          class="bg-orange-400 border-round"
+                          style="height:6px"
+                          [style.width]="(m.besoin > 0 ? (m.disponible / m.besoin * 100) : 0) + '%'"
+                        ></div>
+                      </div>
+                      <span class="text-xs font-mono text-500">
+                        {{ m.besoin > 0 ? (m.disponible / m.besoin * 100 | number:'1.0-0') : 0 }}%
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          } @else {
+            <div class="text-center py-5 text-green-600">
+              <i class="pi pi-check-circle text-3xl mb-2 block"></i>
+              Aucun manque de stock — toutes les matières étaient disponibles.
+            </div>
+          }
+        </p-tabpanel>
+
+        <!-- Onglet : Chronologie -->
+        <p-tabpanel value="2">
+          <div class="py-3">
+            <p-timeline [value]="timelineEvents" align="left">
+              <ng-template pTemplate="marker" let-event>
+                <div
+                  class="border-circle flex align-items-center justify-content-center text-white flex-shrink-0"
+                  style="width:32px;height:32px"
+                  [style.background]="event.color"
+                >
+                  <i [class]="event.icon + ' text-sm'"></i>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="content" let-event>
+                <div class="pb-4">
+                  <div class="font-semibold text-900">{{ event.label }}</div>
+                  @if (event.date) {
+                    <div class="text-500 text-sm mt-1">
+                      {{ event.date | date:'dd/MM/yyyy à HH:mm:ss' }}
+                    </div>
+                  }
+                  @if (event.detail) {
+                    <div class="text-400 text-sm mt-1 italic">{{ event.detail }}</div>
+                  }
+                </div>
+              </ng-template>
+            </p-timeline>
+          </div>
+        </p-tabpanel>
+
+        <!-- Onglet : Notes -->
+        @if (run.notes) {
+          <p-tabpanel value="3">
+            <div class="surface-50 border-round p-4 mt-2 text-900 text-sm line-height-3 white-space-pre-line">
+              {{ run.notes }}
+            </div>
+          </p-tabpanel>
+        }
+
+      </p-tabpanels>
+    </p-tabs>
 
   }
 
+  <!-- Footer -->
   <ng-template pTemplate="footer">
     <div class="flex justify-content-between w-full">
       @if (run?.statut === 'TERMINE') {
         <p-button
-          label="Export CSV traçabilité"
+          label="Exporter CSV traçabilité"
           icon="pi pi-download"
           severity="secondary"
           [outlined]="true"
           [loading]="exportingCsv"
           (onClick)="exportCsv()"
+          pTooltip="Télécharger le rapport de traçabilité complet"
         />
       } @else {
         <span></span>
@@ -132,4 +300,5 @@
       <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
     </div>
   </ng-template>
+
 </p-dialog>
