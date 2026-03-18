@@ -14,12 +14,19 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
-  DeductionIngredientResponse,
+  LotConsommeResponse,
   ProductionControllerService,
   ReportControllerService,
-  ResultatProductionResponse,
   RunProductionResponse,
 } from '@/app/modules/openapi';
+
+interface LotParMateriau {
+  materiauNom: string;
+  materiauUnite: string;
+  quantiteTotale: number;
+  cogsTotaux: number;
+  lots: LotConsommeResponse[];
+}
 
 @Component({
   selector: 'app-run-detail-dialog',
@@ -37,16 +44,11 @@ import {
 export class RunDetailDialogComponent implements OnChanges {
   @Input() visible = false;
   @Output() visibleChange = new EventEmitter<boolean>();
-
   @Input() runId: number | null = null;
 
   run: RunProductionResponse | null = null;
   loading = false;
   exportingCsv = false;
-
-  // Résultat détaillé (disponible après exécution)
-  resultat: ResultatProductionResponse | null = null;
-  loadingResultat = false;
 
   constructor(
     private productionService: ProductionControllerService,
@@ -58,7 +60,6 @@ export class RunDetailDialogComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible && this.runId) {
       this.run = null;
-      this.resultat = null;
       this.loadRun();
     }
   }
@@ -81,6 +82,8 @@ export class RunDetailDialogComponent implements OnChanges {
 
   onHide(): void { this.visibleChange.emit(false); }
 
+  // ── Export CSV ────────────────────────────────────────────────────────────
+
   exportCsv(): void {
     if (!this.runId) return;
     this.exportingCsv = true;
@@ -98,7 +101,7 @@ export class RunDetailDialogComponent implements OnChanges {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
         this.exportingCsv = false;
-        this.messageService.add({ severity: 'success', summary: 'Export réussi', detail: `Fichier CSV téléchargé` });
+        this.messageService.add({ severity: 'success', summary: 'Export réussi', detail: 'Fichier CSV téléchargé' });
         this.cdr.detectChanges();
       },
       error: () => {
@@ -109,7 +112,70 @@ export class RunDetailDialogComponent implements OnChanges {
     });
   }
 
-  // Helpers statut
+  // ── Getters KPIs ──────────────────────────────────────────────────────────
+
+  get cogsTotal(): number {
+    return (this.run?.cogsTotal as unknown as number) ?? 0;
+  }
+
+  get coutParUniteValue(): number {
+    return (this.run?.coutParUnite as unknown as number) ?? 0;
+  }
+
+  // ── Traçabilité lots ──────────────────────────────────────────────────────
+
+  getLots(): LotConsommeResponse[] {
+    return (this.run as any)?.lots ?? [];
+  }
+
+  getLotsByMateriau(): LotParMateriau[] {
+    const lots = this.getLots();
+    const map = new Map<string, LotParMateriau>();
+
+    for (const lot of lots) {
+      const key = lot.materiauNom ?? '';
+      if (!map.has(key)) {
+        map.set(key, {
+          materiauNom: lot.materiauNom ?? '',
+          materiauUnite: lot.materiauUnite ?? '',
+          quantiteTotale: 0,
+          cogsTotaux: 0,
+          lots: [],
+        });
+      }
+      const entry = map.get(key)!;
+      entry.quantiteTotale += (lot.quantiteConsommee as unknown as number) ?? 0;
+      entry.cogsTotaux += (lot.coutTotal as unknown as number) ?? 0;
+      entry.lots.push(lot);
+    }
+
+    return Array.from(map.values());
+  }
+
+  getTotalCogs(): number {
+    return this.getLots()
+      .reduce((s, l) => s + ((l.coutTotal as unknown as number) ?? 0), 0);
+  }
+
+  getPctMateriau(mat: LotParMateriau): number {
+    const total = this.getTotalCogs();
+    if (!total || !mat.cogsTotaux) return 0;
+    return Math.round((mat.cogsTotaux / total) * 100);
+  }
+
+  isExpired(date: string | undefined): boolean {
+    if (!date) return false;
+    return new Date(date) < new Date();
+  }
+
+  expireSoon(date: string | undefined): boolean {
+    if (!date) return false;
+    const diff = new Date(date).getTime() - Date.now();
+    return diff > 0 && diff < 30 * 24 * 60 * 60 * 1000; // 30 jours
+  }
+
+  // ── Statut ────────────────────────────────────────────────────────────────
+
   getStatutSeverity(statut: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
     const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
       TERMINE: 'success', EN_COURS: 'info', PLANIFIE: 'warn', ANNULE: 'danger',
@@ -124,35 +190,8 @@ export class RunDetailDialogComponent implements OnChanges {
     return map[statut] ?? statut;
   }
 
-  // Calculs traçabilité
- 
+  // ── Timeline ──────────────────────────────────────────────────────────────
 
-  getPctDeduction(d: DeductionIngredientResponse): number {
-    const total = this.getTotalDeductions();
-    if (!total || !d.cogs) return 0;
-    return Math.round((d.cogs / total) * 100);
-  }
-  
-  get cogsTotal(): number {
-    return (this.run as any)?.cogsTotal ?? 0;
-  }
-
-  get coutParUniteValue(): number {
-    return (this.run as any)?.coutParUnite ?? 0;
-  }
-
-  get orderId(): string {
-    return (this.run as any)?.platformOrderId ?? '';
-  }
-  getDeductions(): DeductionIngredientResponse[] {
-    return this.run?.deductions ?? [];
-  }
-
-  getTotalDeductions(): number {
-    return this.getDeductions()
-      .reduce((s, d) => s + ((d.cogs as unknown as number) ?? 0), 0);
-  }
-  // Timeline événements
   get timelineEvents(): { label: string; date: string | undefined; icon: string; color: string; detail?: string }[] {
     const events = [];
 
@@ -175,10 +214,9 @@ export class RunDetailDialogComponent implements OnChanges {
     if (this.run?.statut === 'ANNULE') {
       events.push({
         label: 'Run annulé',
-        date: this.run?.completeAt,
+        date: this.run.completeAt,
         icon: 'pi pi-times-circle',
         color: '#ef4444',
-        detail: (this.run as any).raison,
       });
     }
 
@@ -194,10 +232,10 @@ export class RunDetailDialogComponent implements OnChanges {
       }
       events.push({
         label: 'Production terminée',
-        date: this.run?.completeAt,
+        date: this.run.completeAt,
         icon: 'pi pi-check-circle',
         color: '#10b981',
-        detail: `${this.run?.unitesProduite} ${(this.run as any)?.uniteProduite ?? 'unités'} produites`,
+        detail: `${this.run.unitesProduite} unités — COGS ${this.cogsTotal.toFixed(2)} €`,
       });
     }
 

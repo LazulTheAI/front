@@ -1,11 +1,11 @@
 <p-toast />
 
 <p-dialog
-  [header]="'Run #' + (run?.id ?? runId) + (run?.recetteNom ? ' — ' + run?.recetteNom : '')"
+  [header]="'Run #' + (run?.id ?? runId) + (run?.recetteNom ? ' — ' + run.recetteNom : '')"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
-  [style]="{ width: '860px' }"
+  [style]="{ width: '900px' }"
   [draggable]="false"
 >
 
@@ -17,21 +17,16 @@
 
   @if (!loading && run) {
 
-    <!-- Bandeau statut + métriques -->
+    <!-- Bandeau statut -->
     <div class="flex align-items-center justify-content-between mb-4 p-3 surface-50 border-round-xl">
       <div class="flex align-items-center gap-3">
         <p-tag
           [value]="getStatutLabel(run.statut ?? '')"
           [severity]="getStatutSeverity(run.statut ?? '')"
-          styleClass="text-sm px-3 py-1"
+          styleClass="text-sm px-3"
         />
         @if (run.stockInsuffisant) {
           <p-tag value="Stock insuffisant" severity="warn" styleClass="text-xs" />
-        }
-        @if (orderId) {
-          <span class="text-500 text-sm font-mono">
-            <i class="pi pi-shopping-cart mr-1"></i>{{ orderId }}
-          </span>
         }
       </div>
       <div class="flex gap-4 text-sm text-500">
@@ -61,10 +56,8 @@
       <div class="col-3">
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
           <div class="text-400 text-xs font-medium mb-2">COGS TOTAL</div>
-          @if (cogsTotal) {
-            <div class="font-bold text-2xl text-primary">
-              {{ cogsTotal | currency:'EUR':'symbol':'1.2-2' }}
-            </div>
+          @if (cogsTotal > 0) {
+            <div class="font-bold text-2xl text-primary">{{ cogsTotal | currency:'EUR':'symbol':'1.2-2' }}</div>
           } @else {
             <div class="font-bold text-2xl text-400">—</div>
           }
@@ -74,9 +67,7 @@
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
           <div class="text-400 text-xs font-medium mb-2">COÛT / UNITÉ</div>
           @if (coutParUniteValue > 0) {
-            <div class="font-bold text-2xl text-900">
-              {{ coutParUniteValue | currency:'EUR':'symbol':'1.2-4' }}
-            </div>
+            <div class="font-bold text-2xl text-900">{{ coutParUniteValue | currency:'EUR':'symbol':'1.2-4' }}</div>
           } @else {
             <div class="font-bold text-2xl text-400">—</div>
           }
@@ -88,73 +79,120 @@
     <p-tabs>
       <p-tablist>
         <p-tab value="0">
-          <i class="pi pi-list mr-2"></i>Matières consommées
+          <i class="pi pi-list mr-2"></i>Traçabilité lots
+          @if (getLots().length > 0) {
+            <p-tag [value]="getLots().length + ' lot(s)'" severity="secondary" styleClass="text-xs ml-2" />
+          }
         </p-tab>
         <p-tab value="1">
-          <i class="pi pi-exclamation-triangle mr-2"></i>
-          Manques de stock
+          <i class="pi pi-chart-pie mr-2"></i>Résumé par matière
+        </p-tab>
+        <p-tab value="2">
+          <i class="pi pi-exclamation-triangle mr-2"></i>Manques
           @if ((run.manques?.length ?? 0) > 0) {
             <p-tag [value]="run.manques!.length + ''" severity="warn" styleClass="text-xs ml-2" />
           }
         </p-tab>
-        <p-tab value="2">
+        <p-tab value="3">
           <i class="pi pi-history mr-2"></i>Chronologie
         </p-tab>
-        @if (run.notes) {
-          <p-tab value="3">
-            <i class="pi pi-comment mr-2"></i>Notes
-          </p-tab>
-        }
       </p-tablist>
 
       <p-tabpanels>
 
-        <!-- Onglet : Matières consommées -->
+        <!-- Onglet 0 : Traçabilité lot par lot -->
         <p-tabpanel value="0">
-          @if (getDeductions().length > 0) {
-            <p-table [value]="getDeductions()" styleClass="p-datatable-sm mt-2">
+          @if (getLots().length > 0) {
+            <p-table [value]="getLots()" styleClass="p-datatable-sm mt-2">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>Matière première</th>
-                  <th style="width: 130px" class="text-right">Quantité consommée</th>
-                  <th style="width: 120px" class="text-right">COGS</th>
-                  <th style="width: 100px" class="text-right">% du total</th>
-                  <th style="width: 180px">Répartition</th>
+                  <th style="min-width: 160px">Matière première</th>
+                  <th style="width: 110px" class="text-right">Qté consommée</th>
+                  <th style="width: 110px">N° de lot</th>
+                  <th style="width: 130px">DLC lot</th>
+                  <th style="width: 140px">Entrepôt source</th>
+                  <th style="width: 140px">Fournisseur</th>
+                  <th style="width: 100px" class="text-right">Coût unit.</th>
+                  <th style="width: 100px" class="text-right">Coût total</th>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="body" let-d>
+              <ng-template pTemplate="body" let-lot>
                 <tr>
-                  <td><span class="font-medium text-900">{{ d.materiauNom }}</span></td>
-                  <td class="text-right">
-                    <span class="font-mono text-sm">{{ d.quantite | number:'1.0-4' }}</span>
-                    <span class="text-400 text-xs ml-1">{{ d.unite }}</span>
+                  <td>
+                    <span class="font-medium text-900">{{ lot.materiauNom }}</span>
                   </td>
                   <td class="text-right">
-                    <span class="font-mono text-sm font-semibold text-primary">
-                      {{ d.cogs | currency:'EUR':'symbol':'1.2-4' }}
-                    </span>
-                  </td>
-                  <td class="text-right">
-                    <span class="text-sm text-500">{{ getPctDeduction(d) }}%</span>
+                    <span class="font-mono text-sm">{{ lot.quantiteConsommee | number:'1.0-4' }}</span>
+                    <span class="text-400 text-xs ml-1">{{ lot.materiauUnite }}</span>
                   </td>
                   <td>
-                    <div class="bg-200 border-round" style="height:6px">
-                      <div
-                        class="bg-primary border-round"
-                        style="height:6px;transition:width 0.3s"
-                        [style.width]="getPctDeduction(d) + '%'"
-                      ></div>
-                    </div>
+                    @if (lot.numeroLot) {
+                      <span class="font-mono text-sm text-primary">{{ lot.numeroLot }}</span>
+                    } @else {
+                      <span class="text-400">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (lot.expiresAt) {
+                      <span
+                        class="text-sm flex align-items-center gap-1"
+                        [class.text-red-500]="isExpired(lot.expiresAt)"
+                        [class.text-orange-500]="!isExpired(lot.expiresAt) && expireSoon(lot.expiresAt)"
+                        [class.text-500]="!isExpired(lot.expiresAt) && !expireSoon(lot.expiresAt)"
+                      >
+                        @if (isExpired(lot.expiresAt)) {
+                          <i class="pi pi-exclamation-circle text-xs"></i>
+                        } @else if (expireSoon(lot.expiresAt)) {
+                          <i class="pi pi-clock text-xs"></i>
+                        }
+                        {{ lot.expiresAt | date:'dd/MM/yyyy' }}
+                      </span>
+                    } @else {
+                      <span class="text-400">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (lot.entrepotNom) {
+                      <span class="text-sm text-500">
+                        <i class="pi pi-warehouse text-xs mr-1"></i>{{ lot.entrepotNom }}
+                      </span>
+                    } @else {
+                      <span class="text-400">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (lot.fournisseurNom) {
+                      <span class="text-sm text-500">
+                        <i class="pi pi-truck text-xs mr-1"></i>{{ lot.fournisseurNom }}
+                      </span>
+                    } @else {
+                      <span class="text-400 text-sm">Non renseigné</span>
+                    }
+                  </td>
+                  <td class="text-right">
+                    @if (lot.coutUnitaire) {
+                      <span class="font-mono text-sm">{{ lot.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }}</span>
+                    } @else {
+                      <span class="text-400">—</span>
+                    }
+                  </td>
+                  <td class="text-right">
+                    @if (lot.coutTotal) {
+                      <span class="font-mono text-sm font-semibold text-primary">
+                        {{ lot.coutTotal | currency:'EUR':'symbol':'1.2-4' }}
+                      </span>
+                    } @else {
+                      <span class="text-400">—</span>
+                    }
                   </td>
                 </tr>
               </ng-template>
               <ng-template pTemplate="footer">
                 <tr>
-                  <td class="text-right font-medium text-500" colspan="2">Total COGS</td>
+                  <td colspan="7" class="text-right font-medium text-500">COGS Total</td>
                   <td class="text-right font-bold text-900">
-                    {{ getTotalDeductions() | currency:'EUR':'symbol':'1.2-2' }}
+                    {{ getTotalCogs() | currency:'EUR':'symbol':'1.2-2' }}
                   </td>
-                  <td colspan="2"></td>
                 </tr>
               </ng-template>
             </p-table>
@@ -162,21 +200,94 @@
             <div class="text-center py-5 text-400">
               <i class="pi pi-info-circle text-2xl mb-2 block"></i>
               @if (run.statut === 'PLANIFIE') {
-                Les matières consommées seront visibles après exécution du run.
+                La traçabilité sera disponible après exécution du run.
               } @else {
-                Aucune déduction de matières enregistrée.
+                Aucun lot de traçabilité enregistré.
               }
             </div>
           }
         </p-tabpanel>
 
-        <!-- Onglet : Manques de stock -->
+        <!-- Onglet 1 : Résumé par matière -->
         <p-tabpanel value="1">
+          @if (getLotsByMateriau().length > 0) {
+            <div class="flex flex-column gap-3 mt-2">
+              @for (mat of getLotsByMateriau(); track mat.materiauNom) {
+                <div class="surface-50 border-round-xl p-4 border-1 surface-border">
+                  <div class="flex align-items-center justify-content-between mb-3">
+                    <div class="flex align-items-center gap-3">
+                      <div class="surface-200 border-round p-2">
+                        <i class="pi pi-box text-primary"></i>
+                      </div>
+                      <div>
+                        <div class="font-bold text-900">{{ mat.materiauNom }}</div>
+                        <div class="text-500 text-sm">
+                          {{ mat.quantiteTotale | number:'1.0-4' }} {{ mat.materiauUnite }} consommés
+                          · {{ mat.lots.length }} lot(s)
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <div class="font-bold text-primary text-lg">
+                        {{ mat.cogsTotaux | currency:'EUR':'symbol':'1.2-2' }}
+                      </div>
+                      <div class="text-400 text-xs">{{ getPctMateriau(mat) }}% du COGS total</div>
+                    </div>
+                  </div>
+
+                  <!-- Barre de répartition -->
+                  <div class="bg-200 border-round mb-3" style="height: 6px">
+                    <div
+                      class="bg-primary border-round"
+                      style="height: 6px; transition: width 0.3s"
+                      [style.width]="getPctMateriau(mat) + '%'"
+                    ></div>
+                  </div>
+
+                  <!-- Détail lots -->
+                  <div class="flex flex-wrap gap-2">
+                    @for (lot of mat.lots; track $index) {
+                      <div class="surface-card border-round px-3 py-2 border-1 surface-border text-sm">
+                        @if (lot.numeroLot) {
+                          <span class="font-mono text-primary font-semibold">{{ lot.numeroLot }}</span>
+                          <span class="text-400 mx-1">·</span>
+                        }
+                        <span class="text-900">{{ lot.quantiteConsommee | number:'1.0-3' }} {{ lot.materiauUnite }}</span>
+                        @if (lot.expiresAt) {
+                          <span class="text-400 mx-1">·</span>
+                          <span
+                            [class.text-red-500]="isExpired(lot.expiresAt)"
+                            [class.text-orange-500]="expireSoon(lot.expiresAt)"
+                            [class.text-400]="!isExpired(lot.expiresAt) && !expireSoon(lot.expiresAt)"
+                          >
+                            DLC {{ lot.expiresAt | date:'dd/MM/yy' }}
+                          </span>
+                        }
+                        @if (lot.fournisseurNom) {
+                          <span class="text-400 mx-1">·</span>
+                          <span class="text-500">{{ lot.fournisseurNom }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="text-center py-5 text-400">
+              <i class="pi pi-chart-pie text-2xl mb-2 block"></i>
+              Aucune donnée de consommation disponible.
+            </div>
+          }
+        </p-tabpanel>
+
+        <!-- Onglet 2 : Manques -->
+        <p-tabpanel value="2">
           @if ((run.manques?.length ?? 0) > 0) {
             <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round mb-3 mt-2 border-1 border-orange-200">
               <i class="pi pi-exclamation-triangle text-orange-500"></i>
               <span class="text-sm text-orange-800">
-                Ce run a été exécuté avec un stock insuffisant. Les quantités produites peuvent être inférieures à la prévision.
+                Ce run a été exécuté avec un stock insuffisant.
               </span>
             </div>
             <p-table [value]="run.manques ?? []" styleClass="p-datatable-sm">
@@ -197,11 +308,7 @@
                     <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
                   </td>
                   <td class="text-right">
-                    <span
-                      class="font-mono text-sm"
-                      [class.text-red-600]="m.disponible === 0"
-                      [class.text-orange-500]="m.disponible > 0"
-                    >
+                    <span class="font-mono text-sm" [class.text-red-600]="m.disponible === 0">
                       {{ m.disponible | number:'1.0-3' }}
                     </span>
                     <span class="text-400 text-xs ml-1">{{ m.unite }}</span>
@@ -237,8 +344,8 @@
           }
         </p-tabpanel>
 
-        <!-- Onglet : Chronologie -->
-        <p-tabpanel value="2">
+        <!-- Onglet 3 : Chronologie -->
+        <p-tabpanel value="3">
           <div class="py-3">
             <p-timeline [value]="timelineEvents" align="left">
               <ng-template pTemplate="marker" let-event>
@@ -267,17 +374,15 @@
           </div>
         </p-tabpanel>
 
-        <!-- Onglet : Notes -->
-        @if (run.notes) {
-          <p-tabpanel value="3">
-            <div class="surface-50 border-round p-4 mt-2 text-900 text-sm line-height-3 white-space-pre-line">
-              {{ run.notes }}
-            </div>
-          </p-tabpanel>
-        }
-
       </p-tabpanels>
     </p-tabs>
+
+    @if (run.notes) {
+      <div class="mt-3 surface-50 border-round p-3 flex gap-2">
+        <i class="pi pi-comment text-400 mt-1"></i>
+        <span class="text-700 text-sm line-height-3">{{ run.notes }}</span>
+      </div>
+    }
 
   }
 
@@ -292,7 +397,6 @@
           [outlined]="true"
           [loading]="exportingCsv"
           (onClick)="exportCsv()"
-          pTooltip="Télécharger le rapport de traçabilité complet"
         />
       } @else {
         <span></span>
