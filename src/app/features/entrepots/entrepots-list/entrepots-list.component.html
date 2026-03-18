@@ -20,7 +20,7 @@
     @for (entrepot of entrepots; track entrepot.id) {
       <div class="col-12 md:col-6 lg:col-4">
         <div
-          class="surface-card border-round shadow-1 p-4 h-full flex flex-column gap-3 cursor-pointer transition-all transition-duration-200"
+          class="card p-4 h-full flex flex-column gap-3 cursor-pointer transition-all transition-duration-200"
           [class.opacity-60]="!entrepot.actif"
           [class.border-1]="true"
           [class.surface-border]="!entrepot.actif"

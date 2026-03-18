@@ -1,149 +1,295 @@
 <p-toast />
 
-<p-dialog
-  [header]="dialogTitle"
-  [(visible)]="visible"
-  (onHide)="onHide()"
-  [modal]="true"
-  [style]="{ width: dialogWidth }"
-  [draggable]="false"
->
+<p-dialog [header]="dialogTitle" [(visible)]="visible" (onHide)="onHide()" [modal]="true"
+  [style]="{ width: dialogWidth, maxWidth: dialogMaxWidth }" [draggable]="false" [resizable]="false">
 
-  <!-- Steps (création uniquement) -->
-  @if (!isEdit) {
-    <p-steps [model]="steps" [activeIndex]="activeStep" styleClass="mb-4" />
-  }
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-book text-primary"></i>
+      <span class="font-bold text-900">{{ dialogTitle }}</span>
+    </div>
+  </ng-template>
 
+  <!-- ═══════════════════════════════════════════════
+       MODE ÉDITION — formulaire vertical simple
+  ════════════════════════════════════════════════ -->
+  @if (isEdit) {
   <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
 
-    <!-- ======= ÉTAPE 1 / Formulaire edit : Métadonnées ======= -->
-    @if (activeStep === 0 || isEdit) {
-      <!-- Nom -->
-      <div class="flex flex-column gap-2">
-        <label class="font-medium text-900" for="nom">
-          Nom de la recette <span class="text-red-500">*</span>
-        </label>
-        <input
-          pInputText
-          id="nom"
-          name="nom"
-          [(ngModel)]="meta.nom"
-          required
-          maxlength="255"
-          placeholder="Ex: Pain au levain, Sauce tomate..."
-          [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
-        />
-        @if (ngForm.submitted && ngForm.controls['nom']?.invalid) {
-          <small class="text-red-500">Le nom est requis</small>
-        }
-      </div>
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2" for="nom">
+        Nom de la recette <span class="text-red-400">*</span>
+      </label>
+      <input pInputText id="nom" name="nom" [(ngModel)]="meta.nom" required maxlength="255" styleClass="w-full"
+        placeholder="Ex: Bougie Vanille 200g..." class="w-full" />
+    </div>
 
-      <!-- Quantité produite + Unité -->
-      <div class="grid">
-        <div class="col-6 flex flex-column gap-2">
-          <label class="font-medium text-900" for="qte">
-            Quantité produite / batch <span class="text-red-500">*</span>
-          </label>
-          <p-inputNumber
-            inputId="qte"
-            name="quantiteProduite"
-            [(ngModel)]="meta.quantiteProduite"
-            required
-            [min]="0.0001"
-            [minFractionDigits]="0"
-            [maxFractionDigits]="4"
-            placeholder="Ex: 12"
-            [class.ng-invalid]="ngForm.submitted && ngForm.controls['quantiteProduite']?.invalid"
-          />
-        </div>
-        <div class="col-6 flex flex-column gap-2">
-          <label class="font-medium text-900" for="unite">
-            Unité produite <span class="text-red-500">*</span>
-          </label>
-          <input
-            pInputText
-            id="unite"
-            name="uniteProduite"
-            [(ngModel)]="meta.uniteProduite"
-            required
-            maxlength="20"
-            placeholder="pièce, kg, L..."
-            [class.ng-invalid]="ngForm.submitted && ngForm.controls['uniteProduite']?.invalid"
-          />
-        </div>
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2">
+        Quantité produite / batch <span class="text-red-400">*</span>
+      </label>
+      <div class="flex gap-3">
+        <p-inputNumber name="quantiteProduite" [(ngModel)]="meta.quantiteProduite" required [min]="0.0001"
+          [minFractionDigits]="0" [maxFractionDigits]="4" placeholder="Ex: 12" styleClass="flex-1" />
+        <input pInputText name="uniteProduite" [(ngModel)]="meta.uniteProduite" required maxlength="20"
+          placeholder="pièce, kg, L..." style="width: 120px" />
       </div>
+      <small class="text-400">Quantité et unité produites par batch</small>
+    </div>
 
-      <!-- Durée de fabrication -->
-      <div class="flex flex-column gap-2">
-        <label class="font-medium text-900" for="duree">Durée de fabrication</label>
-        <p-inputNumber
-          inputId="duree"
-          name="dureeFabricationMinutes"
-          [(ngModel)]="meta.dureeFabricationMinutes"
-          [min]="1"
-          [max]="100000"
-          suffix=" min"
-          placeholder="Durée en minutes..."
-        />
-        <small class="text-500">Utilisée pour la planification des runs de production</small>
-      </div>
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2">Durée de fabrication</label>
+      <p-inputNumber name="dureeFabricationMinutes" [(ngModel)]="meta.dureeFabricationMinutes" [min]="1" suffix=" min"
+        placeholder="Durée en minutes..." styleClass="w-full" />
+      <small class="text-400">Utilisée pour la planification des runs de production</small>
+    </div>
 
-      <!-- Notes -->
-      <div class="flex flex-column gap-2">
-        <label class="font-medium text-900" for="notes">Notes / Instructions</label>
-        <textarea
-          pTextarea
-          id="notes"
-          name="notes"
-          [(ngModel)]="meta.notes"
-          [rows]="3"
-          maxlength="5000"
-          placeholder="Instructions de fabrication, précautions, conseils..."
-          class="w-full"
-        ></textarea>
-      </div>
-    }
-
-    <!-- ======= ÉTAPE 2 : Ingrédients (création uniquement) ======= -->
-    @if (!isEdit && activeStep === 1) {
-      <p-divider />
-      <app-ingredients-editor
-        [(ingredients)]="ingredients"
-      />
-    }
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2">Notes / Instructions</label>
+      <textarea pTextarea name="notes" [(ngModel)]="meta.notes" [rows]="4" maxlength="5000"
+        placeholder="Instructions de fabrication, précautions, conseils..." class="w-full"></textarea>
+    </div>
 
   </form>
 
   <ng-template pTemplate="footer">
-
-    <!-- Footer création étape 1 -->
-    @if (!isEdit && activeStep === 0) {
-      <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" />
-      <p-button
-        label="Suivant : Ingrédients"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        (onClick)="goToIngredients(ngForm)"
-      />
-    }
-
-    <!-- Footer création étape 2 -->
-    @if (!isEdit && activeStep === 1) {
-      <p-button label="Retour" icon="pi pi-arrow-left" severity="secondary" [text]="true" (onClick)="activeStep = 0" [disabled]="saving" />
-      <p-button
-        label="Créer la recette"
-        icon="pi pi-check"
-        [loading]="saving"
-        [disabled]="ingredients.length === 0"
-        (onClick)="submit(ngForm)"
-      />
-    }
-
-    <!-- Footer édition -->
-    @if (isEdit) {
-      <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
-      <p-button label="Enregistrer" icon="pi pi-check" [loading]="saving" (onClick)="submit(ngForm)" />
-    }
-
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button label="Enregistrer" icon="pi pi-check" [loading]="saving" (onClick)="submit(ngForm)" />
   </ng-template>
-</p-dialog>
+  }
+
+  <!-- ═══════════════════════════════════════════════
+       MODE CRÉATION — 3 étapes sans numéros
+  ════════════════════════════════════════════════ -->
+  @if (!isEdit) {
+
+  <!-- Indicateur d'étape discret -->
+  <div class="flex align-items-center gap-2 mb-4">
+    <div class="border-circle flex align-items-center justify-content-center text-xs font-bold"
+      style="width:24px;height:24px" [class.bg-primary]="step >= 0" [class.text-white]="step >= 0"
+      [class.bg-200]="step < 0">1</div>
+    <div class="flex-1 h-1px" [class.bg-primary]="step >= 1" [class.bg-200]="step < 1"></div>
+    <div class="border-circle flex align-items-center justify-content-center text-xs font-bold"
+      style="width:24px;height:24px" [class.bg-primary]="step >= 1" [class.text-white]="step >= 1"
+      [class.bg-200]="step < 1" [class.text-400]="step < 1">2</div>
+    <div class="flex-1 h-1px" [class.bg-primary]="step >= 2" [class.bg-200]="step < 2"></div>
+    <div class="border-circle flex align-items-center justify-content-center text-xs font-bold"
+      style="width:24px;height:24px" [class.bg-primary]="step >= 2" [class.text-white]="step >= 2"
+      [class.bg-200]="step < 2" [class.text-400]="step < 2">3</div>
+    <div class="ml-3 text-500 text-sm">
+      @if (step === 0) { Informations générales }
+      @if (step === 1) { Sélection des ingrédients }
+      @if (step === 2) { Quantités par batch }
+    </div>
+  </div>
+
+  <!-- ── Étape 0 : Informations ── -->
+  @if (step === 0) {
+  <form #ngForm="ngForm" class="flex flex-column gap-4">
+
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2" for="nom">
+        Nom de la recette <span class="text-red-400">*</span>
+      </label>
+      <input pInputText id="nom" name="nom" [(ngModel)]="meta.nom" required maxlength="255" class="w-full"
+        placeholder="Ex: Bougie Vanille 200g, Pain au levain..." />
+    </div>
+
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2">
+        Production par batch <span class="text-red-400">*</span>
+      </label>
+      <div class="flex gap-3">
+        <p-inputNumber name="quantiteProduite" [(ngModel)]="meta.quantiteProduite" required [min]="0.0001"
+          [minFractionDigits]="0" [maxFractionDigits]="4" placeholder="Ex: 12" styleClass="flex-1" />
+        <input pInputText name="uniteProduite" [(ngModel)]="meta.uniteProduite" required maxlength="20"
+          placeholder="pièce, kg, L..." style="width: 120px" />
+      </div>
+      <small class="text-400">Quantité produite et son unité par batch de fabrication</small>
+    </div>
+
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2">Durée de fabrication</label>
+      <p-inputNumber name="dureeFabricationMinutes" [(ngModel)]="meta.dureeFabricationMinutes" [min]="1" suffix=" min"
+        placeholder="Ex: 120 min" styleClass="w-full" />
+      <small class="text-400">Utilisée pour la planification des runs de production</small>
+    </div>
+
+    <div class="field">
+      <label class="font-semibold text-900 block mb-2">Notes / Instructions</label>
+      <textarea pTextarea name="notes" [(ngModel)]="meta.notes" [rows]="3" maxlength="5000"
+        placeholder="Instructions de fabrication, précautions..." class="w-full"></textarea>
+    </div>
+
+  </form>
+
+
+  }
+
+  <!-- ── Étape 1 : PickList matériaux ── -->
+  @if (step === 1) {
+  <p-pick-list [source]="materiauxSource" [target]="materiauxTarget" sourceHeader="Matériaux disponibles"
+    targetHeader="Ingrédients sélectionnés" [showSourceControls]="false" [showTargetControls]="false" filterBy="nom"
+    sourceFilterPlaceholder="Rechercher..." targetFilterPlaceholder="Rechercher..."
+    (onMoveToSource)="onMoveToSource($event)" (onMoveAllToTarget)="onMoveAllToTarget($event)"
+    (onMoveAllToSource)="onMoveAllToSource($event)" breakpoint="960px" styleClass="w-full">
+    <ng-template #item let-item>
+      <div class="flex align-items-center justify-content-between w-full py-1 pr-2">
+        <div class="flex align-items-center gap-2">
+          @if (item.enAlerte) {
+          <i class="pi pi-exclamation-circle text-orange-500 text-xs" pTooltip="En alerte stock"></i>
+          }
+          <span class="font-medium text-900 text-sm">{{ item.nom }}</span>
+        </div>
+        <div class="flex align-items-center gap-2 flex-shrink-0">
+          @if (item.coutUnitaire) {
+          <p-tag [value]="(item.coutUnitaire | currency:'EUR':'symbol':'1.2-2') + '/' + item.unite" severity="secondary"
+            styleClass="text-xs" />
+          }
+          <span class="text-400 text-xs font-mono">
+            {{ item.unite }}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+  </p-pick-list>
+
+  @if (materiauxTarget.length > 0) {
+  <div class="mt-3 flex align-items-center gap-2 text-sm text-500">
+    <i class="pi pi-check-circle text-green-500"></i>
+    {{ materiauxTarget.length }} ingrédient(s) sélectionné(s)
+  </div>
+  }
+
+  }
+
+  <!-- ── Étape 2 : Quantités via accordéons ── -->
+  @if (step === 2) {
+  <div class="flex flex-column gap-2">
+
+    @if (!ingredientsValides) {
+    <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-2">
+      <i class="pi pi-exclamation-triangle text-orange-500"></i>
+      <span class="text-sm text-orange-800">
+        Renseignez la quantité de chaque ingrédient avant de créer la recette.
+      </span>
+    </div>
+    }
+
+    <p-accordion [multiple]="true">
+      @for (ing of ingredientsSelectionnes; track ing.materiauId; let i = $index) {
+      <p-accordion-panel [value]="i">
+
+        <p-accordion-header>
+          <div class="flex align-items-center justify-content-between w-full pr-3">
+            <div class="flex align-items-center gap-2">
+              @if (ing.quantite != null && ing.quantite > 0) {
+              <i class="pi pi-check-circle text-green-500 text-sm"></i>
+              } @else {
+              <i class="pi pi-circle text-300 text-sm"></i>
+              }
+              <span class="font-medium text-900">{{ ing.materiauNom }}</span>
+            </div>
+            <div class="flex align-items-center gap-3">
+              @if (ing.quantite != null && ing.quantite > 0) {
+              <p-tag [value]="(ing.quantite | number:'1.0-4') + ' ' + ing.uniteOverride" severity="success"
+                styleClass="text-xs" />
+              }
+              @if (ing.coutUnitaire && ing.quantite) {
+              <span class="text-400 text-xs font-mono">
+                ≈ {{ (ing.coutUnitaire * ing.quantite) | currency:'EUR':'symbol':'1.2-2' }}
+              </span>
+              }
+            </div>
+          </div>
+        </p-accordion-header>
+
+        <p-accordion-content>
+          <div class="flex flex-column gap-4 pt-2">
+
+            <!-- Stock disponible -->
+            <div class="surface-50 border-round p-3 flex align-items-center gap-3">
+              <i class="pi pi-box text-primary"></i>
+              <div>
+                <div class="text-400 text-xs mb-1">Stock disponible</div>
+                <div class="font-semibold text-900">
+                  {{ ing.stockTotal | number:'1.0-2' }} {{ ing.unite }}
+                </div>
+              </div>
+              @if (ing.coutUnitaire) {
+              <div class="ml-4">
+                <div class="text-400 text-xs mb-1">Coût unitaire</div>
+                <div class="font-semibold text-900">
+                  {{ ing.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }} / {{ ing.unite }}
+                </div>
+              </div>
+              }
+            </div>
+
+            <!-- Quantité -->
+            <div class="field">
+              <label class="font-semibold text-900 block mb-2">
+                Quantité nécessaire / batch <span class="text-red-400">*</span>
+              </label>
+              <p-inputNumber [(ngModel)]="ing.quantite" [ngModelOptions]="{ standalone: true }" [min]="0.0001"
+                [minFractionDigits]="0" [maxFractionDigits]="4" placeholder="Ex: 0.250" styleClass="w-full" />
+              @if (ing.coutUnitaire && ing.quantite) {
+              <small class="text-primary">
+                Coût estimé : {{ (ing.coutUnitaire * ing.quantite) | currency:'EUR':'symbol':'1.2-4' }} / batch
+              </small>
+              }
+            </div>
+
+            <!-- Unité override -->
+            <div class="field">
+              <label class="font-semibold text-900 block mb-2">Unité</label>
+              <input pInputText [(ngModel)]="ing.uniteOverride" [ngModelOptions]="{ standalone: true }" maxlength="20"
+                class="w-full" [placeholder]="'Par défaut : ' + ing.unite" />
+              <small class="text-400">
+                Modifiez si l'unité dans la recette diffère de l'unité de stock ({{ ing.unite }})
+              </small>
+            </div>
+
+          </div>
+        </p-accordion-content>
+
+      </p-accordion-panel>
+      }
+    </p-accordion>
+
+    <!-- Coût théorique total -->
+    @if (ingredientsValides) {
+    <div class="mt-3 p-3 bg-primary-50 border-round flex align-items-center justify-content-between">
+      <div class="flex align-items-center gap-2 text-primary-700">
+        <i class="pi pi-calculator"></i>
+        <span class="font-medium text-sm">Coût théorique estimé / batch</span>
+      </div>
+      <span class="font-bold text-primary text-lg">
+        {{ coutTheoriqueTotal | currency:'EUR':'symbol':'1.2-2' }}
+      </span>
+    </div>
+    }
+  </div>
+  }
+
+  }
+  <ng-template pTemplate="footer">
+    @if (isEdit) {
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button label="Enregistrer" icon="pi pi-check" [loading]="saving" (onClick)="submitEdit()" />
+    }
+    @if (!isEdit && step === 0) {
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" />
+    <p-button label="Suivant" icon="pi pi-arrow-right" iconPos="right" (onClick)="submitStep0()" />
+    }
+    @if (!isEdit && step === 1) {
+    <p-button label="Précédent" icon="pi pi-arrow-left" severity="secondary" [text]="true" (onClick)="step = 0" />
+    <p-button label="Suivant" icon="pi pi-arrow-right" iconPos="right" [disabled]="materiauxTarget.length === 0"
+      (onClick)="goToQuantites()" />
+    }
+    @if (!isEdit && step === 2) {
+    <p-button label="Précédent" icon="pi pi-arrow-left" severity="secondary" [text]="true" (onClick)="step = 1"
+      [disabled]="saving" />
+    <p-button label="Créer la recette" icon="pi pi-check" [loading]="saving" [disabled]="!ingredientsValides"
+      (onClick)="submitCreate()" />
+    }

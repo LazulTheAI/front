@@ -76,7 +76,7 @@
 </div>
 
 <!-- Table -->
-<div class="surface-card border-round shadow-1">
+<div class="card">
   <p-table
     [value]="runs"
     [loading]="loading"
@@ -84,8 +84,8 @@
     [rows]="15"
     [rowsPerPageOptions]="[10, 15, 25, 50]"
     [showCurrentPageReport]="true"
+    [showGridlines]="true"
     currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-    styleClass="p-datatable-sm p-datatable-hoverable-rows"
     dataKey="id"
     [rowHover]="true"
     (onRowClick)="openDetail($event['data'])"

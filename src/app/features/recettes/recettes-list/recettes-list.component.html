@@ -31,7 +31,7 @@
 }
 
 <!-- Table -->
-<div class="surface-card border-round shadow-1">
+<div class="card">
   <p-table
     [value]="recettes"
     [loading]="loading"
@@ -41,7 +41,7 @@
     [showCurrentPageReport]="true"
     currentPageReportTemplate="{first} à {last} sur {totalRecords}"
     [globalFilterFields]="['nom']"
-    styleClass="p-datatable-sm p-datatable-hoverable-rows"
+    [showGridlines]="true"
     dataKey="id"
     (onRowClick)="openDetail($event['data'])"
     [rowHover]="true"

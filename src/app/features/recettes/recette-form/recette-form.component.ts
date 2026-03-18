@@ -1,187 +1,257 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
-// PrimeNG
+import { AccordionModule } from 'primeng/accordion';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { StepsModule } from 'primeng/steps';
+import { PickListModule } from 'primeng/picklist';
+import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 
-import {
-  CreerRecetteRequest,
-  ModifierRecetteMetaRequest,
-  RecetteControllerService,
-  RecetteResponse,
-} from '@/app/modules/openapi';
+import { CreerRecetteRequest, MateriauControllerService, MateriauResponse, ModifierRecetteMetaRequest, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
 
-import { IngredientLine, IngredientsEditorComponent } from '../ingredients-editor/ingredients-editor.component';
+export interface IngredientSelectionne {
+    materiauId: number;
+    materiauNom: string;
+    unite: string;
+    stockTotal: number;
+    coutUnitaire: number | null;
+    quantite: number | null;
+    uniteOverride: string;
+}
 
 @Component({
-  selector: 'app-recette-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    DialogModule,
-    ButtonModule,
-    InputTextModule,
-    InputNumberModule,
-    TextareaModule,
-    DividerModule,
-    StepsModule,
-    ToastModule,
-    IngredientsEditorComponent,
-  ],
-  providers: [MessageService],
-  templateUrl: './recette-form.component.html',
+    selector: 'app-recette-form',
+    standalone: true,
+    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputTextModule, InputNumberModule, TextareaModule, DividerModule, ToastModule, PickListModule, TagModule, TooltipModule, AccordionModule],
+    providers: [MessageService],
+    templateUrl: './recette-form.component.html'
 })
-export class RecetteFormComponent implements OnChanges {
-  @Input() visible = false;
-  @Output() visibleChange = new EventEmitter<boolean>();
+export class RecetteFormComponent implements OnChanges, OnInit {
+    @Input() visible = false;
+    @Output() visibleChange = new EventEmitter<boolean>();
 
-  @Input() recette: RecetteResponse | null = null;
-  @Output() saved = new EventEmitter<void>();
+    @Input() recette: RecetteResponse | null = null;
+    @Output() saved = new EventEmitter<void>();
 
-  @ViewChild('ngForm') ngForm!: NgForm;
+    saving = false;
 
-  saving = false;
+    // 0 = infos, 1 = sélection matériaux (picklist), 2 = quantités (accordéons)
+    step = 0;
 
-  // Étape active en mode création (0=méta, 1=ingrédients)
-  activeStep = 0;
+    materiauxSource: MateriauResponse[] = [];
+    materiauxTarget: MateriauResponse[] = [];
+    ingredientsSelectionnes: IngredientSelectionne[] = [];
 
-  steps = [
-    { label: 'Informations' },
-    { label: 'Ingrédients' },
-  ];
-
-  meta = {
-    nom: '',
-    quantiteProduite: null as number | null,
-    uniteProduite: '',
-    dureeFabricationMinutes: null as number | null,
-    notes: '',
-  };
-
-  ingredients: IngredientLine[] = [];
-
-  get isEdit(): boolean {
-    return this.recette != null && this.recette.id != null;
-  }
-
-  get dialogTitle(): string {
-    return this.isEdit ? `Modifier "${this.recette?.nom}"` : 'Nouvelle recette';
-  }
-
-  get dialogWidth(): string {
-    return this.isEdit ? '540px' : '700px';
-  }
-
-  constructor(
-    private recetteService: RecetteControllerService,
-    private messageService: MessageService
-  ) {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['visible'] && this.visible) {
-      this.activeStep = 0;
-      this.resetForm();
-    }
-  }
-
-  private resetForm(): void {
-    if (this.isEdit && this.recette) {
-      this.meta = {
-        nom: this.recette.nom ?? '',
-        quantiteProduite: this.recette.quantiteProduite ?? null,
-        uniteProduite: this.recette.uniteProduite ?? '',
-        dureeFabricationMinutes: this.recette.dureeFabricationMinutes ?? null,
-        notes: this.recette.notes ?? '',
-      };
-    } else {
-      this.meta = { nom: '', quantiteProduite: null, uniteProduite: '', dureeFabricationMinutes: null, notes: '' };
-      this.ingredients = [];
-    }
-  }
-
-  onHide(): void {
-    this.visibleChange.emit(false);
-  }
-
-  // Étape 1 → 2
-  goToIngredients(form: NgForm): void {
-    form.onSubmit(new Event('submit'));
-    if (form.invalid) return;
-    this.activeStep = 1;
-  }
-
-  // Soumission finale
-  submit(form: NgForm): void {
-    if (this.isEdit) {
-      this.submitEdit(form);
-    } else {
-      this.submitCreate();
-    }
-  }
-
-  private submitEdit(form: NgForm): void {
-    form.onSubmit(new Event('submit'));
-    if (form.invalid) return;
-
-    this.saving = true;
-    const req: ModifierRecetteMetaRequest = {
-      nom: this.meta.nom,
-      quantiteProduite: this.meta.quantiteProduite!,
-      uniteProduite: this.meta.uniteProduite,
-      dureeFabricationMinutes: this.meta.dureeFabricationMinutes ?? undefined,
-      notes: this.meta.notes || undefined,
+    meta = {
+        nom: '',
+        quantiteProduite: null as number | null,
+        uniteProduite: '',
+        dureeFabricationMinutes: null as number | null,
+        notes: ''
     };
 
-    this.recetteService.modifierMetaRecette(this.recette!.id!, req).subscribe({
-      next: () => this.handleSuccess('Recette modifiée avec succès'),
-      error: () => this.handleError(),
-    });
-  }
-
-  private submitCreate(): void {
-    if (this.ingredients.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Attention', detail: 'Ajoutez au moins un ingrédient' });
-      return;
+    get isEdit(): boolean {
+        return this.recette != null && this.recette.id != null;
     }
 
-    this.saving = true;
-    const req: CreerRecetteRequest = {
-      nom: this.meta.nom,
-      quantiteProduite: this.meta.quantiteProduite!,
-      uniteProduite: this.meta.uniteProduite,
-      dureeFabricationMinutes: this.meta.dureeFabricationMinutes ?? undefined,
-      notes: this.meta.notes || undefined,
-      ingredients: this.ingredients.map((i) => ({
-        materiauId: i.materiauId!,
-        quantite: i.quantite!,
-        unite: i.unite,
-      })),
-    };
+    submitEdit(): void {
+        if (!this.meta.nom || !this.meta.quantiteProduite || !this.meta.uniteProduite) {
+            this.messageService.add({ severity: 'warn', summary: 'Attention', detail: 'Renseignez les champs obligatoires' });
+            return;
+        }
+        this.saving = true;
+        const req: ModifierRecetteMetaRequest = {
+            nom: this.meta.nom,
+            quantiteProduite: this.meta.quantiteProduite!,
+            uniteProduite: this.meta.uniteProduite,
+            dureeFabricationMinutes: this.meta.dureeFabricationMinutes ?? undefined,
+            notes: this.meta.notes || undefined
+        };
+        this.recetteService.modifierMetaRecette(this.recette!.id!, req).subscribe({
+            next: () => this.handleSuccess('Recette modifiée'),
+            error: () => this.handleError()
+        });
+    }
 
-    this.recetteService.creerRecette(req).subscribe({
-      next: () => this.handleSuccess('Recette créée avec succès'),
-      error: () => this.handleError(),
-    });
-  }
+    submitStep0(): void {
+        if (!this.meta.nom || !this.meta.quantiteProduite || !this.meta.uniteProduite) {
+            this.messageService.add({ severity: 'warn', summary: 'Attention', detail: 'Renseignez les champs obligatoires' });
+            return;
+        }
+        this.step = 1;
+    }
 
-  private handleSuccess(msg: string): void {
-    this.saving = false;
-    this.messageService.add({ severity: 'success', summary: 'Succès', detail: msg });
-    this.saved.emit();
-  }
+    get coutTheoriqueTotal(): number {
+        return this.ingredientsSelectionnes.filter((i) => i.coutUnitaire && i.quantite).reduce((s, i) => s + i.coutUnitaire! * i.quantite!, 0);
+    }
+    get dialogTitle(): string {
+        return this.isEdit ? `Modifier "${this.recette?.nom}"` : 'Nouvelle recette';
+    }
 
-  private handleError(): void {
-    this.saving = false;
-    this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue' });
-  }
+    get ingredientsValides(): boolean {
+        return this.ingredientsSelectionnes.length > 0 && this.ingredientsSelectionnes.every((i) => i.quantite != null && i.quantite > 0);
+    }
+
+    get dialogWidth(): string {
+        if (this.isEdit) return '560px';
+        if (this.step === 1) return '92vw';
+        return '620px';
+    }
+
+    onMoveToTarget(event: { items: MateriauResponse[] }): void {
+        this.materiauxTarget = [...this.materiauxTarget, ...event.items];
+        this.materiauxSource = this.materiauxSource.filter((m) => !event.items.some((i) => i.id === m.id));
+    }
+
+    onMoveToSource(event: { items: MateriauResponse[] }): void {
+        this.materiauxSource = [...this.materiauxSource, ...event.items];
+        this.materiauxTarget = this.materiauxTarget.filter((m) => !event.items.some((i) => i.id === m.id));
+    }
+
+    onMoveAllToTarget(event: { items: MateriauResponse[] }): void {
+        this.materiauxTarget = [...this.materiauxTarget, ...event.items];
+        this.materiauxSource = [];
+    }
+
+    onMoveAllToSource(event: { items: MateriauResponse[] }): void {
+        this.materiauxSource = [...this.materiauxSource, ...event.items];
+        this.materiauxTarget = [];
+    }
+
+    get dialogMaxWidth(): string {
+        return this.step === 1 ? '1100px' : '620px';
+    }
+
+    constructor(
+        private recetteService: RecetteControllerService,
+        private materiauService: MateriauControllerService,
+        private messageService: MessageService
+    ) {}
+
+    ngOnInit(): void {
+        this.loadMateriaux();
+    }
+
+    loadMateriaux(): void {
+        this.materiauService.listerMateriau(false).subscribe({
+            next: (data: MateriauResponse[]) => {
+                this.materiauxSource = data.filter((m) => !m.archive);
+            }
+        });
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['visible'] && this.visible) {
+            this.step = 0;
+            this.resetForm();
+        }
+    }
+
+    private resetForm(): void {
+        if (this.isEdit && this.recette) {
+            this.meta = {
+                nom: this.recette.nom ?? '',
+                quantiteProduite: this.recette.quantiteProduite ?? null,
+                uniteProduite: this.recette.uniteProduite ?? '',
+                dureeFabricationMinutes: this.recette.dureeFabricationMinutes ?? null,
+                notes: this.recette.notes ?? ''
+            };
+        } else {
+            this.meta = { nom: '', quantiteProduite: null, uniteProduite: '', dureeFabricationMinutes: null, notes: '' };
+            this.materiauxTarget = [];
+            this.ingredientsSelectionnes = [];
+            this.loadMateriaux();
+        }
+    }
+
+    onHide(): void {
+        this.visibleChange.emit(false);
+    }
+
+    // Étape 0 → 1
+    goToPicklist(form: NgForm): void {
+        form.onSubmit(new Event('submit'));
+        if (form.invalid) return;
+        this.step = 1;
+    }
+
+    // Étape 1 → 2 : convertir les matériaux target en ingrédients
+    goToQuantites(): void {
+        console.log('materiauxTarget:', this.materiauxTarget);
+        if (this.materiauxTarget.length === 0) {
+            this.messageService.add({ severity: 'warn', summary: 'Attention', detail: 'Sélectionnez au moins un ingrédient' });
+            return;
+        }
+
+        // Conserver les quantités déjà saisies si on revient en arrière
+        const existants = new Map(this.ingredientsSelectionnes.map((i) => [i.materiauId, i]));
+
+        this.ingredientsSelectionnes = this.materiauxTarget.map((m) => {
+            const exist = existants.get(m.id!);
+            return (
+                exist ?? {
+                    materiauId: m.id!,
+                    materiauNom: m.nom ?? '',
+                    unite: m.unite ?? '',
+                    stockTotal: Array.isArray(m.stocks) ? m.stocks.reduce((s, st) => s + (st.stockActuel ?? 0), 0) : 0,
+                    coutUnitaire: m.coutUnitaire ?? null,
+                    quantite: null,
+                    uniteOverride: m.unite ?? ''
+                }
+            );
+        });
+
+        this.step = 2;
+    }
+
+    submit(form: NgForm): void {
+        if (this.isEdit) {
+            form.onSubmit(new Event('submit'));
+            if (form.invalid) return;
+            this.submitEdit();
+        }
+    }
+
+    submitCreate(): void {
+        if (!this.ingredientsValides) {
+            this.messageService.add({ severity: 'warn', summary: 'Attention', detail: 'Renseignez toutes les quantités' });
+            return;
+        }
+        this.saving = true;
+        const req: CreerRecetteRequest = {
+            nom: this.meta.nom,
+            quantiteProduite: this.meta.quantiteProduite!,
+            uniteProduite: this.meta.uniteProduite,
+            dureeFabricationMinutes: this.meta.dureeFabricationMinutes ?? undefined,
+            notes: this.meta.notes || undefined,
+            ingredients: this.ingredientsSelectionnes.map((i) => ({
+                materiauId: i.materiauId,
+                quantite: i.quantite!,
+                unite: i.uniteOverride || i.unite
+            }))
+        };
+        this.recetteService.creerRecette(req).subscribe({
+            next: () => this.handleSuccess('Recette créée'),
+            error: () => this.handleError()
+        });
+    }
+
+    private handleSuccess(msg: string): void {
+        this.saving = false;
+        this.messageService.add({ severity: 'success', summary: 'Succès', detail: msg });
+        this.saved.emit();
+    }
+
+    private handleError(): void {
+        this.saving = false;
+        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Une erreur est survenue' });
+    }
 }

@@ -44,17 +44,17 @@
 }
 
 <!-- Table -->
-<div class="surface-card border-round shadow-1">
+<div class="card">
   <p-table
     [value]="materiaux"
     [loading]="loading"
+    [showGridlines]="true"
     [paginator]="true"
     [rows]="15"
     [rowsPerPageOptions]="[10, 15, 25, 50]"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="{first} à {last} sur {totalRecords}"
     [globalFilterFields]="['nom', 'unite']"
-    styleClass="p-datatable-sm"
     dataKey="id"
   >
     <ng-template pTemplate="header">

@@ -25,7 +25,7 @@
 </p-toolbar>
 
 <!-- Table -->
-<div class="surface-card border-round shadow-1">
+<div class="card">
   <p-table
     [value]="bons"
     [loading]="loading"
@@ -34,7 +34,7 @@
     [rowsPerPageOptions]="[10, 15, 25]"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-    styleClass="p-datatable-sm p-datatable-hoverable-rows"
+    [showGridlines]="true"
     dataKey="id"
     [rowHover]="true"
     (onRowClick)="openDetail($event['data'])"
