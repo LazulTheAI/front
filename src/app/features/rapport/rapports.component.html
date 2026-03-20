@@ -1,0 +1,415 @@
+<!-- rapports.component.html -->
+<p-toast />
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+<div class="flex align-items-center justify-content-between mb-4 px-1">
+  <div class="flex align-items-center gap-3">
+    <i class="pi pi-chart-bar text-primary text-2xl"></i>
+    <div>
+      <h1 class="text-900 font-bold text-xl m-0">Rapports</h1>
+      <p class="text-400 text-sm m-0 mt-1">Analyse de votre stock et consommation</p>
+    </div>
+  </div>
+
+  <div class="flex align-items-center gap-2">
+    <p-select
+      [(ngModel)]="periodeSelectionnee"
+      [options]="periodeOptions"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="w-12rem"
+      (onChange)="onPeriodeChange()"
+    />
+    <p-datePicker
+      [(ngModel)]="dateDebut"
+      dateFormat="dd/mm/yy"
+      placeholder="Début"
+      styleClass="w-8rem"
+      (onSelect)="onDatesChange()"
+    />
+    <span class="text-400">→</span>
+    <p-datePicker
+      [(ngModel)]="dateFin"
+      dateFormat="dd/mm/yy"
+      placeholder="Fin"
+      styleClass="w-8rem"
+      (onSelect)="onDatesChange()"
+    />
+  </div>
+</div>
+
+<!-- ═══ SECTION : Valeur du stock ════════════════════════════ -->
+<div class="flex align-items-center gap-2 mb-3">
+  <i class="pi pi-wallet text-primary"></i>
+  <h2 class="text-900 font-semibold text-lg m-0">Valeur du stock</h2>
+</div>
+
+<div class="grid mb-4">
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Valeur totale</div>
+      @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-primary">
+          {{ valeurTotale | currency:'EUR':'symbol':'1.2-2' }}
+        </div>
+      }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Références valorisées</div>
+      @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-900">
+          {{ totalMateriaux - materiauSansCout }} / {{ totalMateriaux }}
+        </div>
+        @if (materiauSansCout > 0) {
+          <div class="text-orange-500 text-xs mt-1">{{ materiauSansCout }} sans coût unitaire</div>
+        }
+      }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Valeur moyenne / matériau</div>
+      @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-900">
+          {{ totalMateriaux > 0
+            ? (valeurTotale / totalMateriaux | currency:'EUR':'symbol':'1.2-2')
+            : '—' }}
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (!loadingValeur && materiauSansCout > 0) {
+  <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-4">
+    <i class="pi pi-exclamation-triangle text-orange-500"></i>
+    <span class="text-sm text-orange-800">
+      {{ materiauSansCout }} matériau(x) sans coût unitaire sont exclus de la valorisation.
+    </span>
+  </div>
+}
+
+<!-- ═══ SECTION : Consommation ═══════════════════════════════ -->
+<p-divider />
+
+<div class="flex align-items-center gap-2 mb-3">
+  <i class="pi pi-chart-bar text-primary"></i>
+  <h2 class="text-900 font-semibold text-lg m-0">Consommation</h2>
+</div>
+
+<div class="grid mb-4">
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Matériaux consommés</div>
+      @if (loadingConso) { <p-skeleton height="2.5rem" /> }
+      @else { <div class="text-3xl font-bold text-900">{{ consoItems.length }}</div> }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Coût total consommé</div>
+      @if (loadingConso) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-primary">
+          {{ coutTotalConso | currency:'EUR':'symbol':'1.2-2' }}
+        </div>
+      }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Matériau le + consommé</div>
+      @if (loadingConso) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-lg font-bold text-900 overflow-hidden text-overflow-ellipsis white-space-nowrap">
+          {{ consoItems[0]?.nom ?? '—' }}
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
+  <div class="flex align-items-center justify-content-between mb-3">
+    <span class="font-semibold text-900">Détail par matériau</span>
+    <p-button label="Exporter" icon="pi pi-download" severity="secondary"
+      size="small" [text]="true" (onClick)="exportCsv('consommation')" />
+  </div>
+  <p-table
+    [value]="consoItems"
+    [loading]="loadingConso"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+    sortField="quantiteTotale"
+    [sortOrder]="-1"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="nom">Matériau <p-sortIcon field="nom" /></th>
+        <th pSortableColumn="quantiteTotale" style="width:160px">
+          Qté consommée <p-sortIcon field="quantiteTotale" />
+        </th>
+        <th pSortableColumn="coutTotal" style="width:140px">
+          Coût total <p-sortIcon field="coutTotal" />
+        </th>
+        <th pSortableColumn="nombreMouvements" style="width:120px">
+          Mouvements <p-sortIcon field="nombreMouvements" />
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td class="font-medium text-900">{{ row.nom }}</td>
+        <td class="font-mono text-sm">{{ row.quantiteTotale | number:'1.0-4' }} {{ row.unite }}</td>
+        <td class="font-semibold text-primary">
+          @if (row.coutTotal) {
+            {{ row.coutTotal | currency:'EUR':'symbol':'1.2-2' }}
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+        <td class="text-center">
+          <p-tag [value]="row.nombreMouvements?.toString()" severity="secondary" />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center text-400 py-4">Aucune consommation sur la période</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- ═══ SECTION : Mouvements ═════════════════════════════════ -->
+<p-divider />
+
+<div class="flex align-items-center gap-2 mb-3">
+  <i class="pi pi-arrow-right-arrow-left text-primary"></i>
+  <h2 class="text-900 font-semibold text-lg m-0">Mouvements</h2>
+</div>
+
+<div class="grid mb-4">
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Total entrées</div>
+      @if (loadingMouvements) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-green-600">+{{ totalEntrees | number:'1.0-2' }}</div>
+      }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Total sorties</div>
+      @if (loadingMouvements) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-red-500">-{{ totalSorties | number:'1.0-2' }}</div>
+      }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Solde net</div>
+      @if (loadingMouvements) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold"
+          [class.text-green-600]="soldeNet >= 0"
+          [class.text-red-500]="soldeNet < 0">
+          {{ soldeNet >= 0 ? '+' : '' }}{{ soldeNet | number:'1.0-2' }}
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
+  <div class="flex align-items-center justify-content-between mb-3">
+    <span class="font-semibold text-900">
+      Liste des mouvements
+      <p-tag [value]="mouvements.length.toString()" severity="secondary" styleClass="ml-2" />
+    </span>
+    <p-button label="Exporter" icon="pi pi-download" severity="secondary"
+      size="small" [text]="true" (onClick)="exportCsv('mouvements')" />
+  </div>
+  <p-table
+    [value]="mouvements"
+    [loading]="loadingMouvements"
+    [paginator]="true"
+    [rows]="15"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+    sortField="createdAt"
+    [sortOrder]="-1"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="createdAt" style="width:140px">
+          Date <p-sortIcon field="createdAt" />
+        </th>
+        <th pSortableColumn="materiauNom">Matériau <p-sortIcon field="materiauNom" /></th>
+        <th pSortableColumn="typeMouvement" style="width:140px">
+          Type <p-sortIcon field="typeMouvement" />
+        </th>
+        <th pSortableColumn="quantite" style="width:120px">
+          Quantité <p-sortIcon field="quantite" />
+        </th>
+        <th pSortableColumn="coutUnitaireSnapshot" style="width:130px">
+          Coût unitaire <p-sortIcon field="coutUnitaireSnapshot" />
+        </th>
+        <th style="width:120px">Référence</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-m>
+      <tr>
+        <td class="text-sm text-500">{{ m.createdAt | date:'dd/MM/yy HH:mm' }}</td>
+        <td class="font-medium text-900">{{ m.materiauNom }}</td>
+        <td>
+          <p-tag
+            [value]="getTypeMouvLabel(m.typeMouvement)"
+            [severity]="getTypeMouvSeverity(m.typeMouvement)"
+            styleClass="text-xs"
+          />
+        </td>
+        <td class="font-mono text-sm font-semibold"
+          [class.text-green-600]="getTypeMouvSeverity(m.typeMouvement) === 'success'"
+          [class.text-red-500]="getTypeMouvSeverity(m.typeMouvement) === 'danger'">
+          {{ m.quantite | number:'1.0-4' }} {{ m.materiauUnite }}
+        </td>
+        <td class="font-mono text-sm text-400">
+          @if (m.coutUnitaireSnapshot) {
+            {{ m.coutUnitaireSnapshot | currency:'EUR':'symbol':'1.2-4' }}
+          } @else { — }
+        </td>
+        <td class="text-xs text-400 font-mono">
+          @if (m.referenceType) {
+            <span [pTooltip]="m.referenceType">{{ m.referenceId }}</span>
+          } @else { — }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center text-400 py-4">Aucun mouvement sur la période</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- ═══ SECTION : Alertes ═════════════════════════════════════ -->
+<p-divider />
+
+<div class="flex align-items-center justify-content-between mb-3">
+  <div class="flex align-items-center gap-2">
+    <i class="pi pi-bell text-primary"></i>
+    <h2 class="text-900 font-semibold text-lg m-0">Alertes stock</h2>
+    @if (nbAlertes > 0) {
+      <p-tag [value]="nbAlertes.toString()" severity="danger" />
+    }
+  </div>
+</div>
+
+<div class="grid mb-4">
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Matériaux en alerte</div>
+      @if (loadingAlertes) { <p-skeleton height="2.5rem" /> }
+      @else { <div class="text-3xl font-bold text-red-500">{{ alertes.length }}</div> }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Manque total estimé</div>
+      @if (loadingAlertes) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-orange-500">
+          {{ totalManque | number:'1.0-2' }}
+        </div>
+      }
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Alertes critiques</div>
+      @if (loadingAlertes) { <p-skeleton height="2.5rem" /> }
+      @else {
+        <div class="text-3xl font-bold text-red-700">{{ nbAlertesCritiques }}</div>
+        <div class="text-400 text-xs mt-1">manque &gt; 5 unités</div>
+      }
+    </div>
+  </div>
+</div>
+
+<div class="surface-card border-round-xl border-1 surface-border p-4">
+  <div class="font-semibold text-900 mb-3">Matériaux sous seuil d'alerte</div>
+  <p-table
+    [value]="alertes"
+    [loading]="loadingAlertes"
+    [paginator]="true"
+    [rows]="15"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+    sortField="manqueMax"
+    [sortOrder]="-1"
+    dataKey="materiauId"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="nom">Matériau <p-sortIcon field="nom" /></th>
+        <th pSortableColumn="seuilAlerte" style="width:130px">
+          Seuil <p-sortIcon field="seuilAlerte" />
+        </th>
+        <th pSortableColumn="manqueMax" style="width:130px">
+          Manque <p-sortIcon field="manqueMax" />
+        </th>
+        <th style="width:220px">Stock par entrepôt</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-a>
+      <tr>
+        <td>
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-exclamation-circle text-red-500"></i>
+            <span class="font-medium text-900">{{ a.nom }}</span>
+            <span class="text-400 text-xs font-mono">({{ a.unite }})</span>
+          </div>
+        </td>
+        <td class="font-mono text-sm text-400">
+          {{ a.seuilAlerte | number:'1.0-2' }} {{ a.unite }}
+        </td>
+        <td class="font-mono text-sm font-semibold text-red-500">
+          -{{ a.manqueMax | number:'1.0-2' }} {{ a.unite }}
+        </td>
+        <td>
+          <div class="flex flex-column gap-1">
+            @for (s of a.stocksParEntrepot; track s.entrepotId) {
+              <div class="flex align-items-center justify-content-between text-xs">
+                <span class="text-500">{{ s.entrepotNom }}</span>
+                <span class="font-mono font-semibold"
+                  [class.text-red-500]="s.stockActuel <= 0"
+                  [class.text-orange-500]="s.stockActuel > 0">
+                  {{ s.stockActuel | number:'1.0-2' }}
+                </span>
+              </div>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center py-6 text-400">
+          <i class="pi pi-check-circle text-green-500 text-4xl mb-3 block"></i>
+          Aucune alerte — stock en ordre
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
