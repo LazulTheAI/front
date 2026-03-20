@@ -24,22 +24,36 @@ export class AppMenu {
     ngOnInit() {
         this.model = [
             {
-                label: 'Home',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
-            },
-            {
-                label: 'UI Components',
+                label: 'Stock & approvisionnement',
                 items: [
                     { label: 'Matériaux', icon: 'pi pi-box', routerLink: ['materiaux'] },
-                    { label: 'Recettes', icon: 'pi pi-book', routerLink: ['recettes'] },
-                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] },
-                    { label: 'Entrepôts', icon: 'pi pi-warehouse', routerLink: ['entrepots'] },
-                    { label: 'Ateliers', icon: 'pi pi-building', routerLink: ['lieux-production'] },
-                    { label: 'Mon équipe', icon: 'pi pi-users', routerLink: ['utilisateurs'] },
                     { label: 'Fournisseurs', icon: 'pi pi-truck', routerLink: ['fournisseurs'] },
-                    { label: 'Produits', icon: 'pi pi-tag', routerLink: ['produits'] },
-                    { label: 'Bon de Comomande', icon: 'pi pi-file', routerLink: ['bons-commande'] },
-                    { label: 'Rapports', icon: 'pi pi-chart-bar', routerLink: ['rapports'] }
+                    { label: 'Bons de commande', icon: 'pi pi-shopping-cart', routerLink: ['bons-commande'] }
+                ]
+            },
+            {
+                label: 'Production',
+                items: [
+                    { label: 'Recettes', icon: 'pi pi-book', routerLink: ['recettes'] },
+                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] }
+                ]
+            },
+            {
+                label: 'Catalogue',
+                items: [{ label: 'Produits', icon: 'pi pi-tag', routerLink: ['produits'] }]
+            },
+            {
+                label: 'Organisation',
+                items: [
+                    { label: 'Utilisateurs', icon: 'pi pi-users', routerLink: ['utilisateurs'] },
+                    { label: 'Ateliers', icon: 'pi pi-warehouse', routerLink: ['lieux-production'] }
+                ]
+            },
+            {
+                label: 'Analyse',
+                items: [
+                    { label: 'Rapports', icon: 'pi pi-chart-bar', routerLink: ['rapports'] },
+                    { label: 'Alertes', icon: 'pi pi-bell', routerLink: ['alertes'] }
                 ]
             }
         ];

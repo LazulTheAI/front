@@ -24,13 +24,13 @@ export const appRoutes: Routes = [
             { path: 'materiaux', loadChildren: () => import('./app/features/materiaux/materiaux.routes').then((m) => m.MATERIAUX_ROUTES) },
             { path: 'recettes', loadChildren: () => import('./app/features/recettes/recettes.routes').then((r) => r.RECETTES_ROUTES) },
             { path: 'production', loadChildren: () => import('./app/features/production/production.routes').then((m) => m.PRODUCTION_ROUTES) },
-            { path: 'entrepots', loadChildren: () => import('./app/features/entrepots/entrepots.routes').then((m) => m.ENTREPOTS_ROUTES) },
             { path: 'lieux-production', loadChildren: () => import('./app/features/lieux-production/lieux-production.routes').then((m) => m.LIEUX_PRODUCTION_ROUTES) },
             { path: 'utilisateurs', loadChildren: () => import('./app/features/mon-equipe/mon-equipe.routes').then((m) => m.MON_EQUIPE_ROUTES) },
             { path: 'produits', loadChildren: () => import('./app/features/produits/produits.routes').then((m) => m.PRODUITS_ROUTES) },
             { path: 'fournisseurs', loadChildren: () => import('./app/features/fournisseurs/fournisseurs.routes').then((m) => m.FOURNISSEURS_ROUTES) },
             { path: 'bons-commande', loadChildren: () => import('./app/features/bons-commande/bons-commande.routes').then((m) => m.BONS_COMMANDE_ROUTES) },
-            { path: 'rapports', loadChildren: () => import('./app/features/rapport/prapports.routes').then((m) => m.RAPPORT_ROUTES) }
+            { path: 'rapports', loadChildren: () => import('./app/features/rapport/prapports.routes').then((m) => m.RAPPORT_ROUTES) },
+            { path: 'alertes', loadChildren: () => import('./app/features/alerte/alertes.routes').then((m) => m.Alerte_ROUTES) }
         ]
     },
 

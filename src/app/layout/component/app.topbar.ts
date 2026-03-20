@@ -1,3 +1,4 @@
+import { AlerteWidgetComponent } from '@/app/features/alerte/alerte-widget.component';
 import { LayoutService } from '@/app/layout/service/layout.service';
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
@@ -9,7 +10,7 @@ import { AppConfigurator } from './app.configurator';
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, AlerteWidgetComponent],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -63,20 +64,7 @@ import { AppConfigurator } from './app.configurator';
             </button>
 
             <div class="layout-topbar-menu hidden lg:block">
-                <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
-                </div>
+                <app-alerte-widget />
             </div>
         </div>
     </div>`

@@ -1,0 +1,140 @@
+<p-toast />
+<p-confirmDialog />
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+<div class="flex align-items-center justify-content-between mb-4 px-1">
+  <div class="flex align-items-center gap-3">
+    <i class="pi pi-bell text-primary text-2xl"></i>
+    <div>
+      <h1 class="text-900 font-bold text-xl m-0">Alertes stock</h1>
+      <p class="text-400 text-sm m-0 mt-1">
+        Matériaux sous seuil d'alerte — actualisé toutes les 30 secondes
+      </p>
+    </div>
+  </div>
+  <p-button
+    label="Actualiser"
+    icon="pi pi-refresh"
+    severity="secondary"
+    [text]="true"
+    (onClick)="alerteService.refresh()"
+  />
+</div>
+
+<!-- ═══ KPIs ════════════════════════════════════════════════ -->
+<div class="grid mb-4">
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Alertes actives</div>
+      <div class="text-3xl font-bold text-red-500">
+        {{ (alertes$ | async)?.length ?? 0 }}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Manque total estimé</div>
+      <div class="text-3xl font-bold text-orange-500">
+        {{ (stockTotal$ | async) ?? 0 | number:'1.0-2' }}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Critiques (manque &gt; 5)</div>
+      <div class="text-3xl font-bold text-red-700">
+        {{ (nbCritiques$ | async) ?? 0 }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TABLE ════════════════════════════════════════════════ -->
+<div class="surface-card border-round-xl border-1 surface-border p-4">
+  <p-table
+    [value]="(alertes$ | async) ?? []"
+    [paginator]="true"
+    [rows]="20"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords} alertes"
+    sortField="manqueMax"
+    [sortOrder]="-1"
+    dataKey="materiauId"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="nom" style="min-width:200px">
+          Matériau <p-sortIcon field="nom" />
+        </th>
+        <th pSortableColumn="manqueMax" style="width:150px">
+          Manque estimé <p-sortIcon field="manqueMax" />
+        </th>
+        <th style="width:220px">Stock par entrepôt</th>
+        <th style="width:100px"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-a>
+      <tr>
+
+        <td>
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-exclamation-circle text-red-500"></i>
+            <div>
+              <div class="font-semibold text-900">{{ a.nom }}</div>
+              <div class="text-400 text-xs font-mono mt-1">{{ a.unite }}</div>
+            </div>
+          </div>
+        </td>
+
+        <td>
+          <div class="font-bold text-red-500 font-mono">
+            -{{ a.manqueMax | number:'1.0-2' }} {{ a.unite }}
+          </div>
+          <div class="text-400 text-xs mt-1">
+            seuil : {{ a.seuilAlerte | number:'1.0-2' }}
+          </div>
+        </td>
+
+        <td>
+          <div class="flex flex-column gap-1">
+            @for (s of a.stocksParEntrepot; track s.entrepotId) {
+              <div class="flex align-items-center justify-content-between gap-3 text-xs">
+                <span class="text-500 white-space-nowrap">{{ s.entrepotNom }}</span>
+                <span class="font-mono font-semibold"
+                  [class.text-red-500]="s.stockActuel <= 0"
+                  [class.text-orange-500]="s.stockActuel > 0 && s.stockActuel <= a.seuilAlerte">
+                  {{ s.stockActuel | number:'1.0-2' }}
+                </span>
+              </div>
+            }
+          </div>
+        </td>
+
+        <td>
+          <p-button
+            label="Acquitter"
+            icon="pi pi-check"
+            severity="success"
+            size="small"
+            [text]="true"
+            [loading]="isAcquittementEnCours(a.materiauId)"
+            [disabled]="isAcquittementEnCours(a.materiauId)"
+            (onClick)="confirmerAcquittement(a)"
+          />
+        </td>
+
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center py-6 text-400">
+          <i class="pi pi-check-circle text-green-500 text-4xl mb-3 block"></i>
+          Aucune alerte active
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</div>
