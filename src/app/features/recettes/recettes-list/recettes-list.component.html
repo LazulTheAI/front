@@ -1,7 +1,5 @@
 <p-toast />
-<p-confirmDialog />
 
-<!-- Toolbar -->
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
@@ -10,17 +8,18 @@
     </div>
   </ng-template>
   <ng-template pTemplate="end">
-    <div class="flex align-items-center gap-3">
-      <div class="flex align-items-center gap-2">
-        <label class="text-500 text-sm">Inclure archives</label>
-        <p-toggleswitch [(ngModel)]="inclureArchives" (onChange)="loadRecettes()" />
-      </div>
-      <p-button label="Nouvelle recette" icon="pi pi-plus" (onClick)="openCreate()" />
+    <div class="flex align-items-center gap-2">
+      <label class="text-500 text-sm">Inclure archives</label>
+      <p-toggleswitch [(ngModel)]="inclureArchives" (onChange)="loadRecettes()" />
+      <p-button
+        label="Nouvelle recette"
+        icon="pi pi-plus"
+        (onClick)="navigateToCreate()"
+      />
     </div>
   </ng-template>
 </p-toolbar>
 
-<!-- Alerte ingrédients en rupture -->
 @if (recettesEnAlerte.length > 0) {
   <div class="surface-card border-round border-left-3 border-orange-500 p-3 mb-4 flex align-items-center gap-3">
     <i class="pi pi-exclamation-triangle text-orange-500 text-xl"></i>
@@ -30,7 +29,6 @@
   </div>
 }
 
-<!-- Table -->
 <div class="card">
   <p-table
     [value]="recettes"
@@ -43,38 +41,35 @@
     [globalFilterFields]="['nom']"
     [showGridlines]="true"
     dataKey="id"
-    (onRowClick)="openDetail($event['data'])"
     [rowHover]="true"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="nom" style="min-width: 220px">
+        <th pSortableColumn="nom" style="min-width:220px">
           Nom <p-sortIcon field="nom" />
         </th>
-        <th style="width: 160px">Production</th>
-        <th style="width: 110px">Durée</th>
-        <th style="width: 120px">Ingrédients</th>
-        <th pSortableColumn="coutTheorique" style="width: 140px">
+        <th style="width:160px">Production</th>
+        <th style="width:110px">Durée</th>
+        <th style="width:120px">Ingrédients</th>
+        <th pSortableColumn="coutTheorique" style="width:140px">
           Coût théorique <p-sortIcon field="coutTheorique" />
         </th>
-        <th style="width: 100px">Statut</th>
-        <th pSortableColumn="updatedAt" style="width: 140px">
+        <th style="width:100px">Statut</th>
+        <th pSortableColumn="updatedAt" style="width:140px">
           Modifiée <p-sortIcon field="updatedAt" />
         </th>
-        <th style="width: 80px"></th>
+        <th style="width:80px"></th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-r>
-      <tr
-        [class.opacity-50]="r.archive"
-        class="cursor-pointer"
-      >
-        <!-- Nom -->
+      <tr [class.opacity-50]="r.archive" class="cursor-pointer" (click)="openDetail(r)">
+
         <td>
           <div class="flex align-items-center gap-2">
             @if (hasAlerte(r)) {
-              <i class="pi pi-exclamation-circle text-orange-500" pTooltip="Un ou plusieurs ingrédients en alerte stock"></i>
+              <i class="pi pi-exclamation-circle text-orange-500"
+                pTooltip="Un ou plusieurs ingrédients en alerte stock"></i>
             } @else if (r.archive) {
               <i class="pi pi-inbox text-400"></i>
             } @else {
@@ -84,37 +79,32 @@
           </div>
         </td>
 
-        <!-- Production unitaire -->
         <td>
           <span class="font-semibold text-900">{{ r.quantiteProduite | number:'1.0-2' }}</span>
           <span class="text-500 text-sm ml-1">{{ r.uniteProduite }}</span>
           <span class="text-400 text-xs ml-1">/ batch</span>
         </td>
 
-        <!-- Durée -->
         <td>
           <span class="text-sm">{{ getDureeFabricationLabel(r.dureeFabricationMinutes) }}</span>
         </td>
 
-        <!-- Nb ingrédients -->
         <td>
-          <div class="flex align-items-center gap-2">
-            <span class="font-semibold">{{ getNbIngredients(r) }}</span>
-            <span class="text-400 text-xs">ingrédient(s)</span>
-          </div>
+          <span class="font-semibold">{{ getNbIngredients(r) }}</span>
+          <span class="text-400 text-xs ml-1">ingrédient(s)</span>
         </td>
 
-        <!-- Coût théorique -->
         <td>
           @if (r.coutTheorique != null && r.coutTheorique > 0) {
-            <span class="font-semibold text-900">{{ r.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}</span>
+            <span class="font-semibold text-900">
+              {{ r.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
             <div class="text-400 text-xs">/ batch</div>
           } @else {
             <span class="text-400 text-sm">—</span>
           }
         </td>
 
-        <!-- Statut -->
         <td>
           @if (r.archive) {
             <p-tag value="Archivée" severity="secondary" />
@@ -123,46 +113,24 @@
           }
         </td>
 
-        <!-- Date modification -->
         <td>
           <span class="text-sm text-500">{{ r.updatedAt | date:'dd/MM/yyyy' }}</span>
         </td>
 
-        <!-- Actions -->
         <td>
           <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
-            <p-button
-              icon="pi pi-eye"
-              severity="secondary"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              pTooltip="Voir le détail"
-              (onClick)="openDetail(r)"
-            />
-            <p-button
-              icon="pi pi-pencil"
-              severity="info"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              pTooltip="Modifier"
-              [disabled]="r.archive"
-              (onClick)="openEdit(r, $event)"
-            />
+            <p-button icon="pi pi-eye" severity="secondary" [text]="true" [rounded]="true"
+              size="small" pTooltip="Voir le détail" (onClick)="openDetail(r)" />
+            <p-button icon="pi pi-pencil" severity="info" [text]="true" [rounded]="true"
+              size="small" pTooltip="Modifier" [disabled]="r.archive"
+              (onClick)="openEdit(r, $event)" />
             @if (!r.archive) {
-              <p-button
-                icon="pi pi-inbox"
-                severity="danger"
-                [text]="true"
-                [rounded]="true"
-                size="small"
-                pTooltip="Archiver"
-                (onClick)="confirmArchive(r, $event)"
-              />
+              <p-button icon="pi pi-inbox" severity="danger" [text]="true" [rounded]="true"
+                size="small" pTooltip="Archiver" (onClick)="confirmArchive(r, $event)" />
             }
           </div>
         </td>
+
       </tr>
     </ng-template>
 
@@ -174,10 +142,11 @@
         </td>
       </tr>
     </ng-template>
+
   </p-table>
 </div>
 
-<!-- Dialogs -->
+<!-- app-recette-form sert uniquement à l'édition désormais -->
 <app-recette-form
   [(visible)]="showFormDialog"
   [recette]="selectedRecette"

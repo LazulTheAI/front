@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 // PrimeNG
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -35,7 +34,7 @@ import { MateriauFormComponent } from '../materiau-form/materiau-form.component'
         ToastModule,
         ToolbarModule,
         ToggleSwitchModule,
-        ConfirmDialogModule,
+
         ProgressBarModule,
         MateriauFormComponent,
         EntreeStockDialogComponent,

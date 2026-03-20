@@ -1,26 +1,34 @@
-import { Component, computed, effect, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AppTopbar } from './app.topbar';
-import { AppSidebar } from './app.sidebar';
-import { AppFooter } from './app.footer';
 import { LayoutService } from '@/app/layout/service/layout.service';
+import { CommonModule } from '@angular/common';
+import { Component, computed, effect, inject } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
+import { AppFooter } from './app.footer';
+import { AppSidebar } from './app.sidebar';
+import { AppTopbar } from './app.topbar';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
-    template: `<div class="layout-wrapper" [ngClass]="containerClass()">
-        <app-topbar></app-topbar>
-        <app-sidebar></app-sidebar>
-        <div class="layout-main-container">
-            <div class="layout-main">
-                <router-outlet></router-outlet>
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, ConfirmDialogModule, ToastModule],
+    providers: [ConfirmationService, MessageService],
+    template: `
+        <div class="layout-wrapper" [ngClass]="containerClass()">
+            <app-topbar></app-topbar>
+            <app-sidebar></app-sidebar>
+            <div class="layout-main-container">
+                <div class="layout-main">
+                    <router-outlet></router-outlet>
+                </div>
+                <app-footer></app-footer>
             </div>
-            <app-footer></app-footer>
+            <div class="layout-mask"></div>
         </div>
-        <div class="layout-mask"></div>
-    </div> `
+        <p-confirmDialog />
+        <p-toast />
+    `
 })
 export class AppLayout {
     layoutService = inject(LayoutService);
@@ -46,5 +54,5 @@ export class AppLayout {
             'layout-overlay-active': state.overlayMenuActive,
             'layout-mobile-active': state.mobileMenuActive
         };
-    })
+    });
 }

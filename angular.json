@@ -29,8 +29,9 @@
                             }
                         ],
                         "styles": [
-                            "src/assets/styles.scss",
-                            "src/assets/tailwind.css"
+                            "./node_modules/primeflex/primeflex.css",
+                            "src/assets/tailwind.css",
+                            "src/assets/styles.scss"
                         ],
                         "scripts": []
                     },

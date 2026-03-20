@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { AccordionModule } from 'primeng/accordion';
@@ -37,6 +37,8 @@ export interface IngredientSelectionne {
 export class RecetteFormComponent implements OnChanges, OnInit {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
+
+    @ViewChild('ngForm') ngForm!: NgForm;
 
     @Input() recette: RecetteResponse | null = null;
     @Output() saved = new EventEmitter<void>();

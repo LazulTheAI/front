@@ -1,6 +1,6 @@
 import { EntrepotControllerService, EntrepotResponse, MateriauControllerService, MateriauResponse, MouvementStockResponse } from '@/app/modules/openapi';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG
@@ -13,111 +13,108 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
-  selector: 'app-historique-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    DialogModule,
-    ButtonModule,
-    TableModule,
-    TagModule,
-    SelectModule,
-    DatePickerModule,
-    TooltipModule,
-  ],
-  templateUrl: './historique-dialog.component.html',
+    selector: 'app-historique-dialog',
+    standalone: true,
+    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, TableModule, TagModule, SelectModule, DatePickerModule, TooltipModule],
+    templateUrl: './historique-dialog.component.html'
 })
 export class HistoriqueDialogComponent implements OnChanges {
-  @Input() visible = false;
-  @Output() visibleChange = new EventEmitter<boolean>();
- 
-  @Input() materiau: MateriauResponse | null = null;
- 
-  loading = false;
-  mouvements: MouvementStockResponse[] = [];
-  entrepots: EntrepotResponse[] = [];
- 
-  // Filtres
-  filtreDepuis: Date | null = null;
-  filtreJusqu: Date | null = null;
-  filtreEntrepotId: number | null = null;
- 
-  constructor(
-    private materiauService: MateriauControllerService,
-    private entrepotService: EntrepotControllerService
-  ) {}
- 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['visible'] && this.visible && this.materiau?.id) {
-      this.loadEntrepots();
-      this.loadHistorique();
+    @Input() visible = false;
+    @Output() visibleChange = new EventEmitter<boolean>();
+
+    @Input() materiau: MateriauResponse | null = null;
+
+    loading = false;
+    mouvements: MouvementStockResponse[] = [];
+    entrepots: EntrepotResponse[] = [];
+
+    // Filtres
+    filtreDepuis: Date | null = null;
+    filtreJusqu: Date | null = null;
+    filtreEntrepotId: number | null = null;
+
+    constructor(
+        private materiauService: MateriauControllerService,
+        private entrepotService: EntrepotControllerService,
+        private cdr: ChangeDetectorRef
+    ) {}
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['visible'] && this.visible && this.materiau?.id) {
+            this.loadEntrepots();
+            this.loadHistorique();
+        }
     }
-  }
- 
-  loadEntrepots(): void {
-    this.entrepotService.listerEntrepot().subscribe({ next: (d: EntrepotResponse[]) => (this.entrepots = d) });
-  }
- 
-  loadHistorique(): void {
-    if (!this.materiau?.id) return;
-    this.loading = true;
-    this.materiauService
-      .historiqueMouvementStock(
-        this.materiau.id,
-        this.filtreDepuis?.toISOString(),
-        this.filtreJusqu?.toISOString(),
-        this.filtreEntrepotId ?? undefined
-      )
-      .subscribe({
-        next: (d: MouvementStockResponse[]) => {
-          this.mouvements = d;
-          this.loading = false;
-        },
-        error: () => (this.loading = false),
-      });
-  }
- 
-  onHide(): void {
-    this.visibleChange.emit(false);
-  }
- 
-  get entrepotOptions(): { label: string; value: number | null }[] {
-    return [
-      { label: 'Tous les entrepôts', value: null },
-      ...this.entrepots.map((e: EntrepotResponse) => ({ label: e.nom!, value: e.id! })),
-    ];
-  }
- 
-  isExpired(date: string | undefined): boolean {
-    if (!date) return false;
-    return new Date(date) < new Date();
-  }
- 
-  getTypeSeverity(type: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-    switch (type) {
-      case 'ENTREE': return 'success';
-      case 'SORTIE': return 'danger';
-      case 'AJUSTEMENT_POSITIF': return 'info';
-      case 'AJUSTEMENT_NEGATIF': return 'warn';
-      case 'PRODUCTION': return 'secondary';
-      default: return 'secondary';
+
+    loadHistorique(): void {
+        if (!this.materiau?.id) return;
+        this.loading = true;
+        this.mouvements = []; // ← reset immédiat avant l'appel
+        this.materiauService.historiqueMouvementStock(this.materiau.id, this.filtreDepuis?.toISOString(), this.filtreJusqu?.toISOString(), this.filtreEntrepotId ?? undefined).subscribe({
+            next: (d) => {
+                this.mouvements = d;
+                this.loading = false;
+                this.cdr.markForCheck(); // ← ici
+            },
+            error: () => {
+                this.loading = false;
+                this.cdr.markForCheck(); // ← et ici
+            }
+        });
     }
-  }
- 
-  getTypeLabel(type: string): string {
-    const labels: Record<string, string> = {
-      ENTREE: 'Entrée',
-      SORTIE: 'Sortie',
-      AJUSTEMENT_POSITIF: 'Ajust. +',
-      AJUSTEMENT_NEGATIF: 'Ajust. -',
-      PRODUCTION: 'Production',
-    };
-    return labels[type] ?? type;
-  }
- 
-  getQuantiteDisplay(m: MouvementStockResponse): string {
-    const prefix = m.typeMouvement?.includes('SORTIE') || m.typeMouvement?.includes('NEGATIF') ? '-' : '+';
-    return `${prefix}${m.quantite}`;
-  }
+
+    loadEntrepots(): void {
+        this.entrepotService.listerEntrepot().subscribe({
+            next: (d) => {
+                this.entrepots = d;
+                this.cdr.markForCheck(); // ← ici aussi
+            }
+        });
+    }
+
+    onHide(): void {
+        this.visibleChange.emit(false);
+    }
+
+    get entrepotOptions(): { label: string; value: number | null }[] {
+        return [{ label: 'Tous les entrepôts', value: null }, ...this.entrepots.map((e: EntrepotResponse) => ({ label: e.nom!, value: e.id! }))];
+    }
+
+    isExpired(date: string | undefined): boolean {
+        if (!date) return false;
+        return new Date(date) < new Date();
+    }
+
+    getTypeSeverity(type: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+        switch (type) {
+            case 'ENTREE':
+                return 'success';
+            case 'SORTIE':
+                return 'danger';
+            case 'AJUSTEMENT_POSITIF':
+                return 'info';
+            case 'AJUSTEMENT_NEGATIF':
+                return 'warn';
+            case 'PRODUCTION':
+                return 'secondary';
+            default:
+                return 'secondary';
+        }
+    }
+
+    getTypeLabel(type: string): string {
+        const labels: Record<string, string> = {
+            ENTREE: 'Entrée',
+            SORTIE: 'Sortie',
+            AJUSTEMENT_POSITIF: 'Ajust. +',
+            AJUSTEMENT_NEGATIF: 'Ajust. -',
+            PRODUCTION: 'Production'
+        };
+        return labels[type] ?? type;
+    }
+
+    getQuantiteDisplay(m: MouvementStockResponse): string {
+        const prefix = m.typeMouvement?.includes('SORTIE') || m.typeMouvement?.includes('NEGATIF') ? '-' : '+';
+        return `${prefix}${m.quantite}`;
+    }
 }
