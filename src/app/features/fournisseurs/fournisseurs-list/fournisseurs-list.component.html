@@ -1,16 +1,26 @@
 <p-toast />
 
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <h2 class="m-0 text-900 font-semibold">Fournisseurs</h2>
+      <p-tag
+        [value]="fournisseursActifs.length + ' fournisseur(s) actif(s)'"
+        severity="secondary"
+      />
+    </div>
+  </ng-template>
 
-<!-- Header -->
-<div class="flex justify-content-between align-items-center mb-4">
-  <div>
-    <h2 class="m-0 text-900 font-bold text-2xl">Fournisseurs</h2>
-    <p class="mt-1 mb-0 text-500">
-      {{ fournisseursActifs.length }} fournisseur(s) actif(s)
-    </p>
-  </div>
-  <p-button label="Nouveau fournisseur" icon="pi pi-plus" (onClick)="openCreate()" />
-</div>
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-3">
+      <p-button
+        label="Nouveau matériau"
+        icon="pi pi-plus"
+        (onClick)="openCreate()"
+      />
+    </div>
+  </ng-template>
+</p-toolbar>
 
 <!-- Layout split : liste + panel détail -->
 <div class="flex gap-4 align-items-start">

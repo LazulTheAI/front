@@ -13,6 +13,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { CreateEntrepotRequest, EntrepotControllerService, EntrepotResponse, UpdateEntrepotRequest, UtilisateurMarchandControllerService, UtilisateurResponse } from '@/app/modules/openapi';
+import { ToolbarModule } from 'primeng/toolbar';
 
 interface LieuVm extends EntrepotResponse {
     utilisateursAssignes: UtilisateurResponse[];
@@ -23,7 +24,7 @@ interface LieuVm extends EntrepotResponse {
     selector: 'app-lieux-production',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, ButtonModule, TagModule, ToastModule, InputTextModule, TextareaModule, DialogModule, TooltipModule, DividerModule],
+    imports: [CommonModule, FormsModule, ButtonModule, ToolbarModule, TagModule, ToastModule, InputTextModule, TextareaModule, DialogModule, TooltipModule, DividerModule],
     providers: [MessageService, ConfirmationService],
     templateUrl: './lieux-production.component.html'
 })

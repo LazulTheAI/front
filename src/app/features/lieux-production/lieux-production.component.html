@@ -1,18 +1,24 @@
 <p-toast />
 
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <h2 class="m-0 text-900 font-semibold">Lieux de production</h2>
+      <p class="mt-1 mb-0 text-500">Gérez vos ateliers, stocks et les opérateurs qui y travaillent</p>
+    </div>
+  </ng-template>
 
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-3">
+      <p-button
+        label="Nouveau lieu"
+        icon="pi pi-plus"
+        (onClick)="openCreate()"
+      />
+    </div>
+  </ng-template>
+</p-toolbar>
 <!-- Header -->
-<div class="flex justify-content-between align-items-center mb-5">
-  <div>
-    <h2 class="m-0 text-900 font-bold text-2xl">Lieux de production</h2>
-    <p class="mt-1 mb-0 text-500">Gérez vos ateliers, stocks et les opérateurs qui y travaillent</p>
-  </div>
-  <p-button
-    label="Nouveau lieu"
-    icon="pi pi-plus"
-    (onClick)="openCreate()"
-  />
-</div>
 
 @if (loading) {
   <div class="flex justify-content-center py-8">

@@ -14,13 +14,14 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { CreateUtilisateurRequest, UpdateUtilisateurRequest, UtilisateurMarchandControllerService, UtilisateurResponse } from '@/app/modules/openapi';
+import { ToolbarModule } from 'primeng/toolbar';
 import { UtilisateursInactifsPipe } from './mon-equipe.pipes';
 
 @Component({
     selector: 'app-mon-equipe',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, ButtonModule, TagModule, ToastModule, InputTextModule, PasswordModule, SelectModule, DialogModule, TooltipModule, DividerModule, UtilisateursInactifsPipe],
+    imports: [CommonModule, FormsModule, ToolbarModule, ButtonModule, TagModule, ToastModule, InputTextModule, PasswordModule, SelectModule, DialogModule, TooltipModule, DividerModule, UtilisateursInactifsPipe],
     providers: [MessageService, ConfirmationService],
     templateUrl: './mon-equipe.component.html'
 })

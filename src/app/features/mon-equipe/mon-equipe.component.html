@@ -1,20 +1,26 @@
 <p-toast />
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <h2 class="m-0 text-900 font-semibold">Mon équipe</h2>
+           {{ nbActifs }} membre(s) actif(s) · {{ admins.length }} admin(s) · {{ operateurs.length }} opérateur(s)
 
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-3">
+      <p-button
+        label="Inviter un membre"
+        icon="pi pi-plus"
+        (onClick)="openCreate()"
+      />
+    </div>
+  </ng-template>
+</p-toolbar>
 
 <!-- Header -->
-<div class="flex justify-content-between align-items-center mb-5">
-  <div>
-    <h2 class="m-0 text-900 font-bold text-2xl">Mon équipe</h2>
-    <p class="mt-1 mb-0 text-500">
-      {{ nbActifs }} membre(s) actif(s) · {{ admins.length }} admin(s) · {{ operateurs.length }} opérateur(s)
-    </p>
-  </div>
-  <p-button
-    label="Inviter un membre"
-    icon="pi pi-user-plus"
-    (onClick)="openCreate()"
-  />
-</div>
+
 
 @if (loading) {
   <div class="flex justify-content-center py-8">

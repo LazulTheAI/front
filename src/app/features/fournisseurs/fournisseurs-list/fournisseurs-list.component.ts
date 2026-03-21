@@ -15,12 +15,13 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { FournisseurControllerService, FournisseurRequest, FournisseurResponse } from '@/app/modules/openapi';
+import { ToolbarModule } from 'primeng/toolbar';
 
 @Component({
     selector: 'app-fournisseurs-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, ButtonModule, TagModule, ToastModule, InputTextModule, TextareaModule, InputNumberModule, DialogModule, TooltipModule, DividerModule, TableModule],
+    imports: [CommonModule, ToolbarModule, FormsModule, ButtonModule, TagModule, ToastModule, InputTextModule, TextareaModule, InputNumberModule, DialogModule, TooltipModule, DividerModule, TableModule],
     providers: [MessageService, ConfirmationService],
     templateUrl: './fournisseurs-list.component.html'
 })

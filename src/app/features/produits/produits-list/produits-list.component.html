@@ -1,20 +1,18 @@
 <p-toast />
-
-<div class="card">
-
   <!-- Toolbar -->
   <p-toolbar styleClass="mb-4">
     <ng-template pTemplate="start">
-      <div class="flex align-items-center gap-2">
-        <i class="pi pi-shopping-bag text-primary text-xl"></i>
-        <span class="font-semibold text-900 text-xl">Produits BigCommerce</span>
-        <span class="text-400 text-sm">({{ produits.length }} produits)</span>
+      <div class="flex align-items-center gap-3">
+        <h2 class="m-0 text-900 font-semibold">Produits BigCommerce</h2>
+        <p-tag
+          [value]="produits.length + ' produits'"
+          severity="secondary"
+        />
       </div>
     </ng-template>
     <ng-template pTemplate="end">
       <div class="flex gap-2">
         <span class="p-input-icon-left">
-          <i class="pi pi-search"></i>
           <input
             pInputText
             [(ngModel)]="globalFilter"
@@ -26,6 +24,7 @@
     </ng-template>
   </p-toolbar>
 
+<div class="card">
   <!-- Tableau -->
   <p-table
     [value]="produits"
