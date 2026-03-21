@@ -1,71 +1,68 @@
 <p-toast />
-  <!-- Toolbar -->
-  <p-toolbar styleClass="mb-4">
-    <ng-template pTemplate="start">
-      <div class="flex align-items-center gap-3">
-        <h2 class="m-0 text-900 font-semibold">Produits BigCommerce</h2>
-        <p-tag
-          [value]="produits.length + ' produits'"
-          severity="secondary"
-        />
-      </div>
-    </ng-template>
-    <ng-template pTemplate="end">
-      <div class="flex gap-2">
-        <span class="p-input-icon-left">
-          <input
-            pInputText
-            [(ngModel)]="globalFilter"
-            placeholder="Rechercher..."
-            class="w-16rem"
-          />
-        </span>
-      </div>
-    </ng-template>
-  </p-toolbar>
+
+<!-- Toolbar -->
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <h2 class="m-0 text-900 font-semibold">Produits BigCommerce</h2>
+      <p-tag [value]="totalRecords + ' produits'" severity="secondary" />
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+      <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+      </span>
+      <input
+        pInputText
+        [ngModel]="search"
+        (ngModelChange)="onSearchInput($event)"
+        placeholder="Rechercher..."
+      />
+  </ng-template>
+</p-toolbar>
 
 <div class="card">
-  <!-- Tableau -->
   <p-table
     [value]="produits"
     [loading]="loading"
     [paginator]="true"
-    [rows]="15"
-    [rowsPerPageOptions]="[15, 30, 50]"
-    [globalFilterFields]="['nom', 'sku', 'platformProductId']"
+    [rows]="size"
+    [rowsPerPageOptions]="[15, 20, 30, 50]"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
     [showCurrentPageReport]="true"
     [showGridlines]="true"
     currentPageReportTemplate="{first}-{last} sur {totalRecords} produits"
     dataKey="id"
+    [rowHover]="true"
     (onRowClick)="openDetail($event['data'])"
-    rowHover="true"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 56px"></th>
+        <th style="width:56px"></th>
         <th pSortableColumn="nom">
           Produit <p-sortIcon field="nom" />
         </th>
-        <th style="width: 130px" pSortableColumn="sku">
+        <th style="width:130px" pSortableColumn="sku">
           SKU <p-sortIcon field="sku" />
         </th>
-        <th style="width: 120px" class="text-right" pSortableColumn="stockPlateforme">
+        <th style="width:120px" class="text-right" pSortableColumn="stockPlateforme">
           Stock BC <p-sortIcon field="stockPlateforme" />
         </th>
-        <th style="width: 120px" class="text-right" pSortableColumn="prixCents">
+        <th style="width:120px" class="text-right" pSortableColumn="prixCents">
           Prix <p-sortIcon field="prixCents" />
         </th>
         <th>Recette liée</th>
-        <th style="width: 110px">Statut</th>
-        <th style="width: 110px">Sync</th>
-        <th style="width: 100px" class="text-center">Actions</th>
+        <th style="width:110px">Statut</th>
+        <th style="width:110px">Sync</th>
+        <th style="width:100px" class="text-center">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-produit>
       <tr class="cursor-pointer">
 
-        <!-- Avatar / image -->
         <td>
           @if (hasProduitImage(produit)) {
             <img
@@ -84,7 +81,6 @@
           }
         </td>
 
-        <!-- Nom + ID plateforme -->
         <td>
           <div class="font-semibold text-900">{{ produit.nom }}</div>
           @if (produit.platformProductId) {
@@ -92,32 +88,32 @@
           }
         </td>
 
-        <!-- SKU -->
         <td>
           @if (produit.sku) {
-            <span class="font-mono text-sm text-700 bg-gray-100 px-2 py-1 border-round">{{ produit.sku }}</span>
+            <span class="font-mono text-sm text-700 bg-gray-100 px-2 py-1 border-round">
+              {{ produit.sku }}
+            </span>
           } @else {
             <span class="text-400">—</span>
           }
         </td>
 
-        <!-- Stock plateforme -->
         <td class="text-right">
           <span [class]="getStockSeverity(produit.stockPlateforme)" class="text-sm font-mono">
             {{ produit.stockPlateforme ?? '—' }}
           </span>
         </td>
 
-        <!-- Prix -->
         <td class="text-right">
           @if (produit.prixCents != null) {
-            <span class="text-sm font-mono text-900">{{ produit.prixCents / 100 | currency:'EUR':'symbol':'1.2-2' }}</span>
+            <span class="text-sm font-mono text-900">
+              {{ produit.prixCents / 100 | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
           } @else {
             <span class="text-400">—</span>
           }
         </td>
 
-        <!-- Recette liée -->
         <td>
           @if (produit.recettes && produit.recettes.length > 0) {
             <div class="flex align-items-center gap-2">
@@ -139,7 +135,6 @@
           }
         </td>
 
-        <!-- Statut -->
         <td>
           <p-tag
             [value]="getStatusLabel(produit.statut)"
@@ -147,12 +142,11 @@
           />
         </td>
 
-        <!-- Dernière sync -->
         <td>
           @if (produit.lastSyncedAt) {
             <span
               class="text-xs text-500"
-              [pTooltip]="(produit.derniereSyncAt | date:'dd/MM/yyyy HH:mm:ss') ?? ''"
+              [pTooltip]="(produit.lastSyncedAt | date:'dd/MM/yyyy HH:mm:ss') ?? ''"
             >
               {{ produit.lastSyncedAt | date:'dd/MM HH:mm' }}
             </span>
@@ -161,9 +155,8 @@
           }
         </td>
 
-        <!-- Actions -->
         <td class="text-center">
-          <div class="flex justify-content-center gap-1">
+          <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
             <p-button
               icon="pi pi-link"
               [rounded]="true"
