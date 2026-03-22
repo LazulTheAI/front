@@ -1,4 +1,4 @@
-import { AlerteStockResponse } from '@/app/modules/openapi';
+import { AlerteResponse } from '@/app/modules/openapi';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -28,7 +28,7 @@ import { AlerteService } from './alerte.service';
     `
 })
 export class AlerteWidgetComponent implements OnInit, OnDestroy {
-    alertes: AlerteStockResponse[] = [];
+    alertes: AlerteResponse[] = [];
     private sub?: Subscription;
 
     constructor(

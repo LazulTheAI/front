@@ -1,60 +1,45 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
-// PrimeNG
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { TableModule } from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
-import { DialogModule } from 'primeng/dialog';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { AjustementDialogComponent } from '../ajustement-dialog/ajustement-dialog.component';
-import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
-import { HistoriqueDialogComponent } from '../historique-dialog/historique-dialog.component';
 import { MateriauFormComponent } from '../materiau-form/materiau-form.component';
 
 @Component({
     selector: 'app-materiaux-list',
     standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        TagModule,
-        TooltipModule,
-        DialogModule,
-        ToastModule,
-        ToolbarModule,
-        ToggleSwitchModule,
-
-        ProgressBarModule,
-        MateriauFormComponent,
-        EntreeStockDialogComponent,
-        AjustementDialogComponent,
-        HistoriqueDialogComponent
-    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, ToggleSwitchModule, InputTextModule, ConfirmDialogModule, MateriauFormComponent],
     providers: [MessageService, ConfirmationService],
     templateUrl: './materiaux-list.component.html'
 })
-export class MateriauxListComponent implements OnInit {
+export class MateriauxListComponent implements OnInit, OnDestroy {
     materiaux: MateriauResponse[] = [];
+    totalRecords = 0;
     loading = false;
+
+    page = 0;
+    size = 20;
+    sortBy = 'nom';
+    sortDir = 'asc';
+
     inclureArchives = false;
+    search = '';
+    private search$ = new Subject<string>();
 
-    // Dialog states
     showFormDialog = false;
-    showEntreeDialog = false;
-    showAjustementDialog = false;
-    showHistoriqueDialog = false;
-
     selectedMateriau: MateriauResponse | null = null;
 
     constructor(
@@ -65,110 +50,80 @@ export class MateriauxListComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.loadMateriaux();
+        this.search$.pipe(debounceTime(400), distinctUntilChanged()).subscribe((v) => {
+            this.search = v;
+            this.page = 0;
+            this.load();
+        });
+        this.load();
     }
 
-    loadMateriaux(): void {
+    ngOnDestroy(): void {
+        this.search$.complete();
+    }
+
+    load(): void {
         this.loading = true;
-        this.materiauService.listerMateriau(this.inclureArchives).subscribe({
+        this.materiauService.listerMateriau(this.inclureArchives, this.page, this.size, this.sortBy, this.sortDir, this.search || undefined).subscribe({
             next: (data: any) => {
-                this.materiaux = Array.isArray(data) ? data : (data.content ?? data.items ?? []);
+                this.materiaux = data.content ?? [];
+                this.totalRecords = data.totalElements ?? 0;
                 this.loading = false;
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             },
             error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les matériaux' });
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Chargement impossible' });
                 this.loading = false;
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             }
         });
     }
 
-    get materiauxEnAlerte(): MateriauResponse[] {
-        return this.materiaux.filter((m) => m.enAlerte && !m.archive);
+    onLazyLoad(event: TableLazyLoadEvent): void {
+        this.page = Math.floor((event.first ?? 0) / (event.rows ?? this.size));
+        this.size = event.rows ?? this.size;
+        if (event.sortField) {
+            this.sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+            this.sortDir = event.sortOrder === -1 ? 'desc' : 'asc';
+        }
+        this.load();
     }
 
+    onSearchInput(v: string): void {
+        this.search$.next(v);
+    }
     onToggleArchives(): void {
-        this.loadMateriaux();
+        this.page = 0;
+        this.load();
     }
 
     openCreate(): void {
         this.selectedMateriau = null;
         this.showFormDialog = true;
     }
-
-    openEdit(materiau: MateriauResponse): void {
-        this.selectedMateriau = { ...materiau };
+    openEdit(m: MateriauResponse): void {
+        this.selectedMateriau = { ...m };
         this.showFormDialog = true;
     }
-
-    openEntreeStock(materiau: MateriauResponse): void {
-        this.selectedMateriau = materiau;
-        this.showEntreeDialog = true;
-    }
-
-    openAjustement(materiau: MateriauResponse): void {
-        this.selectedMateriau = materiau;
-        this.showAjustementDialog = true;
-    }
-
-    openHistorique(materiau: MateriauResponse): void {
-        this.selectedMateriau = materiau;
-        this.showHistoriqueDialog = true;
-    }
-
-    confirmArchive(materiau: MateriauResponse): void {
-        this.confirmationService.confirm({
-            message: `Archiver le matériau "${materiau.nom}" ?`,
-            header: "Confirmer l'archivage",
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => this.archiveMateriau(materiau.id!)
-        });
-    }
-
-    private archiveMateriau(id: number): void {
-        this.materiauService.archiverMateriau(id).subscribe({
-            next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Archivé', detail: 'Matériau archivé avec succès' });
-                this.loadMateriaux();
-            },
-            error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Archivage impossible' });
-            }
-        });
-    }
-
     onFormSaved(): void {
         this.showFormDialog = false;
-        this.loadMateriaux();
+        this.load();
     }
 
-    onStockUpdated(result: { success: boolean; message: string }): void {
-        this.showEntreeDialog = false;
-        this.showAjustementDialog = false;
-        this.messageService.add({
-            severity: result.success ? 'success' : 'error',
-            summary: result.success ? 'Succès' : 'Erreur',
-            detail: result.message
+    confirmArchive(m: MateriauResponse): void {
+        this.confirmationService.confirm({
+            message: `Archiver "${m.nom}" ?`,
+            header: "Confirmer l'archivage",
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.materiauService.archiverMateriau(m.id!).subscribe({
+                    next: () => {
+                        this.messageService.add({ severity: 'success', summary: 'Archivé', detail: `"${m.nom}" archivé` });
+                        this.load();
+                    },
+                    error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Archivage impossible' })
+                });
+            }
         });
-        if (result.success) this.loadMateriaux();
-    }
-
-    getTotalStock(materiau: MateriauResponse): number {
-        return materiau.stocks?.reduce((sum, s) => sum + (s.stockActuel ?? 0), 0) ?? 0;
-    }
-
-    getStockSeverity(materiau: MateriauResponse): 'success' | 'warn' | 'danger' {
-        if (materiau.enAlerte) return 'danger';
-        const total = this.getTotalStock(materiau);
-        if (total === 0) return 'warn';
-        return 'success';
-    }
-
-    getStockLabel(materiau: MateriauResponse): string {
-        if (materiau.enAlerte) return 'Alerte';
-        const total = this.getTotalStock(materiau);
-        if (total === 0) return 'Vide';
-        return 'OK';
     }
 }

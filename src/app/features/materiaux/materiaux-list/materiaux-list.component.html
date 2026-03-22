@@ -1,210 +1,135 @@
 <p-toast />
+<p-confirmDialog />
 
-
-<!-- Toolbar -->
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
-      <h2 class="m-0 text-900 font-semibold">Matériaux & Stock</h2>
-      <p-tag
-        [value]="materiaux.length + ' matériaux'"
-        severity="secondary"
-      />
+      <h2 class="m-0 text-900 font-semibold">Matériaux</h2>
+      <p-tag [value]="totalRecords + ' matériaux'" severity="secondary" />
     </div>
   </ng-template>
-
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3">
-      <!-- Toggle archives -->
+      <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
+        placeholder="Rechercher..." class="w-14rem" />
       <div class="flex align-items-center gap-2">
         <label class="text-500 text-sm">Inclure archives</label>
-        <p-toggleswitch
-          [(ngModel)]="inclureArchives"
-          (onChange)="onToggleArchives()"
-        />
+        <p-toggleswitch [(ngModel)]="inclureArchives" (onChange)="onToggleArchives()" />
       </div>
-
-      <p-button
-        label="Nouveau matériau"
-        icon="pi pi-plus"
-        (onClick)="openCreate()"
-      />
+      <p-button label="Nouveau matériau" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>
   </ng-template>
 </p-toolbar>
 
-<!-- Stock alert banner -->
-@if (materiauxEnAlerte.length > 0) {
-  <div class="surface-card border-round border-left-3 border-red-500 p-3 mb-4 flex align-items-center gap-3">
-    <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
-    <span class="text-900 font-medium">
-      {{ materiauxEnAlerte.length }} matériau(x) en alerte de stock
-    </span>
-  </div>
-}
-
-<!-- Table -->
 <div class="card">
   <p-table
     [value]="materiaux"
     [loading]="loading"
-    [showGridlines]="true"
     [paginator]="true"
-    [rows]="15"
-    [rowsPerPageOptions]="[10, 15, 25, 50]"
+    [rows]="size"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
     [showCurrentPageReport]="true"
-    currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-    [globalFilterFields]="['nom', 'unite']"
+    [showGridlines]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords}"
     dataKey="id"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="nom" style="min-width: 200px">
+        <th pSortableColumn="nom" style="min-width:220px">
           Nom <p-sortIcon field="nom" />
         </th>
-        <th style="width: 100px">Unité</th>
-        <th style="width: 130px">Statut stock</th>
-        <th>Stock par entrepôt</th>
-        <th pSortableColumn="coutUnitaire" style="width: 130px">
+        <th style="width:90px">Unité</th>
+        <th pSortableColumn="coutUnitaire" style="width:140px">
           Coût unitaire <p-sortIcon field="coutUnitaire" />
         </th>
-        <th style="width: 120px">Seuil alerte</th>
-        <th style="width: 60px"></th>
+        <th style="width:130px">Seuil alerte</th>
+        <th style="width:130px">Recettes liées</th>
+        <th style="width:110px">Statut</th>
+        <th pSortableColumn="createdAt" style="width:130px">
+          Créé le <p-sortIcon field="createdAt" />
+        </th>
+        <th style="width:80px"></th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-m>
       <tr [class.opacity-50]="m.archive">
-        <!-- Nom -->
+
         <td>
           <div class="flex align-items-center gap-2">
             @if (m.archive) {
-              <i class="pi pi-box text-400" pTooltip="Archivé"></i>
-            } @else if (m.enAlerte) {
-              <i class="pi pi-exclamation-circle text-red-500" pTooltip="Alerte stock"></i>
+              <i class="pi pi-inbox text-400" pTooltip="Archivé"></i>
             } @else {
-              <i class="pi pi-box text-green-500"></i>
+              <i class="pi pi-box text-primary"></i>
             }
             <span class="font-medium text-900">{{ m.nom }}</span>
           </div>
         </td>
 
-        <!-- Unité -->
         <td>
-          <span class="text-500 text-sm font-mono">{{ m.unite }}</span>
+          <span class="font-mono text-sm text-500">{{ m.unite }}</span>
         </td>
 
-        <!-- Statut stock -->
-        <td>
-          <p-tag
-            [value]="getStockLabel(m)"
-            [severity]="getStockSeverity(m)"
-          />
-        </td>
-
-        <!-- Stock par entrepôt -->
-        <td>
-          <div class="flex flex-wrap gap-2">
-            @if (m.stocks && m.stocks.length > 0) {
-              @for (stock of m.stocks; track stock.entrepotId) {
-                <div
-                  class="border-round surface-100 px-2 py-1 flex align-items-center gap-1"
-                  [pTooltip]="stock.entrepotNom"
-                >
-                  <i class="pi pi-warehouse text-400 text-xs"></i>
-                  <span class="font-semibold text-sm text-900">{{ stock.stockActuel | number:'1.0-2' }}</span>
-                  <span class="text-400 text-xs">{{ m.unite }}</span>
-                </div>
-              }
-              <span class="text-xs text-500 align-self-center">
-                Total: <strong>{{ getTotalStock(m) | number:'1.0-2' }}</strong>
-              </span>
-            } @else {
-              <span class="text-400 text-sm">Aucun stock</span>
-            }
-          </div>
-        </td>
-
-        <!-- Coût unitaire -->
         <td>
           @if (m.coutUnitaire != null) {
-            <span class="font-semibold text-900">{{ m.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }}</span>
+            <span class="font-semibold text-900">
+              {{ m.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }}
+            </span>
             <span class="text-400 text-xs ml-1">/ {{ m.unite }}</span>
           } @else {
-            <span class="text-400 text-sm">—</span>
+            <span class="text-400">—</span>
           }
         </td>
 
-        <!-- Seuil -->
         <td>
           @if (m.seuilAlerte != null) {
             <span class="text-sm">{{ m.seuilAlerte | number:'1.0-2' }} {{ m.unite }}</span>
           } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <td class="text-center">
+          @if (m.nbRecettes != null && m.nbRecettes > 0) {
+            <p-tag [value]="m.nbRecettes + ' recette(s)'" severity="info" />
+          } @else {
             <span class="text-400 text-sm">—</span>
           }
         </td>
 
-        <!-- Actions -->
+        <td>
+          @if (m.archive) {
+            <p-tag value="Archivé" severity="secondary" />
+          } @else {
+            <p-tag value="Actif" severity="success" />
+          }
+        </td>
+
+        <td>
+          <span class="text-sm text-500">{{ m.createdAt | date:'dd/MM/yyyy' }}</span>
+        </td>
+
         <td>
           <div class="flex gap-1 justify-content-end">
-            <p-button
-              icon="pi pi-history"
-              severity="secondary"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              pTooltip="Historique mouvements"
-              (onClick)="openHistorique(m)"
-            />
-            <p-button
-              icon="pi pi-arrow-down"
-              severity="success"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              pTooltip="Entrée de stock"
-              [disabled]="m.archive"
-              (onClick)="openEntreeStock(m)"
-            />
-            <p-button
-              icon="pi pi-sliders-h"
-              severity="warn"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              pTooltip="Ajustement stock"
-              [disabled]="m.archive"
-              (onClick)="openAjustement(m)"
-            />
-            <p-button
-              icon="pi pi-pencil"
-              severity="info"
-              [text]="true"
-              [rounded]="true"
-              size="small"
-              pTooltip="Modifier"
-              [disabled]="m.archive"
-              (onClick)="openEdit(m)"
-            />
+            <p-button icon="pi pi-pencil" severity="info" [text]="true" [rounded]="true"
+              size="small" pTooltip="Modifier" [disabled]="m.archive"
+              (onClick)="openEdit(m)" />
             @if (!m.archive) {
-              <p-button
-                icon="pi pi-inbox"
-                severity="danger"
-                [text]="true"
-                [rounded]="true"
-                size="small"
-                pTooltip="Archiver"
-                (onClick)="confirmArchive(m)"
-              />
+              <p-button icon="pi pi-inbox" severity="danger" [text]="true" [rounded]="true"
+                size="small" pTooltip="Archiver" (onClick)="confirmArchive(m)" />
             }
           </div>
         </td>
+
       </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="text-center py-5 text-400">
+        <td colspan="8" class="text-center py-6 text-400">
           <i class="pi pi-box text-4xl mb-3 block"></i>
           Aucun matériau trouvé
         </td>
@@ -213,26 +138,8 @@
   </p-table>
 </div>
 
-<!-- Dialogs -->
 <app-materiau-form
   [(visible)]="showFormDialog"
   [materiau]="selectedMateriau"
   (saved)="onFormSaved()"
-/>
-
-<app-entree-stock-dialog
-  [(visible)]="showEntreeDialog"
-  [materiau]="selectedMateriau"
-  (saved)="onStockUpdated($event)"
-/>
-
-<app-ajustement-dialog
-  [(visible)]="showAjustementDialog"
-  [materiau]="selectedMateriau"
-  (saved)="onStockUpdated($event)"
-/>
-
-<app-historique-dialog
-  [(visible)]="showHistoriqueDialog"
-  [materiau]="selectedMateriau"
 />

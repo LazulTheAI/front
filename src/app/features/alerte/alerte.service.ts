@@ -1,25 +1,34 @@
-import { AlerteStockResponse, ReportControllerService } from '@/app/modules/openapi';
+// alerte.service.ts
+import { AlerteControllerService, AlerteResponse } from '@/app/modules/openapi';
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, interval, startWith, Subscription, switchMap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AlerteService implements OnDestroy {
-    private _alertes$ = new BehaviorSubject<AlerteStockResponse[]>([]);
+    private _alertes$ = new BehaviorSubject<AlerteResponse[]>([]);
     readonly alertes$ = this._alertes$.asObservable();
 
     private pollSub?: Subscription;
 
-    constructor(private reportService: ReportControllerService) {}
+    constructor(private alerteController: AlerteControllerService) {}
 
+    // alerte.service.ts
     startPolling(): void {
-        if (this.pollSub) return; // déjà actif
+        if (this.pollSub) return;
         this.pollSub = interval(30_000)
             .pipe(
                 startWith(0),
-                switchMap(() => this.reportService.alertesAlerteStockResponse())
+                switchMap(() =>
+                    this.alerteController.listerAlertes(
+                        false, // all
+                        0, // page
+                        100, // size
+                        undefined // entrepotId
+                    )
+                )
             )
             .subscribe({
-                next: (d) => this._alertes$.next(d),
+                next: (data: any) => this._alertes$.next(data.content ?? []),
                 error: () => {}
             });
     }
@@ -30,14 +39,10 @@ export class AlerteService implements OnDestroy {
     }
 
     refresh(): void {
-        this.reportService.alertesAlerteStockResponse().subscribe({
-            next: (d) => this._alertes$.next(d),
+        this.alerteController.listerAlertes(false, 0, 100, undefined).subscribe({
+            next: (data: any) => this._alertes$.next(data.content ?? []),
             error: () => {}
         });
-    }
-
-    get count(): number {
-        return this._alertes$.value.length;
     }
 
     ngOnDestroy(): void {

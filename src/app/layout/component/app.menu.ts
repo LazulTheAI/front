@@ -27,6 +27,7 @@ export class AppMenu {
                 label: 'Stock & approvisionnement',
                 items: [
                     { label: 'Matériaux', icon: 'pi pi-box', routerLink: ['materiaux'] },
+                    { label: 'Stock', icon: 'pi pi-shopping-cart', routerLink: ['materiaux/stock'] },
                     { label: 'Fournisseurs', icon: 'pi pi-truck', routerLink: ['fournisseurs'] },
                     { label: 'Bons de commande', icon: 'pi pi-shopping-cart', routerLink: ['bons-commande'] }
                 ]

@@ -143,7 +143,7 @@ export class RecetteFormComponent implements OnChanges, OnInit {
     }
 
     loadMateriaux(): void {
-        this.materiauService.listerMateriau(false).subscribe({
+        this.materiauService.tousLesMateriaux().subscribe({
             next: (data: MateriauResponse[]) => {
                 this.materiauxSource = data.filter((m) => !m.archive);
             }

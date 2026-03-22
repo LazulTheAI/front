@@ -1,4 +1,3 @@
-// rapports.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +13,7 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { AlerteStockResponse, ConsommationMateriauResponse, RapportConsommationResponse, ReportControllerService } from '@/app/modules/openapi';
+import { AlerteControllerService, AlerteResponse, ConsommationMateriauResponse, RapportConsommationResponse, ReportControllerService } from '@/app/modules/openapi';
 
 interface ValeurStockReportResponse {
     valeurTotale: number;
@@ -63,10 +62,12 @@ export class RapportsComponent implements OnInit {
     valeurStock: ValeurStockReportResponse | null = null;
     consommation: RapportConsommationResponse | null = null;
     mouvements: MouvementExportResponse[] = [];
-    alertes: AlerteStockResponse[] = [];
+    alertes: AlerteResponse[] = [];
+    totalAlertes = 0;
 
     constructor(
         private reportService: ReportControllerService,
+        private alerteService: AlerteControllerService,
         private messageService: MessageService,
         private cdr: ChangeDetectorRef
     ) {}
@@ -142,7 +143,7 @@ export class RapportsComponent implements OnInit {
         this.loadingMouvements = true;
         this.reportService.mouvements(this.dateDebut.toISOString() as any, this.dateFin.toISOString() as any).subscribe({
             next: (d: any) => {
-                this.mouvements = d;
+                this.mouvements = d.content ?? [];
                 this.loadingMouvements = false;
                 this.cdr.markForCheck();
             },
@@ -155,17 +156,25 @@ export class RapportsComponent implements OnInit {
 
     loadAlertes(): void {
         this.loadingAlertes = true;
-        this.reportService.alertesAlerteStockResponse().subscribe({
-            next: (d) => {
-                this.alertes = d;
-                this.loadingAlertes = false;
-                this.cdr.markForCheck();
-            },
-            error: () => {
-                this.loadingAlertes = false;
-                this.cdr.markForCheck();
-            }
-        });
+        this.alerteService
+            .listerAlertes(
+                false, // all
+                0, // page
+                20, // size
+                undefined // entrepotId
+            )
+            .subscribe({
+                next: (data: any) => {
+                    this.alertes = data.content ?? [];
+                    this.totalAlertes = data.totalElements ?? 0;
+                    this.loadingAlertes = false;
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.loadingAlertes = false;
+                    this.cdr.markForCheck();
+                }
+            });
     }
 
     // ─── Getters valeur stock ──────────────────────────────────
@@ -214,15 +223,15 @@ export class RapportsComponent implements OnInit {
     // ─── Getters alertes ───────────────────────────────────────
 
     get nbAlertes(): number {
-        return this.alertes.length;
+        return this.totalAlertes;
     }
 
     get nbAlertesCritiques(): number {
-        return this.alertes.filter((a) => Number(a.manqueMax ?? 0) > 5).length;
+        return this.alertes.filter((a) => a.typeAlerte === 'stock_bas').length;
     }
 
     get totalManque(): number {
-        return this.alertes.reduce((s, a) => s + Number(a.manqueMax ?? 0), 0);
+        return this.alertes.length;
     }
 
     // ─── Helpers affichage ─────────────────────────────────────

@@ -1,16 +1,22 @@
+<!-- bons-commande-list.component.html -->
 <p-toast />
 
-
-<!-- Toolbar -->
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
       <h2 class="m-0 text-900 font-semibold">Bons de commande</h2>
-      <p-tag [value]="bons.length + ' bon(s)'" severity="secondary" />
+      <p-tag [value]="totalRecords + ' bon(s)'" severity="secondary" />
     </div>
   </ng-template>
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3">
+      <input
+        pInputText
+        [ngModel]="search"
+        (ngModelChange)="onSearchInput($event)"
+        placeholder="Rechercher un fournisseur..."
+        class="w-14rem"
+      />
       <p-select
         [(ngModel)]="filtreStatut"
         [options]="statutOptions"
@@ -24,14 +30,16 @@
   </ng-template>
 </p-toolbar>
 
-<!-- Table -->
 <div class="card">
   <p-table
     [value]="bons"
     [loading]="loading"
     [paginator]="true"
-    [rows]="15"
-    [rowsPerPageOptions]="[10, 15, 25]"
+    [rows]="size"
+    [rowsPerPageOptions]="[10, 15, 25, 50]"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="{first} à {last} sur {totalRecords}"
     [showGridlines]="true"
@@ -41,19 +49,19 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 80px">#</th>
-        <th pSortableColumn="fournisseurNom" style="min-width: 180px">
+        <th style="width:80px">#</th>
+        <th pSortableColumn="fournisseurNom" style="min-width:180px">
           Fournisseur <p-sortIcon field="fournisseurNom" />
         </th>
-        <th style="width: 150px">Statut</th>
-        <th style="width: 120px">Réception</th>
-        <th pSortableColumn="dateCommande" style="width: 130px">
+        <th style="width:150px">Statut</th>
+        <th style="width:120px">Réception</th>
+        <th pSortableColumn="dateCommande" style="width:130px">
           Date <p-sortIcon field="dateCommande" />
         </th>
-        <th style="width: 140px">Livraison prévue</th>
-        <th style="width: 120px" class="text-right">Montant</th>
-        <th style="width: 150px">Référence</th>
-        <th style="width: 120px"></th>
+        <th style="width:140px">Livraison prévue</th>
+        <th style="width:120px" class="text-right">Montant</th>
+        <th style="width:150px">Référence</th>
+        <th style="width:120px"></th>
       </tr>
     </ng-template>
 
@@ -75,7 +83,6 @@
           />
         </td>
 
-        <!-- Progression réception -->
         <td>
           @if (bon.statut === 'RECU') {
             <div class="flex align-items-center gap-2">
@@ -84,16 +91,18 @@
             </div>
           } @else if (bon.statut === 'PARTIELLEMENT_RECU') {
             <div class="flex align-items-center gap-2">
-              <div class="flex-1" style="min-width: 60px">
-                <div class="bg-200 border-round" style="height: 6px">
+              <div class="flex-1" style="min-width:60px">
+                <div class="bg-200 border-round" style="height:6px">
                   <div
                     class="bg-orange-400 border-round"
-                    style="height: 6px; transition: width 0.3s"
+                    style="height:6px;transition:width 0.3s"
                     [style.width]="getProgressionReception(bon) + '%'"
                   ></div>
                 </div>
               </div>
-              <span class="text-orange-500 text-xs font-mono">{{ getProgressionReception(bon) }}%</span>
+              <span class="text-orange-500 text-xs font-mono">
+                {{ getProgressionReception(bon) }}%
+              </span>
             </div>
           } @else if (bon.statut === 'ENVOYE') {
             <span class="text-400 text-sm">En attente</span>
@@ -141,54 +150,33 @@
           }
         </td>
 
-        <!-- Actions -->
         <td>
           <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
-            <p-button
-              icon="pi pi-eye"
-              severity="secondary"
-              [text]="true" [rounded]="true" size="small"
-              pTooltip="Voir le détail"
-              (onClick)="openDetail(bon, $event)"
-            />
+            <p-button icon="pi pi-eye" severity="secondary" [text]="true" [rounded]="true"
+              size="small" pTooltip="Voir le détail" (onClick)="openDetail(bon, $event)" />
             @if (canEnvoyer(bon)) {
-              <p-button
-                icon="pi pi-send"
-                severity="info"
-                [text]="true" [rounded]="true" size="small"
-                pTooltip="Marquer comme envoyé"
-                (onClick)="envoyerBon(bon, $event)"
-              />
+              <p-button icon="pi pi-send" severity="info" [text]="true" [rounded]="true"
+                size="small" pTooltip="Marquer comme envoyé"
+                (onClick)="envoyerBon(bon, $event)" />
             }
             @if (canReceptionner(bon)) {
-              <p-button
-                icon="pi pi-arrow-down"
-                severity="success"
-                [text]="true" [rounded]="true" size="small"
-                pTooltip="Réceptionner"
-                (onClick)="openDetail(bon, $event)"
-              />
+              <p-button icon="pi pi-arrow-down" severity="success" [text]="true" [rounded]="true"
+                size="small" pTooltip="Réceptionner"
+                (onClick)="openDetail(bon, $event)" />
             }
             @if (canAnnuler(bon)) {
-              <p-button
-                icon="pi pi-times"
-                severity="danger"
-                [text]="true" [rounded]="true" size="small"
-                pTooltip="Annuler"
-                (onClick)="confirmAnnuler(bon, $event)"
-              />
+              <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true"
+                size="small" pTooltip="Annuler"
+                (onClick)="confirmAnnuler(bon, $event)" />
             }
             @if (canSupprimer(bon)) {
-              <p-button
-                icon="pi pi-trash"
-                severity="danger"
-                [text]="true" [rounded]="true" size="small"
-                pTooltip="Supprimer le brouillon"
-                (onClick)="confirmSupprimer(bon, $event)"
-              />
+              <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                size="small" pTooltip="Supprimer le brouillon"
+                (onClick)="confirmSupprimer(bon, $event)" />
             }
           </div>
         </td>
+
       </tr>
     </ng-template>
 
@@ -200,10 +188,10 @@
         </td>
       </tr>
     </ng-template>
+
   </p-table>
 </div>
 
-<!-- Dialogs -->
 <app-bon-commande-form
   [(visible)]="showFormDialog"
   (saved)="onFormSaved($event)"

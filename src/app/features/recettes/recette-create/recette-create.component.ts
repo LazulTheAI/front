@@ -102,7 +102,7 @@ export class RecetteCreateComponent implements OnInit, OnDestroy {
 
     private loadMateriaux(): void {
         this.materiauService
-            .listerMateriau()
+            .tousLesMateriaux()
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (list) => {

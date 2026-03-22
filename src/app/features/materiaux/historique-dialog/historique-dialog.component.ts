@@ -27,6 +27,7 @@ export class HistoriqueDialogComponent implements OnChanges {
     loading = false;
     mouvements: MouvementStockResponse[] = [];
     entrepots: EntrepotResponse[] = [];
+    totalMouvements = 0;
 
     // Filtres
     filtreDepuis: Date | null = null;
@@ -49,18 +50,32 @@ export class HistoriqueDialogComponent implements OnChanges {
     loadHistorique(): void {
         if (!this.materiau?.id) return;
         this.loading = true;
-        this.mouvements = []; // ← reset immédiat avant l'appel
-        this.materiauService.historiqueMouvementStock(this.materiau.id, this.filtreDepuis?.toISOString(), this.filtreJusqu?.toISOString(), this.filtreEntrepotId ?? undefined).subscribe({
-            next: (d) => {
-                this.mouvements = d;
-                this.loading = false;
-                this.cdr.markForCheck(); // ← ici
-            },
-            error: () => {
-                this.loading = false;
-                this.cdr.markForCheck(); // ← et ici
-            }
-        });
+        this.mouvements = [];
+
+        this.materiauService
+            .historiqueMouvementStock(
+                this.materiau.id,
+                this.filtreDepuis?.toISOString(),
+                this.filtreJusqu?.toISOString(),
+                this.filtreEntrepotId ?? undefined,
+                undefined, // typeMouvement
+                0, // page
+                50, // size — assez grand pour l'historique d'un seul matériau
+                'createdAt',
+                'desc'
+            )
+            .subscribe({
+                next: (data: any) => {
+                    this.mouvements = data.content ?? [];
+                    this.totalMouvements = data.totalElements ?? 0;
+                    this.loading = false;
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.loading = false;
+                    this.cdr.markForCheck();
+                }
+            });
     }
 
     loadEntrepots(): void {

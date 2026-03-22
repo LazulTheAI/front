@@ -1,18 +1,20 @@
+// bons-commande-list.component.ts
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { BonCommandeControllerService, BonCommandeResponse } from '@/app/modules/openapi';
-
 import { BonCommandeDetailComponent } from '../bon-commande-detail/bon-commande-detail.component';
 import { BonCommandeFormComponent } from '../bon-commande-form/bon-commande-form.component';
 
@@ -20,15 +22,26 @@ import { BonCommandeFormComponent } from '../bon-commande-form/bon-commande-form
     selector: 'app-bons-commande-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, SelectModule, BonCommandeFormComponent, BonCommandeDetailComponent],
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, SelectModule, InputTextModule, BonCommandeFormComponent, BonCommandeDetailComponent],
     providers: [MessageService, ConfirmationService],
     templateUrl: './bons-commande-list.component.html'
 })
-export class BonsCommandeListComponent implements OnInit {
+export class BonsCommandeListComponent implements OnInit, OnDestroy {
     bons: BonCommandeResponse[] = [];
+    totalRecords = 0;
     loading = false;
 
+    // Pagination & tri
+    page = 0;
+    size = 15;
+    sortBy = 'dateCommande';
+    sortDir = 'desc';
+
+    // Filtres
     filtreStatut: string | null = null;
+    search = '';
+    private search$ = new Subject<string>();
+
     statutOptions = [
         { label: 'Tous les statuts', value: null },
         { label: 'Brouillon', value: 'BROUILLON' },
@@ -50,39 +63,66 @@ export class BonsCommandeListComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        this.search$.pipe(debounceTime(400), distinctUntilChanged()).subscribe((value) => {
+            this.search = value;
+            this.page = 0;
+            this.loadBons();
+        });
+
         this.loadBons();
+    }
+
+    ngOnDestroy(): void {
+        this.search$.complete();
+    }
+
+    onSearchInput(value: string): void {
+        this.search$.next(value);
     }
 
     loadBons(): void {
         this.loading = true;
-        const statut = (this.filtreStatut as any) ?? undefined;
-        this.bonService.listerBonCommande(statut).subscribe({
-            next: (data: BonCommandeResponse[]) => {
-                this.bons = data;
+        this.bonService.listerBonCommande(this.page, this.size, this.sortBy, this.sortDir, (this.filtreStatut as any) ?? undefined, this.search || undefined).subscribe({
+            next: (data: any) => {
+                this.bons = data.content;
+                this.totalRecords = data.totalElements;
                 this.loading = false;
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             },
             error: () => {
                 this.loading = false;
-                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             }
         });
     }
 
+    onLazyLoad(event: TableLazyLoadEvent): void {
+        this.page = Math.floor((event.first ?? 0) / (event.rows ?? this.size));
+        this.size = event.rows ?? this.size;
+
+        if (event.sortField) {
+            this.sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+            this.sortDir = event.sortOrder === -1 ? 'desc' : 'asc';
+        }
+
+        this.loadBons();
+    }
+
     onFiltreChange(): void {
+        this.page = 0;
         this.loadBons();
     }
 
     openCreate(): void {
         this.showFormDialog = true;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
     }
 
     openDetail(bon: BonCommandeResponse, event?: Event): void {
         event?.stopPropagation();
         this.selectedBon = bon;
         this.showDetailDialog = true;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
     }
 
     confirmAnnuler(bon: BonCommandeResponse, event: Event): void {
@@ -94,7 +134,11 @@ export class BonsCommandeListComponent implements OnInit {
             accept: () => {
                 this.bonService.annulerBonCommande(bon.id!).subscribe({
                     next: () => {
-                        this.messageService.add({ severity: 'success', summary: 'Annulé', detail: `BC #${bon.id} annulé` });
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Annulé',
+                            detail: `BC #${bon.id} annulé`
+                        });
                         this.loadBons();
                     }
                 });
@@ -111,7 +155,11 @@ export class BonsCommandeListComponent implements OnInit {
             accept: () => {
                 this.bonService.supprimerBonCommande(bon.id!).subscribe({
                     next: () => {
-                        this.messageService.add({ severity: 'success', summary: 'Supprimé', detail: `BC #${bon.id} supprimé` });
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Supprimé',
+                            detail: `BC #${bon.id} supprimé`
+                        });
                         this.loadBons();
                     }
                 });
@@ -127,13 +175,13 @@ export class BonsCommandeListComponent implements OnInit {
             detail: result.message
         });
         if (result.success) this.loadBons();
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
     }
 
     onDetailClosed(): void {
         this.showDetailDialog = false;
         this.loadBons();
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
     }
 
     getStatutSeverity(statut: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
@@ -159,11 +207,7 @@ export class BonsCommandeListComponent implements OnInit {
     }
 
     getTotalBC(bon: BonCommandeResponse): number {
-        return (
-            bon.lignes?.reduce((sum, l) => {
-                return sum + ((l.quantiteCommandee ?? 0) * (l.prixUnitaireCents ?? 0)) / 100;
-            }, 0) ?? 0
-        );
+        return bon.lignes?.reduce((sum, l) => sum + ((l.quantiteCommandee ?? 0) * (l.prixUnitaireCents ?? 0)) / 100, 0) ?? 0;
     }
 
     getProgressionReception(bon: BonCommandeResponse): number {
@@ -176,15 +220,12 @@ export class BonsCommandeListComponent implements OnInit {
     canEnvoyer(bon: BonCommandeResponse): boolean {
         return bon.statut === 'BROUILLON';
     }
-
     canReceptionner(bon: BonCommandeResponse): boolean {
         return bon.statut === 'ENVOYE' || bon.statut === 'PARTIELLEMENT_RECU';
     }
-
     canAnnuler(bon: BonCommandeResponse): boolean {
         return bon.statut === 'BROUILLON' || bon.statut === 'ENVOYE';
     }
-
     canSupprimer(bon: BonCommandeResponse): boolean {
         return bon.statut === 'BROUILLON';
     }
@@ -199,7 +240,11 @@ export class BonsCommandeListComponent implements OnInit {
         event.stopPropagation();
         this.bonService.envoyerBonCommande(bon.id!).subscribe({
             next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Envoyé', detail: `BC #${bon.id} marqué comme envoyé` });
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Envoyé',
+                    detail: `BC #${bon.id} marqué comme envoyé`
+                });
                 this.loadBons();
             }
         });
