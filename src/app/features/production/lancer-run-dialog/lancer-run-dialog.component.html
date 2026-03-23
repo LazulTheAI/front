@@ -8,10 +8,9 @@
 >
 
   <!-- Formulaire (avant exécution) -->
-  @if (!resultat) {
+  @if (!runTermine) {
     <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
 
-      <!-- Recette -->
       <div class="flex flex-column gap-2">
         <label class="font-medium text-900" for="recette">
           Recette <span class="text-red-500">*</span>
@@ -32,7 +31,6 @@
         />
       </div>
 
-      <!-- Batches + Entrepôt -->
       <div class="grid">
         <div class="col-6 flex flex-column gap-2">
           <label class="font-medium text-900" for="batches">
@@ -71,7 +69,6 @@
         </div>
       </div>
 
-      <!-- Coût théorique -->
       @if (selectedRecette?.coutTheorique) {
         <div class="surface-50 border-round p-3 flex align-items-center gap-3">
           <i class="pi pi-calculator text-primary"></i>
@@ -87,32 +84,23 @@
       <div class="grid">
         <div class="col-6 flex flex-column gap-2">
           <label class="font-medium text-900" for="orderId">Référence commande</label>
-          <input pInputText id="orderId" name="orderId" [(ngModel)]="form.orderId" placeholder="N° commande..." />
+          <input pInputText id="orderId" name="orderId"
+            [(ngModel)]="form.orderId" placeholder="N° commande..." />
         </div>
         <div class="col-6 flex flex-column gap-2">
           <label class="font-medium text-900" for="notes">Notes</label>
-          <input pInputText id="notes" name="notes" [(ngModel)]="form.notes" placeholder="Remarques..." />
+          <input pInputText id="notes" name="notes"
+            [(ngModel)]="form.notes" placeholder="Remarques..." />
         </div>
       </div>
 
     </form>
-
-    <ng-template pTemplate="footer">
-      <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
-      <p-button
-        label="Lancer maintenant"
-        icon="pi pi-play"
-        [loading]="saving"
-        (onClick)="submit(ngForm)"
-      />
-    </ng-template>
   }
 
   <!-- Résultat après exécution -->
-  @if (resultat) {
+  @if (runTermine && resultat) {
     <div class="flex flex-column gap-4 pt-2">
 
-      <!-- Succès header -->
       <div class="flex align-items-center gap-3 surface-50 border-round p-4">
         <i class="pi pi-check-circle text-green-500 text-4xl"></i>
         <div>
@@ -121,29 +109,33 @@
         </div>
       </div>
 
-      <!-- KPIs -->
       <div class="grid">
         <div class="col-4">
           <div class="surface-card border-round p-3 text-center border-1 surface-border">
             <div class="text-400 text-xs font-medium mb-1">BATCHES</div>
-            <div class="font-bold text-xl text-900">{{ resultat.batchsProduits | number:'1.0-2' }}</div>
+            <div class="font-bold text-xl text-900">
+              {{ resultat.batchsProduits | number:'1.0-2' }}
+            </div>
           </div>
         </div>
         <div class="col-4">
           <div class="surface-card border-round p-3 text-center border-1 surface-border">
             <div class="text-400 text-xs font-medium mb-1">UNITÉS PRODUITES</div>
-            <div class="font-bold text-xl text-green-600">{{ resultat.unitesProduite | number:'1.0-2' }}</div>
+            <div class="font-bold text-xl text-green-600">
+              {{ resultat.unitesProduite | number:'1.0-2' }}
+            </div>
           </div>
         </div>
         <div class="col-4">
           <div class="surface-card border-round p-3 text-center border-1 surface-border">
             <div class="text-400 text-xs font-medium mb-1">COGS TOTAL</div>
-            <div class="font-bold text-xl text-primary">{{ resultat.cogsTotal | currency:'EUR':'symbol':'1.2-2' }}</div>
+            <div class="font-bold text-xl text-primary">
+              {{ resultat.cogsTotal | currency:'EUR':'symbol':'1.2-2' }}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Déductions matières -->
       @if (resultat.deductions && resultat.deductions.length > 0) {
         <div>
           <div class="font-medium text-900 mb-2">Matières consommées</div>
@@ -151,8 +143,8 @@
             <ng-template pTemplate="header">
               <tr>
                 <th>Matériau</th>
-                <th class="text-right" style="width: 120px">Quantité</th>
-                <th class="text-right" style="width: 120px">COGS</th>
+                <th class="text-right" style="width:120px">Quantité</th>
+                <th class="text-right" style="width:120px">COGS</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-d>
@@ -163,7 +155,9 @@
                   <span class="text-400 text-xs ml-1">{{ d.unite }}</span>
                 </td>
                 <td class="text-right">
-                  <span class="font-mono text-sm">{{ d.cogs | currency:'EUR':'symbol':'1.2-4' }}</span>
+                  <span class="font-mono text-sm">
+                    {{ d.cogs | currency:'EUR':'symbol':'1.2-4' }}
+                  </span>
                 </td>
               </tr>
             </ng-template>
@@ -172,10 +166,31 @@
       }
 
     </div>
-
-    <ng-template pTemplate="footer">
-      <p-button label="Fermer" icon="pi pi-check" (onClick)="fermer()" />
-    </ng-template>
   }
+
+  <!-- ═══ Footer unique hors des @if ═══ -->
+  <div class="flex justify-content-end gap-2 mt-4 pt-3 border-top-1 surface-border">
+    @if (!runTermine) {
+      <p-button
+        label="Annuler"
+        severity="secondary"
+        [text]="true"
+        [disabled]="saving"
+        (onClick)="onHide()"
+      />
+      <p-button
+        label="Lancer maintenant"
+        icon="pi pi-play"
+        [loading]="saving"
+        (onClick)="submit()"
+      />
+    } @else {
+      <p-button
+        label="Fermer"
+        icon="pi pi-check"
+        (onClick)="fermer()"
+      />
+    }
+  </div>
 
 </p-dialog>

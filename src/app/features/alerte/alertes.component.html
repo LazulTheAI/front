@@ -8,17 +8,28 @@
     <div>
       <h1 class="text-900 font-bold text-xl m-0">Alertes stock</h1>
       <p class="text-400 text-sm m-0 mt-1">
-        Matériaux sous seuil d'alerte — actualisé toutes les 30 secondes
+        Actualisé toutes les 30 secondes
       </p>
     </div>
   </div>
-  <p-button
-    label="Actualiser"
-    icon="pi pi-refresh"
-    severity="secondary"
-    [text]="true"
-    (onClick)="alerteService.refresh()"
-  />
+  <div class="flex align-items-center gap-2">
+    <p-select
+      [(ngModel)]="filtreType"
+      [options]="typeOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Tous les types"
+      styleClass="w-14rem"
+      (onChange)="onFiltreTypeChange()"
+    />
+    <p-button
+      label="Actualiser"
+      icon="pi pi-refresh"
+      severity="secondary"
+      [text]="true"
+      (onClick)="alerteService.refresh()"
+    />
+  </div>
 </div>
 
 <!-- ═══ KPIs ════════════════════════════════════════════════ -->
@@ -33,17 +44,17 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Manque total estimé</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Stock bas</div>
       <div class="text-3xl font-bold text-orange-500">
-        {{ (stockTotal$ | async) ?? 0 | number:'1.0-2' }}
+        {{ (nbStockBas$ | async) ?? 0 }}
       </div>
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Critiques (manque &gt; 5)</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Autres alertes</div>
       <div class="text-3xl font-bold text-red-700">
-        {{ (nbCritiques$ | async) ?? 0 }}
+        {{ (nbAutres$ | async) ?? 0 }}
       </div>
     </div>
   </div>
@@ -52,25 +63,24 @@
 <!-- ═══ TABLE ════════════════════════════════════════════════ -->
 <div class="surface-card border-round-xl border-1 surface-border p-4">
   <p-table
-    [value]="(alertes$ | async) ?? []"
+    [value]="(alertesFiltrees$ | async) ?? []"
     [paginator]="true"
     [rows]="20"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="{first}-{last} sur {totalRecords} alertes"
-    sortField="manqueMax"
+    sortField="createdAt"
     [sortOrder]="-1"
-    dataKey="materiauId"
+    dataKey="id"
   >
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="nom" style="min-width:200px">
-          Matériau <p-sortIcon field="nom" />
+        <th style="width:150px">Type</th>
+        <th>Message</th>
+        <th style="width:130px">Entrepôt</th>
+        <th pSortableColumn="createdAt" style="width:140px">
+          Date <p-sortIcon field="createdAt" />
         </th>
-        <th pSortableColumn="manqueMax" style="width:150px">
-          Manque estimé <p-sortIcon field="manqueMax" />
-        </th>
-        <th style="width:220px">Stock par entrepôt</th>
-        <th style="width:100px"></th>
+        <th style="width:110px"></th>
       </tr>
     </ng-template>
 
@@ -78,37 +88,27 @@
       <tr>
 
         <td>
+          <p-tag
+            [value]="getTypeLabel(a.typeAlerte)"
+            [severity]="getTypeSeverity(a.typeAlerte)"
+          />
+        </td>
+
+        <td>
           <div class="flex align-items-center gap-2">
-            <i class="pi pi-exclamation-circle text-red-500"></i>
-            <div>
-              <div class="font-semibold text-900">{{ a.nom }}</div>
-              <div class="text-400 text-xs font-mono mt-1">{{ a.unite }}</div>
-            </div>
+            <i class="pi pi-exclamation-circle text-red-500 text-sm flex-shrink-0"></i>
+            <span class="text-900 text-sm">{{ a.message }}</span>
           </div>
         </td>
 
         <td>
-          <div class="font-bold text-red-500 font-mono">
-            -{{ a.manqueMax | number:'1.0-2' }} {{ a.unite }}
-          </div>
-          <div class="text-400 text-xs mt-1">
-            seuil : {{ a.seuilAlerte | number:'1.0-2' }}
-          </div>
+          <span class="text-500 text-sm">{{ a.entrepotNom ?? '—' }}</span>
         </td>
 
         <td>
-          <div class="flex flex-column gap-1">
-            @for (s of a.stocksParEntrepot; track s.entrepotId) {
-              <div class="flex align-items-center justify-content-between gap-3 text-xs">
-                <span class="text-500 white-space-nowrap">{{ s.entrepotNom }}</span>
-                <span class="font-mono font-semibold"
-                  [class.text-red-500]="s.stockActuel <= 0"
-                  [class.text-orange-500]="s.stockActuel > 0 && s.stockActuel <= a.seuilAlerte">
-                  {{ s.stockActuel | number:'1.0-2' }}
-                </span>
-              </div>
-            }
-          </div>
+          <span class="text-sm text-500">
+            {{ a.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
         </td>
 
         <td>
@@ -118,8 +118,8 @@
             severity="success"
             size="small"
             [text]="true"
-            [loading]="isAcquittementEnCours(a.materiauId)"
-            [disabled]="isAcquittementEnCours(a.materiauId)"
+            [loading]="isAcquittementEnCours(a.id)"
+            [disabled]="isAcquittementEnCours(a.id)"
             (onClick)="confirmerAcquittement(a)"
           />
         </td>
@@ -129,7 +129,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="4" class="text-center py-6 text-400">
+        <td colspan="5" class="text-center py-6 text-400">
           <i class="pi pi-check-circle text-green-500 text-4xl mb-3 block"></i>
           Aucune alerte active
         </td>

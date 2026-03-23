@@ -1,6 +1,6 @@
+<!-- produits-list.component.html -->
 <p-toast />
 
-<!-- Toolbar -->
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
@@ -9,15 +9,8 @@
     </div>
   </ng-template>
   <ng-template pTemplate="end">
-      <span class="p-inputgroup-addon">
-        <i class="pi pi-search"></i>
-      </span>
-      <input
-        pInputText
-        [ngModel]="search"
-        (ngModelChange)="onSearchInput($event)"
-        placeholder="Rechercher..."
-      />
+    <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
+      placeholder="Rechercher..." class="w-16rem" />
   </ng-template>
 </p-toolbar>
 
@@ -41,22 +34,16 @@
     <ng-template pTemplate="header">
       <tr>
         <th style="width:56px"></th>
-        <th pSortableColumn="nom">
-          Produit <p-sortIcon field="nom" />
-        </th>
-        <th style="width:130px" pSortableColumn="sku">
-          SKU <p-sortIcon field="sku" />
-        </th>
-        <th style="width:120px" class="text-right" pSortableColumn="stockPlateforme">
-          Stock BC <p-sortIcon field="stockPlateforme" />
-        </th>
-        <th style="width:120px" class="text-right" pSortableColumn="prixCents">
+        <th pSortableColumn="nom">Produit <p-sortIcon field="nom" /></th>
+        <th style="width:130px" pSortableColumn="sku">SKU <p-sortIcon field="sku" /></th>
+        <th style="width:130px" class="text-right" pSortableColumn="prixCents">
           Prix <p-sortIcon field="prixCents" />
         </th>
+        <th style="width:160px">Stock interne</th>
+        <th style="width:160px">Seuil alerte</th>
         <th>Recette liée</th>
-        <th style="width:110px">Statut</th>
-        <th style="width:110px">Sync</th>
-        <th style="width:100px" class="text-center">Actions</th>
+        <th style="width:110px">Sync BC</th>
+        <th style="width:80px" class="text-center">Actions</th>
       </tr>
     </ng-template>
 
@@ -65,19 +52,11 @@
 
         <td>
           @if (hasProduitImage(produit)) {
-            <img
-              [src]="produit.imageUrl"
-              [alt]="produit.nom"
-              class="border-round"
-              style="width:40px;height:40px;object-fit:cover;"
-            />
+            <img [src]="produit.imageUrl" [alt]="produit.nom"
+              class="border-round" style="width:40px;height:40px;object-fit:cover;" />
           } @else {
-            <p-avatar
-              [label]="getInitials(produit.nom)"
-              shape="square"
-              size="normal"
-              styleClass="bg-primary-100 text-primary font-bold"
-            />
+            <p-avatar [label]="getInitials(produit.nom)" shape="square" size="normal"
+              styleClass="bg-primary-100 text-primary font-bold" />
           }
         </td>
 
@@ -99,12 +78,6 @@
         </td>
 
         <td class="text-right">
-          <span [class]="getStockSeverity(produit.stockPlateforme)" class="text-sm font-mono">
-            {{ produit.stockPlateforme ?? '—' }}
-          </span>
-        </td>
-
-        <td class="text-right">
           @if (produit.prixCents != null) {
             <span class="text-sm font-mono text-900">
               {{ produit.prixCents / 100 | currency:'EUR':'symbol':'1.2-2' }}
@@ -114,40 +87,61 @@
           }
         </td>
 
+        <!-- Stock interne -->
+        <td (click)="$event.stopPropagation()">
+          <div class="flex align-items-center gap-2">
+            @if (isEnAlerteProduit(produit)) {
+              <i class="pi pi-exclamation-circle text-red-500 text-sm"
+                pTooltip="Stock sous le seuil d'alerte"></i>
+            }
+            <span class="font-mono text-sm font-semibold"
+              [class.text-red-500]="isEnAlerteProduit(produit)"
+              [class.text-900]="!isEnAlerteProduit(produit)">
+              {{ getStockTotalProduit(produit) | number:'1.0-2' }}
+            </span>
+            <p-button icon="pi pi-warehouse" [text]="true" [rounded]="true"
+              severity="secondary" size="small" pTooltip="Détail par entrepôt"
+              (onClick)="openStockDialog(produit, $event)" />
+          </div>
+        </td>
+
+        <!-- Seuil alerte -->
+        <td (click)="$event.stopPropagation()">
+          <div class="flex align-items-center gap-2">
+            @if (getSeuilProduit(produit) != null) {
+              <span class="text-sm text-900">
+                {{ getSeuilProduit(produit) | number:'1.0-2' }}
+              </span>
+            } @else {
+              <span class="text-400 text-sm">—</span>
+            }
+            <p-button icon="pi pi-pencil" [text]="true" [rounded]="true"
+              severity="info" size="small" pTooltip="Modifier le seuil"
+              (onClick)="openStockDialog(produit, $event)" />
+          </div>
+        </td>
+
         <td>
           @if (produit.recettes && produit.recettes.length > 0) {
             <div class="flex align-items-center gap-2">
               <i class="pi pi-book text-primary text-sm"></i>
               <span class="text-sm text-900">{{ getPrincipalRecette(produit) }}</span>
               @if (produit.recettes.length > 1) {
-                <p-chip
-                  [label]="'+' + (produit.recettes.length - 1)"
-                  styleClass="text-xs"
-                  pTooltip="Voir toutes les recettes liées"
-                />
+                <p-chip [label]="'+' + (produit.recettes.length - 1)"
+                  styleClass="text-xs" pTooltip="Voir toutes les recettes liées" />
               }
             </div>
           } @else {
             <span class="text-orange-400 text-sm flex align-items-center gap-1">
-              <i class="pi pi-exclamation-circle"></i>
-              Aucune recette
+              <i class="pi pi-exclamation-circle"></i>Aucune recette
             </span>
           }
         </td>
 
         <td>
-          <p-tag
-            [value]="getStatusLabel(produit.statut)"
-            [severity]="getStatusSeverity(produit.statut)"
-          />
-        </td>
-
-        <td>
           @if (produit.lastSyncedAt) {
-            <span
-              class="text-xs text-500"
-              [pTooltip]="(produit.lastSyncedAt | date:'dd/MM/yyyy HH:mm:ss') ?? ''"
-            >
+            <span class="text-xs text-500"
+              [pTooltip]="(produit.lastSyncedAt | date:'dd/MM/yyyy HH:mm:ss') ?? ''">
               {{ produit.lastSyncedAt | date:'dd/MM HH:mm' }}
             </span>
           } @else {
@@ -157,24 +151,12 @@
 
         <td class="text-center">
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
-            <p-button
-              icon="pi pi-link"
-              [rounded]="true"
-              [text]="true"
-              severity="primary"
-              size="small"
-              pTooltip="Lier une recette"
-              (onClick)="openLierRecette(produit, $event)"
-            />
-            <p-button
-              icon="pi pi-eye"
-              [rounded]="true"
-              [text]="true"
-              severity="secondary"
-              size="small"
-              pTooltip="Voir le détail"
-              (onClick)="openDetail(produit)"
-            />
+            <p-button icon="pi pi-link" [rounded]="true" [text]="true"
+              severity="primary" size="small" pTooltip="Lier une recette"
+              (onClick)="openLierRecette(produit, $event)" />
+            <p-button icon="pi pi-eye" [rounded]="true" [text]="true"
+              severity="secondary" size="small" pTooltip="Voir le détail"
+              (onClick)="openDetail(produit)" />
           </div>
         </td>
 
@@ -192,6 +174,131 @@
 
   </p-table>
 </div>
+
+<!-- ═══ Modal stock par entrepôt ════════════════════════════ -->
+<p-dialog
+  [(visible)]="showStockDialog"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '560px' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-warehouse text-primary"></i>
+      <span class="font-bold text-900">Stock — {{ selectedProduit?.nom }}</span>
+    </div>
+  </ng-template>
+
+  @if (stockDialogLoading) {
+    <div class="flex flex-column gap-3 pt-2">
+      <p-skeleton height="3rem" />
+      <p-skeleton height="3rem" />
+    </div>
+  } @else if (stocksProduit.length === 0) {
+    <div class="text-center py-6 text-400">
+      <i class="pi pi-warehouse text-4xl mb-3 block"></i>
+      <div>Aucun stock enregistré pour ce produit</div>
+      <div class="text-sm mt-1">
+        Le stock se crée automatiquement après un run de production
+      </div>
+    </div>
+  } @else {
+    <div class="flex flex-column gap-3 pt-2">
+      @for (stock of stocksProduit; track stock.entrepotId) {
+        <div class="surface-50 border-round-lg border-1 surface-border p-3">
+
+          <!-- Header entrepôt + stock -->
+          <div class="flex align-items-center justify-content-between mb-3">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-warehouse text-primary"></i>
+              <span class="font-semibold text-900">{{ stock.entrepotNom }}</span>
+              @if (stock.enAlerte) {
+                <p-tag value="Alerte" severity="danger" styleClass="text-xs" />
+              }
+            </div>
+            <span class="text-2xl font-bold"
+              [class.text-red-500]="stock.enAlerte"
+              [class.text-primary]="!stock.enAlerte">
+              {{ stock.stockActuel | number:'1.0-2' }}
+            </span>
+          </div>
+
+          <!-- Infos DLC + dernière prod -->
+          @if (stock.dlcProchaine || stock.derniereProductionAt) {
+            <div class="grid text-sm mb-3">
+              @if (stock.dlcProchaine) {
+                <div class="col-6">
+                  <div class="text-400 text-xs mb-1">DLC prochaine</div>
+                  <div class="font-semibold"
+                    [class.text-orange-500]="isDlcProche(stock.dlcProchaine)"
+                    [class.text-900]="!isDlcProche(stock.dlcProchaine)">
+                    {{ stock.dlcProchaine | date:'dd/MM/yyyy' }}
+                    @if (isDlcProche(stock.dlcProchaine)) {
+                      <i class="pi pi-exclamation-triangle ml-1 text-xs"></i>
+                    }
+                  </div>
+                </div>
+              }
+              @if (stock.derniereProductionAt) {
+                <div class="col-6">
+                  <div class="text-400 text-xs mb-1">Dernière production</div>
+                  <div class="font-semibold text-900">
+                    {{ stock.derniereProductionAt | date:'dd/MM/yyyy HH:mm' }}
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <p-divider styleClass="my-2" />
+
+          <!-- Seuil éditable -->
+          <div class="flex align-items-center justify-content-between">
+            <span class="text-400 text-sm">Seuil d'alerte</span>
+
+            @if (stockProduitSelectionne?.entrepotId === stock.entrepotId) {
+              <div class="flex align-items-center gap-2">
+                <p-inputNumber
+                  [(ngModel)]="editingSeuil"
+                  [min]="0"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  placeholder="Ex : 10"
+                  styleClass="w-8rem"
+                />
+                <p-button icon="pi pi-check" severity="success" [text]="true"
+                  [rounded]="true" size="small" pTooltip="Enregistrer"
+                  [loading]="stockDialogSaving" (onClick)="saveSeuil()" />
+                <p-button icon="pi pi-times" severity="secondary" [text]="true"
+                  [rounded]="true" size="small" pTooltip="Annuler"
+                  (onClick)="cancelEditSeuil()" />
+              </div>
+            } @else {
+              <div class="flex align-items-center gap-2">
+                @if (stock.seuilAlerte != null) {
+                  <span class="font-semibold text-900">
+                    {{ stock.seuilAlerte | number:'1.0-2' }}
+                  </span>
+                } @else {
+                  <span class="text-400 text-sm font-italic">Non défini</span>
+                }
+                <p-button icon="pi pi-pencil" severity="info" [text]="true"
+                  [rounded]="true" size="small" pTooltip="Modifier le seuil"
+                  (onClick)="startEditSeuil(stock)" />
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button label="Fermer" severity="secondary" (onClick)="showStockDialog = false" />
+  </ng-template>
+</p-dialog>
 
 <!-- Dialog détail -->
 <app-produit-detail

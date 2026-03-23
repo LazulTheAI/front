@@ -216,22 +216,8 @@
   }
 
   <ng-template pTemplate="footer">
-    <div class="flex justify-content-between w-full">
-      <p-button
-        label="Simuler le coût"
-        icon="pi pi-calculator"
-        severity="secondary"
-        [outlined]="true"
-        [disabled]="!recette || recette.archive"
-        (onClick)="showSimulation = true"
-      />
-      <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
-    </div>
+    <p-button label="Fermer"(onClick)="onHide()" />
   </ng-template>
 </p-dialog>
 
 <!-- Simulation -->
-<app-simulation-dialog
-  [(visible)]="showSimulation"
-  [recette]="recette"
-/>
