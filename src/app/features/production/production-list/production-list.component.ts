@@ -141,6 +141,13 @@ export class ProductionListComponent implements OnInit, OnDestroy {
         });
     }
 
+    isDlcProche(dlc: string | null | undefined): boolean {
+        if (!dlc) return false;
+        const limite = new Date();
+        limite.setDate(limite.getDate() + 30);
+        return new Date(dlc) <= limite;
+    }
+
     onLazyLoad(event: TableLazyLoadEvent): void {
         this.page = Math.floor((event.first ?? 0) / (event.rows ?? this.size));
         this.size = event.rows ?? this.size;

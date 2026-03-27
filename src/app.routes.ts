@@ -18,7 +18,7 @@ export const appRoutes: Routes = [
         children: [
             {
                 path: '',
-                redirectTo: 'materiaux',
+                redirectTo: 'alertes',
                 pathMatch: 'full'
             },
             { path: 'materiaux', loadChildren: () => import('./app/features/materiaux/materiaux.routes').then((m) => m.MATERIAUX_ROUTES) },

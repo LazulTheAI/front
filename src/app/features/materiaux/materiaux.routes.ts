@@ -12,12 +12,7 @@ import { Routes } from '@angular/router';
 export const MATERIAUX_ROUTES: Routes = [
     {
         path: '',
-        loadComponent: () => import('./materiaux-list/materiaux-list.component').then((m) => m.MateriauxListComponent),
-        title: 'Matériaux & Stock'
-    },
-    {
-        path: 'stock',
-        loadComponent: () => import('./stock/stock-list.component').then((m) => m.StockListComponent),
+        loadComponent: () => import('./materiaux-list/materiaux-list.component').then((m) => m.StockMateriauxComponent),
         title: 'Matériaux & Stock'
     }
 ];

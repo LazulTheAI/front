@@ -24,37 +24,36 @@ export class AppMenu {
     ngOnInit() {
         this.model = [
             {
-                label: 'Stock & approvisionnement',
+                label: 'Approvisionnement',
                 items: [
-                    { label: 'Matériaux', icon: 'pi pi-box', routerLink: ['materiaux'] },
-                    { label: 'Stock', icon: 'pi pi-shopping-cart', routerLink: ['materiaux/stock'] },
+                    { label: 'Stock matières', icon: 'pi pi-warehouse', routerLink: ['materiaux'] },
                     { label: 'Fournisseurs', icon: 'pi pi-truck', routerLink: ['fournisseurs'] },
-                    { label: 'Bons de commande', icon: 'pi pi-shopping-cart', routerLink: ['bons-commande'] }
+                    { label: 'Bons de commande', icon: 'pi pi-file-import', routerLink: ['bons-commande'] }
                 ]
             },
             {
                 label: 'Production',
                 items: [
-                    { label: 'Recettes', icon: 'pi pi-book', routerLink: ['recettes'] },
-                    { label: 'Production', icon: 'pi pi-cog', routerLink: ['production'] }
+                    { label: 'Runs de production', icon: 'pi pi-cog', routerLink: ['production'] },
+                    { label: 'Recettes', icon: 'pi pi-book', routerLink: ['recettes'] }
                 ]
             },
             {
-                label: 'Catalogue',
-                items: [{ label: 'Produits', icon: 'pi pi-tag', routerLink: ['produits'] }]
+                label: 'Ventes',
+                items: [{ label: 'Produits & stock', icon: 'pi pi-tag', routerLink: ['produits'] }]
             },
             {
-                label: 'Organisation',
+                label: 'Pilotage',
                 items: [
-                    { label: 'Utilisateurs', icon: 'pi pi-users', routerLink: ['utilisateurs'] },
-                    { label: 'Ateliers', icon: 'pi pi-warehouse', routerLink: ['lieux-production'] }
+                    { label: 'Alertes', icon: 'pi pi-bell', routerLink: ['alertes'] },
+                    { label: 'Rapports', icon: 'pi pi-chart-bar', routerLink: ['rapports'] }
                 ]
             },
             {
-                label: 'Analyse',
+                label: 'Configuration',
                 items: [
-                    { label: 'Rapports', icon: 'pi pi-chart-bar', routerLink: ['rapports'] },
-                    { label: 'Alertes', icon: 'pi pi-bell', routerLink: ['alertes'] }
+                    { label: 'Ateliers', icon: 'pi pi-building', routerLink: ['lieux-production'] },
+                    { label: 'Utilisateurs', icon: 'pi pi-users', routerLink: ['utilisateurs'] }
                 ]
             }
         ];
