@@ -29,6 +29,7 @@ import { AjustementDialogComponent } from '../ajustement-dialog/ajustement-dialo
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
 import { HistoriqueDialogComponent } from '../historique-dialog/historique-dialog.component';
 import { MateriauFormComponent } from '../materiau-form/materiau-form.component';
+import { TransfertMatiereDialogComponent } from '../transfert-matiere-dialog/transfert-matiere-dialog.component';
 
 /**
  * LigneStockMateriau — une ligne = un MateriauResponse × un entrepôt.
@@ -95,12 +96,14 @@ interface SelectOption {
         EntreeStockDialogComponent,
         AjustementDialogComponent,
         HistoriqueDialogComponent,
-        MateriauFormComponent
+        MateriauFormComponent,
+        TransfertMatiereDialogComponent
     ],
     providers: [MessageService, ConfirmationService]
 })
 export class StockMateriauxComponent implements OnInit, OnDestroy {
     private materiauxBruts: MateriauResponse[] = [];
+    showTransfertDialog = false;
 
     lignes: LigneStockMateriau[] = [];
     lignesFiltrees: LigneStockMateriau[] = [];
@@ -193,6 +196,11 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
+    }
+
+    openTransfert(l: LigneStockMateriau): void {
+        this.selectedMateriau = this.findMateriau(l.materiauId);
+        this.showTransfertDialog = true;
     }
 
     // ─── 1 ligne par matériau (stockTotal si pas de filtre entrepôt) ───────────

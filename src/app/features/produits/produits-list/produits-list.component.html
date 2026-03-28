@@ -1,5 +1,7 @@
 <!-- produits-list.component.html -->
 <p-toast />
+<p-confirmDialog />
+
 
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
@@ -151,6 +153,18 @@
 
         <td class="text-center">
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
+            <p-button icon="pi pi-history" [rounded]="true" [text]="true"
+              severity="info" size="small" pTooltip="Historique mouvements"
+              (onClick)="openHistoriqueProduit(produit)" />
+            <p-button icon="pi pi-arrow-down" [rounded]="true" [text]="true"
+              severity="success" size="small" pTooltip="Entrée de stock"
+              (onClick)="openEntreeProduit(produit)" />
+            <p-button icon="pi pi-sliders-h" [rounded]="true" [text]="true"
+              severity="warn" size="small" pTooltip="Ajustement stock"
+              (onClick)="openAjustementProduit(produit)" />
+            <p-button icon="pi pi-arrow-right-arrow-left" [rounded]="true" [text]="true"
+              severity="secondary" size="small" pTooltip="Transfert inter-entrepôts"
+              (onClick)="openTransfertProduit(produit)" />
             <p-button icon="pi pi-link" [rounded]="true" [text]="true"
               severity="primary" size="small" pTooltip="Lier une recette"
               (onClick)="openLierRecette(produit, $event)" />
@@ -296,8 +310,26 @@
   }
 
   <ng-template pTemplate="footer">
-    <p-button label="Fermer" severity="secondary" (onClick)="showStockDialog = false" />
+    <div class="flex justify-content-between align-items-center w-full">
+      <div class="flex gap-2">
+        <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
+          severity="success" size="small" pTooltip="Entrée de stock"
+          (onClick)="showStockDialog = false; openEntreeProduit(selectedProduit!)" />
+        <p-button icon="pi pi-sliders-h" [text]="true" [rounded]="true"
+          severity="warn" size="small" pTooltip="Ajustement stock"
+          (onClick)="showStockDialog = false; openAjustementProduit(selectedProduit!)" />
+        <p-button icon="pi pi-arrow-right-arrow-left" [text]="true" [rounded]="true"
+          severity="secondary" size="small" pTooltip="Transfert inter-entrepôts"
+          (onClick)="showStockDialog = false; openTransfertProduit(selectedProduit!)" />
+        <p-button icon="pi pi-history" [text]="true" [rounded]="true"
+          severity="info" size="small" pTooltip="Historique mouvements"
+          (onClick)="showStockDialog = false; openHistoriqueProduit(selectedProduit!)" />
+      </div>
+      <p-button label="Fermer" severity="secondary"
+        (onClick)="showStockDialog = false" />
+    </div>
   </ng-template>
+ 
 </p-dialog>
 
 <!-- Dialog détail -->
@@ -312,4 +344,26 @@
   [(visible)]="showLierRecetteDialog"
   [produit]="selectedProduit"
   (onSaved)="onRecetteLiee()"
+/>
+
+<app-entree-produit-dialog
+  [(visible)]="showEntreeProduitDialog"
+  [produit]="selectedProduit"
+  (saved)="onStockUpdated($event)"
+/>
+<app-transfert-produit-dialog
+  [(visible)]="showTransfertProduitDialog"
+  [produit]="selectedProduit"
+  [stocksProduit]="stocksProduit"
+  (saved)="onStockUpdated($event)"
+/>
+<app-historique-produit-dialog
+  [(visible)]="showHistoriqueProduitDialog"
+  [produit]="selectedProduit"
+/>
+
+<app-ajustement-produit-dialog
+  [(visible)]="showAjustementProduitDialog"
+  [produit]="selectedProduit"
+  (saved)="onStockUpdated($event)"
 />

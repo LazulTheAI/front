@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
@@ -21,9 +21,14 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ProduitControllerService, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { AjustementProduitDialogComponent } from '../ajustement-produit/ajustement-produit-dialog.component';
+import { EntreeProduitDialogComponent } from '../entree-produit-dialog/entree-produit-dialog.component';
+import { HistoriqueProduitDialogComponent } from '../historique-produit-dialog/historique-produit-dialog.component';
 import { LierRecetteDialogComponent } from '../lier-recette-dialog/lier-recette-dialog.component';
 import { ProduitDetailComponent } from '../produit-detail/produit-detail.component';
+import { TransfertProduitDialogComponent } from '../transfert-produit-dialog/transfert-produit-dialog.component';
 
 interface StockProduitResponse {
     produitId: number;
@@ -41,8 +46,10 @@ interface StockProduitResponse {
     selector: 'app-produits-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [ConfirmationService],
     imports: [
         CommonModule,
+        ConfirmDialog,
         FormsModule,
         TableModule,
         ButtonModule,
@@ -60,9 +67,12 @@ interface StockProduitResponse {
         InputNumberModule,
         DividerModule,
         ProduitDetailComponent,
-        LierRecetteDialogComponent
+        LierRecetteDialogComponent,
+        EntreeProduitDialogComponent,
+        TransfertProduitDialogComponent,
+        HistoriqueProduitDialogComponent,
+        AjustementProduitDialogComponent
     ],
-    providers: [MessageService],
     templateUrl: './produits-list.component.html'
 })
 export class ProduitsListComponent implements OnInit {
@@ -89,8 +99,13 @@ export class ProduitsListComponent implements OnInit {
     stocksProduit: StockProduitResponse[] = [];
     stockProduitSelectionne: StockProduitResponse | null = null;
     editingSeuil: number | null = null;
+    showEntreeProduitDialog = false;
+    showTransfertProduitDialog = false;
+    showHistoriqueProduitDialog = false;
+    showAjustementProduitDialog = false;
 
     constructor(
+        private confirmationService: ConfirmationService,
         private produitService: ProduitControllerService,
         @Inject(StockProduitControllerService)
         private stockProduitService: StockProduitControllerService,
@@ -111,6 +126,44 @@ export class ProduitsListComponent implements OnInit {
         this.search$.next(value);
     }
 
+    openEntreeProduit(produit: ProduitResponse): void {
+        this.selectedProduit = produit;
+        this.showEntreeProduitDialog = true;
+    }
+
+    openTransfertProduit(produit: ProduitResponse): void {
+        this.selectedProduit = produit;
+        // Réutilise stocksProduit déjà chargé par openStockDialog.
+        // Si pas encore chargé, on charge via le service existant.
+        if (!this.stocksProduit.some((s) => s.produitId === produit.id)) {
+            this.stockProduitService.lister(0, 100, undefined).subscribe({
+                next: (data: any) => {
+                    this.stocksProduit = (data.content ?? []).filter((s: any) => s.produitId === produit.id);
+                    this.cdr.markForCheck();
+                }
+            });
+        }
+        this.showTransfertProduitDialog = true;
+    }
+
+    openAjustementProduit(produit: ProduitResponse): void {
+        this.selectedProduit = produit;
+        this.showAjustementProduitDialog = true;
+    }
+
+    onStockUpdated(result: { success: boolean; message: string }): void {
+        this.messageService.add({
+            severity: result.success ? 'success' : 'error',
+            summary: result.success ? 'Succès' : 'Erreur',
+            detail: result.message
+        });
+        if (result.success) this.loadProduits();
+    }
+
+    openHistoriqueProduit(produit: ProduitResponse): void {
+        this.selectedProduit = produit;
+        this.showHistoriqueProduitDialog = true;
+    }
     loadProduits(): void {
         this.loading = true;
         this.produitService.listerProduit(this.page, this.size, this.sortBy, this.sortDir, this.search || undefined).subscribe({
@@ -297,5 +350,56 @@ export class ProduitsListComponent implements OnInit {
             .map((w) => w[0])
             .join('')
             .toUpperCase();
+    }
+
+    confirmArchiver(produit: ProduitResponse): void {
+        this.confirmationService.confirm({
+            message: `Archiver « ${produit.nom} » ? Le produit ne sera plus visible dans la liste.`,
+            header: "Confirmer l'archivage",
+            icon: 'pi pi-inbox',
+            accept: () => this.archiverProduit(produit)
+        });
+    }
+
+    private archiverProduit(produit: ProduitResponse): void {
+        this.produitService.archiverProduit(produit.id!).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Archivé',
+                    detail: `${produit.nom} a été archivé.`
+                });
+                this.loadProduits();
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: "Impossible d'archiver ce produit."
+                });
+            }
+        });
+    }
+
+    restaurerProduit(produit: ProduitResponse): void {
+        this.produitService.restaurerProduit(produit.id!).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Restauré',
+                    detail: `${produit.nom} a été restauré.`
+                });
+                this.loadProduits();
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: 'Impossible de restaurer ce produit.'
+                });
+            }
+        });
     }
 }

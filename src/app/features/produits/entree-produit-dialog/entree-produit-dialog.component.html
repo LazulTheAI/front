@@ -1,0 +1,113 @@
+<p-dialog
+  [header]="dialogHeader"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+>
+
+  <form #entreeForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <!-- Entrepôt -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Entrepôt <span class="text-red-400">*</span></label>
+      <p-select
+        name="entrepotId"
+        [(ngModel)]="form.entrepotId"
+        [options]="entrepotOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner..."
+        [required]="true"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Quantité -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Quantité <span class="text-red-400">*</span></label>
+      <p-inputNumber
+        name="quantite"
+        [(ngModel)]="form.quantite"
+        [min]="0.0001"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="4"
+        [required]="true"
+        placeholder="0"
+        styleClass="w-full"
+      />
+    </div>
+
+    <!-- Coût unitaire snapshot -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Coût unitaire</label>
+      <p-inputNumber
+        name="coutUnitaireSnapshot"
+        [(ngModel)]="form.coutUnitaireSnapshot"
+        [min]="0"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="4"
+        mode="currency"
+        currency="EUR"
+        locale="fr-FR"
+        placeholder="0,00 €"
+        styleClass="w-full"
+      />
+      <small class="text-400">Snapshot au moment de l'entrée — n'affecte pas le coût unitaire du produit</small>
+    </div>
+
+    <!-- Référence + Lot sur la même ligne -->
+    <div class="grid">
+      <div class="col-6 flex flex-column gap-1">
+        <label class="text-sm font-medium text-700">Référence</label>
+        <input pInputText name="referenceId" [(ngModel)]="form.referenceId"
+          placeholder="BL-2024-001" class="w-full" />
+      </div>
+      <div class="col-6 flex flex-column gap-1">
+        <label class="text-sm font-medium text-700">N° lot</label>
+        <input pInputText name="numeroLot" [(ngModel)]="form.numeroLot"
+          placeholder="LOT-001" class="w-full" />
+      </div>
+    </div>
+
+    <!-- DLC -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">DLC</label>
+      <p-datepicker
+        name="dlc"
+        [(ngModel)]="form.dlc"
+        [showIcon]="true"
+        dateFormat="dd/mm/yy"
+        placeholder="jj/mm/aaaa"
+        [minDate]="today"
+        styleClass="w-full"
+      />
+    </div>
+
+    <!-- Notes -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Notes</label>
+      <textarea pTextarea name="notes" [(ngModel)]="form.notes"
+        rows="2" placeholder="Origine, sous-traitant..." class="w-full"></textarea>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Annuler" severity="secondary" [outlined]="true"
+        (onClick)="onHide()" [disabled]="saving" />
+      <p-button
+        label="Enregistrer l'entrée"
+        icon="pi pi-check"
+        severity="success"
+        [loading]="saving"
+        [disabled]="!form.entrepotId || !form.quantite"
+        (onClick)="submit(entreeForm)"
+      />
+    </div>
+  </ng-template>
+
+</p-dialog>

@@ -253,6 +253,9 @@
               <p-button icon="pi pi-sliders-h" severity="warn" [text]="true"
                 [rounded]="true" size="small" pTooltip="Ajustement"
                 (onClick)="openAjustement(m)" />
+              <p-button icon="pi pi-arrow-right-arrow-left" severity="secondary" [text]="true"
+                [rounded]="true" size="small" pTooltip="Transfert inter-entrepôts"
+                (onClick)="openTransfert(m)" />
               <p-button icon="pi pi-pencil" severity="info" [text]="true" [rounded]="true"
                 size="small" pTooltip="Modifier"
                 (onClick)="openEdit(m)" />
@@ -296,4 +299,10 @@
 <app-historique-dialog
   [(visible)]="showHistoriqueDialog"
   [materiau]="selectedMateriau"
+/>
+
+<app-transfert-matiere-dialog
+  [(visible)]="showTransfertDialog"
+  [materiau]="selectedMateriau"
+  (saved)="onDialogSaved($event)"
 />

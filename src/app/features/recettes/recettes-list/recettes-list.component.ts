@@ -14,6 +14,8 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { LierProduitRecetteDialogComponent } from '../lier-produit-recette-dialog/lier-produit-recette-dialog.component';
 import { RecetteDetailComponent } from '../recette-detail/recette-detail.component';
 import { RecetteFormComponent } from '../recette-form/recette-form.component';
 
@@ -21,7 +23,23 @@ import { RecetteFormComponent } from '../recette-form/recette-form.component';
     selector: 'app-recettes-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, RouterModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, ToggleSwitchModule, ChipModule, RecetteFormComponent, RecetteDetailComponent],
+    imports: [
+        CommonModule,
+        ConfirmDialog,
+        FormsModule,
+        RouterModule,
+        LierProduitRecetteDialogComponent,
+        TableModule,
+        ButtonModule,
+        TagModule,
+        TooltipModule,
+        ToastModule,
+        ToolbarModule,
+        ToggleSwitchModule,
+        ChipModule,
+        RecetteFormComponent,
+        RecetteDetailComponent
+    ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './recettes-list.component.html'
 })
@@ -32,6 +50,7 @@ export class RecettesListComponent implements OnInit {
 
     showFormDialog = false;
     showDetailDialog = false;
+    showLierProduitDialog = false;
 
     selectedRecette: RecetteResponse | null = null;
     recettesEnAlerte: RecetteResponse[] = [];
@@ -46,6 +65,20 @@ export class RecettesListComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadRecettes();
+    }
+
+    openLierProduit(recette: RecetteResponse, event: Event): void {
+        event.stopPropagation();
+        this.selectedRecette = recette;
+        this.showLierProduitDialog = true;
+    }
+
+    onLierProduitSaved(result: { success: boolean; message: string }): void {
+        this.messageService.add({
+            severity: result.success ? 'success' : 'error',
+            summary: result.success ? 'Succès' : 'Erreur',
+            detail: result.message
+        });
     }
 
     loadRecettes(): void {

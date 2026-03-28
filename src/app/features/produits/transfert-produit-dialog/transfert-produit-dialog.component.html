@@ -1,0 +1,115 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '480px' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-arrow-right-arrow-left text-primary"></i>
+      <span class="font-bold text-900">Transfert — {{ produit?.nom }}</span>
+    </div>
+  </ng-template>
+
+  <form #transfertForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <!-- Schéma visuel -->
+    <div class="flex align-items-center justify-content-between gap-2 p-3 surface-50 border-round-lg border-1 surface-border">
+      <div class="flex flex-column align-items-center gap-1 flex-1">
+        <span class="text-400 text-xs">Source</span>
+        <span class="font-semibold text-900 text-sm">{{ entrepotSourceLabel || '—' }}</span>
+        @if (stockSource !== null) {
+          <span class="text-xs font-mono" [class.text-500]="stockSource > 0" [class.text-red-500]="stockSource === 0">
+            {{ stockSource | number:'1.0-2' }}
+          </span>
+        }
+      </div>
+      <div class="flex flex-column align-items-center gap-1">
+        <i class="pi pi-arrow-right text-primary text-xl"></i>
+        @if (form.quantite) {
+          <span class="text-xs font-mono text-primary font-semibold">{{ form.quantite | number:'1.0-2' }}</span>
+        }
+      </div>
+      <div class="flex flex-column align-items-center gap-1 flex-1">
+        <span class="text-400 text-xs">Destination</span>
+        <span class="font-semibold text-900 text-sm">{{ entrepotDestLabel || '—' }}</span>
+      </div>
+    </div>
+
+    <!-- Entrepôt source -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Entrepôt source <span class="text-red-400">*</span></label>
+      <p-select
+        name="entrepotSourceId"
+        [(ngModel)]="form.entrepotSourceId"
+        [options]="entrepotSourceOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner..."
+        [required]="true"
+        (onChange)="onSourceChange()"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Entrepôt destination -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Entrepôt destination <span class="text-red-400">*</span></label>
+      <p-select
+        name="entrepotDestinationId"
+        [(ngModel)]="form.entrepotDestinationId"
+        [options]="entrepotDestOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner..."
+        [required]="true"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Quantité -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Quantité <span class="text-red-400">*</span></label>
+      <p-inputNumber
+        name="quantite"
+        [(ngModel)]="form.quantite"
+        [min]="0.0001"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="4"
+        [required]="true"
+        placeholder="0"
+        styleClass="w-full"
+      />
+      @if (stockSource !== null && form.quantite && form.quantite > stockSource) {
+        <small class="text-red-400">
+          Insuffisant — disponible : {{ stockSource | number:'1.0-2' }}
+        </small>
+      }
+    </div>
+
+    <!-- Notes -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Notes</label>
+      <textarea pTextarea name="notes" [(ngModel)]="form.notes"
+        rows="2" placeholder="Raison du transfert..." class="w-full"></textarea>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Annuler" severity="secondary" [outlined]="true"
+        (onClick)="onHide()" [disabled]="saving" />
+      <p-button
+        label="Transférer"
+        icon="pi pi-arrow-right-arrow-left"
+        [loading]="saving"
+        [disabled]="!isFormValid()"
+        (onClick)="submit()"
+      />
+    </div>
+  </ng-template>
+
+</p-dialog>

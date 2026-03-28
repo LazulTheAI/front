@@ -12,6 +12,33 @@
     <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
 
       <div class="flex flex-column gap-2">
+        <label class="font-medium text-900" for="produit">
+          Produit <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          inputId="produit"
+          name="produitId"
+          [(ngModel)]="form.produitId"
+          required
+          [options]="produitOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Sélectionner un produit..."
+          [filter]="true"
+          filterPlaceholder="Rechercher..."
+          (onChange)="onProduitChange($event.value)"
+          styleClass="w-full"
+        />
+        @if (selectedProduit && (!selectedProduit.recettes || selectedProduit.recettes.length === 0)) {
+          <small class="text-orange-500">
+            <i class="pi pi-exclamation-triangle mr-1"></i>
+            Ce produit n'a pas de recette liée
+          </small>
+        }
+      </div>
+ 
+      <!-- 2. Recette (pré-remplie depuis la recette principale du produit) -->
+      <div class="flex flex-column gap-2">
         <label class="font-medium text-900" for="recette">
           Recette <span class="text-red-500">*</span>
         </label>
@@ -24,11 +51,18 @@
           optionLabel="label"
           optionValue="value"
           placeholder="Sélectionner une recette..."
-          [filter]="true"
-          filterPlaceholder="Rechercher..."
+          [disabled]="!form.produitId"
           (onChange)="onRecetteChange($event.value)"
           styleClass="w-full"
         />
+        @if (form.produitId && recetteOptions.length === 0) {
+          <small class="text-orange-500">Aucune recette liée à ce produit</small>
+        }
+        @if (selectedRecette && form.batches > 0) {
+          <small class="text-500">
+            → {{ unitesPrevues | number:'1.0-2' }} {{ selectedRecette.uniteProduite }} produit(es)
+          </small>
+        }
       </div>
 
       <div class="grid">

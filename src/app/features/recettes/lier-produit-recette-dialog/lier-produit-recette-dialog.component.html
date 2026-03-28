@@ -1,0 +1,95 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '480px' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-link text-primary"></i>
+      <span class="font-bold text-900">Lier à un produit — {{ recette?.nom }}</span>
+    </div>
+  </ng-template>
+
+  <form #lierForm="ngForm" class="flex flex-column gap-4 pt-2">
+
+    <!-- Produit -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">Produit BC <span class="text-red-400">*</span></label>
+      <p-select
+        name="produitId"
+        [(ngModel)]="form.produitId"
+        [options]="produitOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sélectionner un produit..."
+        [required]="true"
+        [filter]="true"
+        filterPlaceholder="Rechercher..."
+        class="w-full"
+      />
+      @if (liaisonsExistantes.length > 0) {
+        <small class="text-400">
+          Déjà lié à :
+          @for (l of liaisonsExistantes; track l.liaisonId) {
+            <span class="font-medium text-700">{{ l.recetteNom }}</span>
+            @if (!$last) { , }
+          }
+        </small>
+      }
+    </div>
+
+    <!-- Batches par unité -->
+    <div class="flex flex-column gap-1">
+      <label class="text-sm font-medium text-700">
+        Batches par unité vendue <span class="text-red-400">*</span>
+      </label>
+      <p-inputNumber
+        name="batchesParUnite"
+        [(ngModel)]="form.batchesParUnite"
+        [min]="0.0001"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="4"
+        [required]="true"
+        placeholder="1"
+        styleClass="w-full"
+      />
+      <small class="text-400">
+        Exemple : 1 vente = 0.5 batch si un batch produit 2 unités.
+      </small>
+    </div>
+
+    <!-- Recette principale -->
+    <div class="flex align-items-center gap-2">
+      <p-checkbox
+        name="estPrincipale"
+        [(ngModel)]="form.estPrincipale"
+        [binary]="true"
+        inputId="estPrincipale"
+      />
+      <label for="estPrincipale" class="text-sm text-700 cursor-pointer">
+        Recette principale
+      </label>
+      <i class="pi pi-info-circle text-400 text-sm"
+        pTooltip="La recette principale est utilisée pour le calcul du coût et la déduction automatique"></i>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Annuler" severity="secondary" [outlined]="true"
+        (onClick)="onHide()" [disabled]="saving" />
+      <p-button
+        label="Lier le produit"
+        icon="pi pi-link"
+        [loading]="saving"
+        [disabled]="!form.produitId || !form.batchesParUnite"
+        (onClick)="submit(lierForm)"
+      />
+    </div>
+  </ng-template>
+
+</p-dialog>

@@ -1,4 +1,5 @@
 <p-toast />
+<p-confirmDialog />
 
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
@@ -54,6 +55,7 @@
         <th pSortableColumn="coutTheorique" style="width:140px">
           Coût théorique <p-sortIcon field="coutTheorique" />
         </th>
+        <th style="width:200px">Produits liés</th>
         <th style="width:100px">Statut</th>
         <th pSortableColumn="updatedAt" style="width:140px">
           Modifiée <p-sortIcon field="updatedAt" />
@@ -105,6 +107,33 @@
           }
         </td>
 
+        <!-- Produits liés -->
+        <td (click)="$event.stopPropagation()">
+          @if (r.produits && r.produits.length > 0) {
+            <div class="flex flex-column gap-1">
+              @for (p of r.produits; track p.produitId) {
+                <div class="flex align-items-center gap-1">
+                  @if (p.estPrincipale) {
+                    <i class="pi pi-star-fill text-yellow-400 text-xs"
+                      pTooltip="Recette principale de ce produit"></i>
+                  } @else {
+                    <i class="pi pi-star text-300 text-xs"></i>
+                  }
+                  <span class="text-sm text-900">{{ p.produitNom }}</span>
+                  @if (p.sku) {
+                    <span class="text-400 text-xs font-mono">({{ p.sku }})</span>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <span class="text-orange-400 text-sm flex align-items-center gap-1">
+              <i class="pi pi-exclamation-circle text-xs"></i>
+              Non lié
+            </span>
+          }
+        </td>
+
         <td>
           @if (r.archive) {
             <p-tag value="Archivée" severity="secondary" />
@@ -124,6 +153,9 @@
             <p-button icon="pi pi-pencil" severity="info" [text]="true" [rounded]="true"
               size="small" pTooltip="Modifier" [disabled]="r.archive"
               (onClick)="openEdit(r, $event)" />
+            <p-button icon="pi pi-link" severity="primary" [text]="true" [rounded]="true"
+              size="small" pTooltip="Lier à un produit" [disabled]="r.archive"
+              (onClick)="openLierProduit(r, $event)" />
             @if (!r.archive) {
               <p-button icon="pi pi-inbox" severity="danger" [text]="true" [rounded]="true"
                 size="small" pTooltip="Archiver" (onClick)="confirmArchive(r, $event)" />
@@ -136,7 +168,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="8" class="text-center py-6 text-400">
+        <td colspan="9" class="text-center py-6 text-400">
           <i class="pi pi-book text-4xl mb-3 block"></i>
           Aucune recette trouvée
         </td>
@@ -157,4 +189,10 @@
   [(visible)]="showDetailDialog"
   [recetteId]="selectedRecette?.id ?? null"
   (closed)="onDetailClosed()"
+/>
+
+<app-lier-produit-recette-dialog
+  [(visible)]="showLierProduitDialog"
+  [recette]="selectedRecette"
+  (saved)="onLierProduitSaved($event)"
 />

@@ -294,7 +294,7 @@ export class RecetteCreateComponent implements OnInit, OnDestroy {
                         summary: 'Recette créée',
                         detail: `"${created.nom}" a été créée avec succès`
                     });
-                    setTimeout(() => this.router.navigate(['/recettes', created.id]), 1200);
+                    setTimeout(() => this.router.navigate(['/recettes']), 1200);
                 },
                 error: () => {
                     this.saving = false;
