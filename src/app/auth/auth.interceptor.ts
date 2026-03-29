@@ -1,4 +1,3 @@
-
 import { AuthApiService } from '@/app/auth/services/api/auth.service';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
@@ -15,11 +14,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         '/auth/login',
         '/auth/refresh',
         '/auth/load',
-        '/api/bc/',         // ← BigCommerce OAuth
-        '/api/mobile/auth/login',  // ← login mobile
+        '/api/bc/', // ← BigCommerce OAuth
+        '/api/mobile/auth/login' // ← login mobile
     ];
 
-    if (skipUrls.some(url => req.url.includes(url))) {
+    if (skipUrls.some((url) => req.url.includes(url))) {
         return next(req);
     }
 
@@ -29,7 +28,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         // Ne pas throw, juste laisser passer — le backend renverra 401
         // et l'utilisateur sera redirigé proprement
         router.navigate(['/auth/login']);
-        return EMPTY;  // ← import { EMPTY } from 'rxjs'
+        return EMPTY; // ← import { EMPTY } from 'rxjs'
     }
 
     req = req.clone({
@@ -41,7 +40,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             if (error.status === 401) {
                 authService.logout();
                 router.navigate(['/auth/login']);
-                return EMPTY;  // ← au lieu de throwError
+                return EMPTY; // ← au lieu de throwError
             }
             return throwError(() => error);
         })

@@ -1,0 +1,212 @@
+<p-toast />
+<p-confirmDialog />
+
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <i class="pi pi-users text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Revendeurs</h2>
+        <p class="m-0 text-400 text-sm mt-1">Gestion des clients B2B</p>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-3">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText [ngModel]="search"
+          (ngModelChange)="onSearchInput($event)"
+          placeholder="Rechercher un revendeur..."
+          class="w-16rem" />
+      </p-iconfield>
+      <p-button label="Nouveau revendeur" icon="pi pi-plus" (onClick)="openCreate()" />
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<div class="card">
+  <p-table
+    [value]="revendeurs"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="size"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [showCurrentPageReport]="true"
+    [showGridlines]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords} revendeurs"
+    dataKey="id"
+    [rowHover]="true"
+    (onRowClick)="openDetail($event['data'])"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:48px"></th>
+        <th pSortableColumn="nom">Revendeur <p-sortIcon field="nom" /></th>
+        <th style="width:160px">Ville</th>
+        <th style="width:120px" class="text-right">Remise</th>
+        <th style="width:140px" class="text-right">CA mois en cours</th>
+        <th style="width:140px" class="text-right">CA mois précédent</th>
+        <th style="width:140px" class="text-right">CA année</th>
+        <th style="width:130px" class="text-right">Panier moyen</th>
+        <th style="width:90px" class="text-center">Commandes</th>
+        <th style="width:100px" class="text-center">Statut</th>
+        <th style="width:80px" class="text-center">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-r>
+      <tr class="cursor-pointer">
+
+        <!-- Avatar -->
+        <td>
+          <p-avatar [label]="getInitials(r.nom)" shape="circle" size="normal"
+            styleClass="bg-primary-100 text-primary font-bold" />
+        </td>
+
+        <!-- Nom -->
+        <td>
+          <div class="font-semibold text-900">{{ r.nom }}</div>
+          @if (r.email) {
+            <div class="text-400 text-xs mt-1">{{ r.email }}</div>
+          }
+        </td>
+
+        <!-- Ville -->
+        <td>
+          @if (r.ville) {
+            <span class="text-sm text-700">{{ r.ville }}</span>
+            @if (r.pays && r.pays !== 'France') {
+              <span class="text-400 text-xs ml-1">({{ r.pays }})</span>
+            }
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- Remise -->
+        <td class="text-right">
+          @if (r.remiseGlobale != null) {
+            <span class="font-semibold text-primary">{{ r.remiseGlobale }}%</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- CA mois courant -->
+        <td class="text-right">
+          @if (r.caMoisCourant != null) {
+            <span class="font-semibold text-900">{{ r.caMoisCourant | currency:currency:'symbol':'1.2-2' }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- CA mois précédent + évolution -->
+        <td class="text-right">
+          @if (r.caMoisPrecedent != null) {
+            <div>{{ r.caMoisPrecedent | currency:'EUR':'symbol':'1.2-2':'fr' }}</div>
+            @if (r.caMoisCourant != null && r.caMoisPrecedent > 0) {
+              <div class="text-xs mt-1" [ngClass]="{
+                'text-green-500': r.caMoisCourant >= r.caMoisPrecedent,
+                'text-red-500':   r.caMoisCourant < r.caMoisPrecedent
+              }">
+                <i class="pi" [ngClass]="{
+                  'pi-arrow-up':   r.caMoisCourant >= r.caMoisPrecedent,
+                  'pi-arrow-down': r.caMoisCourant < r.caMoisPrecedent
+                }"></i>
+                {{ getEvolution(r.caMoisCourant, r.caMoisPrecedent) }}%
+              </div>
+            }
+            @if (r.caMoisPrecedent === 0 && r.caMoisCourant > 0) {
+              <div class="text-xs mt-1 text-green-500">
+                <i class="pi pi-arrow-up"></i> Nouveau
+              </div>
+            }
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- CA année courante -->
+        <td class="text-right">
+          @if (r.caAnneeCourante != null) {
+            <span class="text-700">{{ r.caAnneeCourante | currency:'EUR':'symbol':'1.2-2':'fr' }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- Panier moyen -->
+        <td class="text-right">
+          @if (r.panierMoyen != null) {
+            <span class="text-700">{{ r.panierMoyen | currency:'EUR':'symbol':'1.2-2':'fr' }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- Nb commandes -->
+        <td class="text-center">
+          @if (r.nbCommandes != null && r.nbCommandes > 0) {
+            <p-badge [value]="r.nbCommandes.toString()" severity="info" />
+          } @else {
+            <span class="text-400">0</span>
+          }
+        </td>
+
+        <!-- Statut -->
+        <td class="text-center">
+          @if (r.actif) {
+            <p-tag value="Actif" severity="success" />
+          } @else {
+            <p-tag value="Archivé" severity="secondary" />
+          }
+        </td>
+
+        <!-- Actions -->
+        <td class="text-center" (click)="$event.stopPropagation()">
+          <div class="flex justify-content-center gap-1">
+            <p-button icon="pi pi-eye" [text]="true" [rounded]="true"
+              severity="secondary" size="small" pTooltip="Voir le détail"
+              (onClick)="openDetail(r)" />
+            <p-button icon="pi pi-pencil" [text]="true" [rounded]="true"
+              severity="info" size="small" pTooltip="Modifier"
+              (onClick)="openEdit(r, $event)" />
+            @if (r.actif) {
+              <p-button icon="pi pi-inbox" [text]="true" [rounded]="true"
+                severity="danger" size="small" pTooltip="Archiver"
+                (onClick)="confirmArchiver(r, $event)" />
+            }
+          </div>
+        </td>
+
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="11" class="text-center py-6 text-400">
+          <i class="pi pi-users text-4xl block mb-3 opacity-30"></i>
+          Aucun revendeur trouvé
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</div>
+
+<app-revendeur-form-dialog
+  [(visible)]="showFormDialog"
+  [revendeur]="selectedRevendeur"
+  (saved)="onFormSaved()"
+/>
+
+<app-revendeur-detail-dialog
+  [(visible)]="showDetailDialog"
+  [revendeur]="selectedRevendeur"
+  (onEdit)="openEdit(selectedRevendeur!, $event)"
+/>

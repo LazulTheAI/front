@@ -39,8 +39,12 @@ export class AppMenu {
                 ]
             },
             {
-                label: 'Ventes',
-                items: [{ label: 'Produits & stock', icon: 'pi pi-tag', routerLink: ['produits'] }]
+                label: 'Ventes & B2B',
+                items: [
+                    { label: 'Produits & stock', icon: 'pi pi-tag', routerLink: ['produits'] },
+                    { label: 'Revendeurs', icon: 'pi pi-users', routerLink: ['revendeurs'] },
+                    { label: 'Commandes B2B', icon: 'pi pi-shopping-bag', routerLink: ['commandes-b2b'] }
+                ]
             },
             {
                 label: 'Pilotage',

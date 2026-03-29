@@ -30,7 +30,9 @@ export const appRoutes: Routes = [
             { path: 'fournisseurs', loadChildren: () => import('./app/features/fournisseurs/fournisseurs.routes').then((m) => m.FOURNISSEURS_ROUTES) },
             { path: 'bons-commande', loadChildren: () => import('./app/features/bons-commande/bons-commande.routes').then((m) => m.BONS_COMMANDE_ROUTES) },
             { path: 'rapports', loadChildren: () => import('./app/features/rapport/prapports.routes').then((m) => m.RAPPORT_ROUTES) },
-            { path: 'alertes', loadChildren: () => import('./app/features/alerte/alertes.routes').then((m) => m.Alerte_ROUTES) }
+            { path: 'alertes', loadChildren: () => import('./app/features/alerte/alertes.routes').then((m) => m.Alerte_ROUTES) },
+            { path: 'revendeurs', loadChildren: () => import('./app/features/revendeurs/revendeurs.routes').then((m) => m.REVENDEURS_ROUTES) },
+            { path: 'commandes-b2b', loadChildren: () => import('./app/features/commande/commandes-b2b.routes').then((m) => m.COMMANDES_B2B_ROUTES) }
         ]
     },
 

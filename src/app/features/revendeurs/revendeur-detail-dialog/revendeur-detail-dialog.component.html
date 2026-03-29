@@ -1,0 +1,146 @@
+<p-toast />
+
+<p-dialog
+    [header]="dialogHeader"
+    [(visible)]="visible"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="w-full max-w-4xl"
+    (onHide)="onHide()"
+>
+    <ng-template pTemplate="header">
+        <div class="flex align-items-center justify-content-between w-full">
+            <span class="text-xl font-semibold">{{ dialogHeader }}</span>
+            <p-button
+                icon="pi pi-pencil"
+                label="Modifier"
+                severity="secondary"
+                size="small"
+                (onClick)="onEdit.emit($event)"
+            />
+        </div>
+    </ng-template>
+
+    <ng-container *ngIf="revendeur">
+        <!-- Informations générales -->
+        <section class="mb-4">
+            <h3 class="text-base font-semibold text-color-secondary mb-3">Informations générales</h3>
+            <div class="grid">
+                <div class="col-12 md:col-6 flex flex-column gap-1">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Nom</span>
+                    <span class="font-medium">{{ revendeur.nom ?? '—' }}</span>
+                </div>
+                <div class="col-12 md:col-6 flex flex-column gap-1">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Contact</span>
+                    <span class="font-medium">{{ revendeur.contact ?? '—' }}</span>
+                </div>
+                <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Email</span>
+                    <span class="font-medium">{{ revendeur.email ?? '—' }}</span>
+                </div>
+                <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Téléphone</span>
+                    <span class="font-medium">{{ revendeur.telephone ?? '—' }}</span>
+                </div>
+                <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Adresse</span>
+                    <span class="font-medium">
+                        {{ revendeur.adresse ?? '—' }}<br *ngIf="revendeur.adresse" />
+                        {{ revendeur.codePostal }} {{ revendeur.ville }}<br *ngIf="revendeur.ville" />
+                        {{ revendeur.pays ?? '' }}
+                    </span>
+                </div>
+                <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Remise globale</span>
+                    <span class="font-medium">
+                        {{ revendeur.remiseGlobale != null ? (revendeur.remiseGlobale + ' %') : '—' }}
+                    </span>
+                </div>
+                <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Statut</span>
+                    <p-tag
+                        [value]="revendeur.actif ? 'Actif' : 'Inactif'"
+                        [severity]="revendeur.actif ? 'success' : 'danger'"
+                    />
+                </div>
+                <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Créé le</span>
+                    <span class="font-medium">{{ revendeur.createdAt | date: 'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="col-12 flex flex-column gap-1 mt-3" *ngIf="revendeur.notes">
+                    <span class="text-xs text-color-secondary uppercase font-medium">Notes</span>
+                    <span class="font-medium">{{ revendeur.notes }}</span>
+                </div>
+            </div>
+        </section>
+
+        <p-divider />
+
+        <!-- Commandes récentes -->
+        <section>
+            <h3 class="text-base font-semibold text-color-secondary mb-3">Commandes récentes</h3>
+
+            <p-table
+                [value]="commandes"
+                [loading]="loadingCommandes"
+                [rows]="10"
+                [paginator]="false"
+                responsiveLayout="scroll"
+                styleClass="p-datatable-sm"
+                emptyMessage="Aucune commande trouvée"
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Numéro</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Montant</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-commande>
+                    <tr>
+                        <td class="font-medium">{{ commande.numero }}</td>
+                        <td>{{ commande.dateCommande | date: 'dd/MM/yyyy' }}</td>
+                        <td>
+                            <p-tag
+                                [value]="getStatutLabel(commande.statut)"
+                                [severity]="getStatutSeverity(commande.statut)"
+                            />
+                        </td>
+                        <td>{{ commande.montantTotal | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</td>
+                        <td class="text-center">
+                            <p-button
+                                icon="pi pi-file-pdf"
+                                severity="secondary"
+                                [text]="true"
+                                size="small"
+                                pTooltip="Télécharger le bon de livraison"
+                                tooltipPosition="left"
+                                (onClick)="downloadBonLivraison(commande)"
+                            />
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="loadingbody">
+                    <tr *ngFor="let i of [1, 2, 3]">
+                        <td *ngFor="let j of [1, 2, 3, 4, 5]">
+                            <div class="p-skeleton" style="height: 1.2rem; border-radius: 4px;"></div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </section>
+    </ng-container>
+
+    <ng-container *ngIf="!revendeur">
+        <div class="flex align-items-center justify-content-center py-6 text-color-secondary">
+            <i class="pi pi-info-circle mr-2"></i>
+            <span>Aucun revendeur sélectionné.</span>
+        </div>
+    </ng-container>
+</p-dialog>

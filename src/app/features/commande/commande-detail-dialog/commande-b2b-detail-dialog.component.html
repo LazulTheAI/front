@@ -1,0 +1,169 @@
+<p-toast />
+
+<p-dialog
+  [header]="dialogHeader"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '760px' }"
+>
+
+  @if (commande) {
+
+    <!-- ── Header statut + actions ──────────────────────────── -->
+    <div class="flex align-items-center justify-content-between mb-4 pt-2">
+      <div class="flex align-items-center gap-3">
+        <p-tag [value]="getStatutLabel(commande.statut)"
+          [severity]="getStatutSeverity(commande.statut)"
+          styleClass="text-sm px-3 py-1" />
+        @if (commande.dateCommande) {
+          <span class="text-400 text-sm">
+            {{ commande.dateCommande | date:'dd/MM/yyyy' }}
+          </span>
+        }
+      </div>
+      <div class="flex gap-2">
+        <!-- PDF bon de livraison -->
+        @if (['CONFIRMEE','EXPEDIEE','LIVREE'].includes(commande.statut)) {
+          <p-button label="Bon de livraison" icon="pi pi-file-pdf"
+            severity="secondary" [outlined]="true" size="small"
+            (onClick)="downloadBonLivraison()" />
+        }
+        <!-- PDF facture -->
+        @if (commande.statut === 'LIVREE') {
+          <p-button label="Facture" icon="pi pi-receipt"
+            severity="info" [outlined]="true" size="small"
+            (onClick)="downloadFacture()" />
+        }
+        <!-- Avancer statut -->
+        @if (getNextStatut(commande.statut)) {
+          <p-button [label]="getNextStatutLabel(commande.statut)"
+            icon="pi pi-arrow-right" severity="success" size="small"
+            [loading]="saving"
+            (onClick)="changerStatut(getNextStatut(commande.statut)!)" />
+        }
+        <!-- Annuler -->
+        @if (canAnnuler(commande.statut)) {
+          <p-button label="Annuler" icon="pi pi-times"
+            severity="danger" [text]="true" size="small"
+            [loading]="saving"
+            (onClick)="changerStatut('ANNULEE')" />
+        }
+      </div>
+    </div>
+
+    <!-- ── Infos générales ───────────────────────────────────── -->
+    <div class="grid mb-4">
+      <div class="col-6">
+        <div class="surface-50 border-round border-1 surface-border p-3">
+          <div class="text-400 text-xs font-semibold uppercase mb-2">Revendeur</div>
+          <div class="font-bold text-900">{{ commande.revendeurNom }}</div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="surface-50 border-round border-1 surface-border p-3">
+          <div class="text-400 text-xs font-semibold uppercase mb-2">Livraison</div>
+          @if (commande.dateLivraisonSouhaitee) {
+            <div class="text-sm">
+              <span class="text-500">Souhaitée : </span>
+              <span class="font-semibold">{{ commande.dateLivraisonSouhaitee | date:'dd/MM/yyyy' }}</span>
+            </div>
+          }
+          @if (commande.dateExpedition) {
+            <div class="text-sm mt-1">
+              <span class="text-500">Expédiée : </span>
+              <span class="font-semibold">{{ commande.dateExpedition | date:'dd/MM/yyyy' }}</span>
+            </div>
+          }
+          @if (commande.dateLivraison) {
+            <div class="text-sm mt-1">
+              <span class="text-500">Livrée : </span>
+              <span class="font-semibold text-green-600">{{ commande.dateLivraison | date:'dd/MM/yyyy' }}</span>
+            </div>
+          }
+          @if (!commande.dateLivraisonSouhaitee && !commande.dateExpedition) {
+            <span class="text-400 text-sm">Non renseignée</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (commande.notes) {
+      <div class="flex align-items-center gap-2 p-3 surface-50 border-round border-1 surface-border mb-4 text-sm text-700">
+        <i class="pi pi-info-circle text-primary"></i>
+        {{ commande.notes }}
+      </div>
+    }
+
+    <!-- ── Tableau lignes ────────────────────────────────────── -->
+    <p-table [value]="commande.lignes ?? []" [showGridlines]="true" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Produit</th>
+          <th style="width:100px" class="text-right">Quantité</th>
+          <th style="width:130px" class="text-right">Prix unit. HT</th>
+          <th style="width:90px" class="text-right">Remise</th>
+          <th style="width:130px" class="text-right">Total HT</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-ligne>
+        <tr>
+          <td>
+            <div class="font-semibold text-900">{{ ligne.produitNom }}</div>
+            @if (ligne.produitSku) {
+              <div class="text-400 text-xs font-mono">{{ ligne.produitSku }}</div>
+            }
+          </td>
+          <td class="text-right font-mono">{{ ligne.quantite | number:'1.0-2' }}</td>
+          <td class="text-right font-mono">
+            @if (ligne.prixUnitaireCents != null) {
+              {{ ligne.prixUnitaireCents / 100 | currency:'EUR':'symbol':'1.2-2' }}
+            } @else {
+              <span class="text-400">—</span>
+            }
+          </td>
+          <td class="text-right">
+            @if (ligne.remise != null) {
+              <span class="text-primary">{{ ligne.remise }}%</span>
+            } @else {
+              <span class="text-400">—</span>
+            }
+          </td>
+          <td class="text-right font-semibold">
+            @if (ligne.prixUnitaireCents != null) {
+              {{ (ligne.prixUnitaireCents / 100) * ligne.quantite * (ligne.remise ? (1 - ligne.remise / 100) : 1) | currency:'EUR':'symbol':'1.2-2' }}
+            } @else {
+              <span class="text-400">—</span>
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- ── Total ─────────────────────────────────────────────── -->
+    <div class="flex justify-content-end mt-3">
+      <div class="surface-100 border-round px-4 py-3">
+        @if (commande.remise) {
+          <div class="flex justify-content-between gap-4 text-sm text-500 mb-2">
+            <span>Remise globale</span>
+            <span class="font-semibold">{{ commande.remise }}%</span>
+          </div>
+        }
+        <div class="flex justify-content-between gap-4">
+          <span class="font-semibold text-700">Total HT</span>
+          <span class="font-bold text-xl text-primary">
+            {{ commande.totalHT | currency:'EUR':'symbol':'1.2-2' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button label="Fermer" severity="secondary" (onClick)="onHide()" />
+  </ng-template>
+
+</p-dialog>

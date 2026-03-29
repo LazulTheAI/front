@@ -1,0 +1,181 @@
+<p-toast />
+<p-confirmDialog />
+
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <i class="pi pi-shopping-bag text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Commandes B2B</h2>
+        <p class="m-0 text-400 text-sm mt-1">Commandes revendeurs</p>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-3 flex-wrap">
+      <!-- Filtre revendeur -->
+      <p-select
+        [options]="revendeurOptions"
+        [(ngModel)]="filtreRevendeurId"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="onFiltreChange()"
+        class="w-14rem"
+      />
+      <!-- Filtre statut -->
+      <p-select
+        [options]="statutOptions"
+        [(ngModel)]="filtreStatut"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="onFiltreChange()"
+        class="w-12rem"
+      />
+      <p-button label="Nouvelle commande" icon="pi pi-plus" (onClick)="openCreate()" />
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<div class="card">
+  <p-table
+    [value]="commandes"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="size"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [showCurrentPageReport]="true"
+    [showGridlines]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords} commandes"
+    dataKey="id"
+    [rowHover]="true"
+    (onRowClick)="openDetail($event['data'])"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:120px" pSortableColumn="numero">N° <p-sortIcon field="numero" /></th>
+        <th>Revendeur</th>
+        <th style="width:120px">Date</th>
+        <th style="width:130px">Livraison souhaitée</th>
+        <th style="width:80px" class="text-center">Lignes</th>
+        <th style="width:120px" class="text-right">Total HT</th>
+        <th style="width:110px" class="text-center">Statut</th>
+        <th style="width:140px" class="text-center">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-c>
+      <tr class="cursor-pointer">
+
+        <!-- Numéro -->
+        <td>
+          <span class="font-mono text-sm font-semibold text-900">{{ c.numero }}</span>
+        </td>
+
+        <!-- Revendeur -->
+        <td>
+          <div class="font-semibold text-900">{{ c.revendeurNom }}</div>
+          @if (c.templateId) {
+            <div class="text-400 text-xs mt-1">
+              <i class="pi pi-sync text-xs mr-1"></i>Depuis template
+            </div>
+          }
+        </td>
+
+        <!-- Date commande -->
+        <td>
+          <span class="text-sm text-500">{{ c.dateCommande | date:'dd/MM/yyyy' }}</span>
+        </td>
+
+        <!-- Livraison souhaitée -->
+        <td>
+          @if (c.dateLivraisonSouhaitee) {
+            <span class="text-sm text-700">{{ c.dateLivraisonSouhaitee | date:'dd/MM/yyyy' }}</span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- Nb lignes -->
+        <td class="text-center">
+          <span class="font-semibold">{{ c.lignes?.length ?? 0 }}</span>
+        </td>
+
+        <!-- Total HT -->
+        <td class="text-right">
+          @if (c.totalHT != null) {
+            <span class="font-semibold font-mono text-900">
+              {{ c.totalHT | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <!-- Statut -->
+        <td class="text-center">
+          <p-tag [value]="getStatutLabel(c.statut)"
+            [severity]="getStatutSeverity(c.statut)" />
+        </td>
+
+        <!-- Actions -->
+        <td class="text-center" (click)="$event.stopPropagation()">
+          <div class="flex justify-content-center gap-1">
+
+            <!-- Avancer le statut -->
+            @if (getNextStatut(c.statut)) {
+              <p-button icon="pi pi-arrow-right" [text]="true" [rounded]="true"
+                severity="success" size="small"
+                [pTooltip]="getNextStatutLabel(c.statut)"
+                (onClick)="changerStatut(c, getNextStatut(c.statut)!, $event)" />
+            }
+
+            <!-- Bon de livraison PDF -->
+            @if (c.statut === 'CONFIRMEE' || c.statut === 'EXPEDIEE' || c.statut === 'LIVREE') {
+              <p-button icon="pi pi-file-pdf" [text]="true" [rounded]="true"
+                severity="secondary" size="small" pTooltip="Bon de livraison PDF"
+                (onClick)="downloadBonLivraison(c, $event)" />
+            }
+
+            <!-- Facture PDF -->
+            @if (c.statut === 'LIVREE') {
+              <p-button icon="pi pi-receipt" [text]="true" [rounded]="true"
+                severity="info" size="small" pTooltip="Facture PDF"
+                (onClick)="downloadFacture(c, $event)" />
+            }
+
+            <!-- Détail -->
+            <p-button icon="pi pi-eye" [text]="true" [rounded]="true"
+              severity="secondary" size="small" pTooltip="Voir le détail"
+              (onClick)="openDetail(c)" />
+
+          </div>
+        </td>
+
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center py-6 text-400">
+          <i class="pi pi-shopping-bag text-4xl block mb-3 opacity-30"></i>
+          Aucune commande trouvée
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</div>
+
+<app-commande-b2b-form-dialog
+  [(visible)]="showFormDialog"
+  (saved)="onFormSaved()"
+/>
+
+<app-commande-b2b-detail-dialog
+  [(visible)]="showDetailDialog"
+  [commande]="selectedCommande"
+  (onStatutChange)="loadCommandes()"
+/>
