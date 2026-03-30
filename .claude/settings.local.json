@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find c:Usersborisprojriche-front -name *manque*response* -type f)",
+      "Bash(python3 -c \":*)"
+    ]
+  }
+}

@@ -17,6 +17,8 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { EntrepotControllerService, EntrepotResponse, ProductionControllerService, ReportControllerService, RunProductionResponse } from '@/app/modules/openapi';
 
+import { environment } from '@/environments/environment';
+import { HttpClient } from '@angular/common/http';
 import { AnnulerRunDialogComponent } from '../annuler-run-dialog/annuler-run-dialog.component';
 import { LancerRunDialogComponent } from '../lancer-run-dialog/lancer-run-dialog.component';
 import { PlanifierRunDialogComponent } from '../planifier-run-dialog/planifier-run-dialog.component';
@@ -87,6 +89,7 @@ export class ProductionListComponent implements OnInit, OnDestroy {
     selectedRun: RunProductionResponse | null = null;
 
     constructor(
+        private http: HttpClient,
         private productionService: ProductionControllerService,
         private reportService: ReportControllerService,
         private entrepotService: EntrepotControllerService,
@@ -229,30 +232,32 @@ export class ProductionListComponent implements OnInit, OnDestroy {
         this.exportingRunId = run.id;
         this.cdr.markForCheck();
 
-        this.reportService.exportCsv(run.id).subscribe({
-            next: (data: any) => {
-                const blob = data instanceof Blob ? data : new Blob([data], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `tracabilite-run-${run.id}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-                this.exportingRunId = null;
-                this.cdr.markForCheck();
-            },
-            error: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erreur',
-                    detail: 'Export CSV impossible'
-                });
-                this.exportingRunId = null;
-                this.cdr.markForCheck();
-            }
-        });
+        this.http
+            .get(`${environment.baseUrl}/api/reports/tracabilite/${run.id}/csv`, {
+                responseType: 'blob'
+            })
+            .subscribe({
+                next: (blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `tracabilite-run-${run.id}.csv`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    this.exportingRunId = null;
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Erreur',
+                        detail: 'Export CSV impossible'
+                    });
+                    this.exportingRunId = null;
+                    this.cdr.markForCheck();
+                }
+            });
     }
-
     onRunSaved(result: { success: boolean; message: string }): void {
         this.showPlanifierDialog = false;
         this.showLancerDialog = false;
