@@ -26,6 +26,7 @@ export interface RecetteMeta {
     quantiteProduite: number | null;
     uniteProduite: string;
     dureeFabricationMinutes: number | null;
+    coutVariableParBatch: number | null;
     notes: string;
 }
 
@@ -63,6 +64,7 @@ export class RecetteCreateComponent implements OnInit, OnDestroy {
         quantiteProduite: null,
         uniteProduite: '',
         dureeFabricationMinutes: null,
+        coutVariableParBatch: null as number | null,
         notes: ''
     };
 
@@ -147,6 +149,7 @@ export class RecetteCreateComponent implements OnInit, OnDestroy {
             quantiteProduite: source.quantiteProduite,
             uniteProduite: source.uniteProduite,
             dureeFabricationMinutes: source.dureeFabricationMinutes ?? null,
+            coutVariableParBatch: source.coutVariableParBatch ?? null,
             notes: source.notes ?? ''
         };
 

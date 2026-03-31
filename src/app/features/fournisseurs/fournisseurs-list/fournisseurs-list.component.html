@@ -1,16 +1,14 @@
 <p-toast />
-
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
-      <h2 class="m-0 text-900 font-semibold">Fournisseurs</h2>
-      <p-tag
-        [value]="fournisseursActifs.length + ' fournisseur(s) actif(s)'"
-        severity="secondary"
-      />
+      <i class="pi pi-truck text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Fournisseurs</h2>
+        <p class="m-0 text-400 text-sm mt-1">Gestion de vos fournisseurs de mati&#232;res premi&#232;res</p>
+      </div>
     </div>
   </ng-template>
-
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3">
       <p-button
@@ -21,7 +19,6 @@
     </div>
   </ng-template>
 </p-toolbar>
-
 <!-- Layout split : liste + panel détail -->
 <div class="flex gap-4 align-items-start">
 

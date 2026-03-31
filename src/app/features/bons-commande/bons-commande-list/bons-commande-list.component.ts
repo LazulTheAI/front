@@ -15,6 +15,8 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { BonCommandeControllerService, BonCommandeResponse } from '@/app/modules/openapi';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { BonCommandeDetailComponent } from '../bon-commande-detail/bon-commande-detail.component';
 import { BonCommandeFormComponent } from '../bon-commande-form/bon-commande-form.component';
 
@@ -22,7 +24,7 @@ import { BonCommandeFormComponent } from '../bon-commande-form/bon-commande-form
     selector: 'app-bons-commande-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, SelectModule, InputTextModule, BonCommandeFormComponent, BonCommandeDetailComponent],
+    imports: [CommonModule, IconField, InputIcon, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, SelectModule, InputTextModule, BonCommandeFormComponent, BonCommandeDetailComponent],
     providers: [MessageService, ConfirmationService],
     templateUrl: './bons-commande-list.component.html'
 })

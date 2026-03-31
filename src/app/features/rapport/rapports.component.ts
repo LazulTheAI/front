@@ -14,6 +14,9 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { AlerteControllerService, AlerteResponse, ConsommationMateriauResponse, RapportConsommationResponse, ReportControllerService } from '@/app/modules/openapi';
+import { environment } from '@/environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { ToolbarModule } from 'primeng/toolbar';
 
 interface ValeurStockReportResponse {
     valeurTotale: number;
@@ -38,9 +41,17 @@ interface MouvementExportResponse {
     selector: 'app-rapports',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, SkeletonModule, DatePickerModule, SelectModule, DividerModule],
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, ToolbarModule, TooltipModule, ToastModule, SkeletonModule, DatePickerModule, SelectModule, DividerModule],
     providers: [MessageService],
-    templateUrl: './rapports.component.html'
+    templateUrl: './rapports.component.html',
+    styles: `
+        :host ::ng-deep .p-toolbar {
+            .p-toolbar-start {
+                flex: 1;
+                width: 100%;
+            }
+        }
+    `
 })
 export class RapportsComponent implements OnInit {
     dateDebut: Date = this.defaultDebut();
@@ -59,35 +70,82 @@ export class RapportsComponent implements OnInit {
     loadingMouvements = false;
     loadingAlertes = false;
 
+    loadingRapportFinancier = false;
+    loadingProjection = false;
+
     valeurStock: ValeurStockReportResponse | null = null;
     consommation: RapportConsommationResponse | null = null;
     mouvements: MouvementExportResponse[] = [];
     alertes: AlerteResponse[] = [];
     totalAlertes = 0;
+    rangeDates: Date[] = [this.defaultDebut(), new Date()];
 
     constructor(
         private reportService: ReportControllerService,
         private alerteService: AlerteControllerService,
         private messageService: MessageService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private http: HttpClient
     ) {}
 
     ngOnInit(): void {
         this.loadAll();
     }
-
-    // ─── Période ───────────────────────────────────────────────
+    get isRangePersonnalisee(): boolean {
+        return this.periodeSelectionnee === null;
+    }
 
     onPeriodeChange(): void {
-        const now = new Date();
-        if (this.periodeSelectionnee === 0) {
-            this.dateDebut = new Date(now.getFullYear(), now.getMonth(), 1);
-        } else {
-            this.dateDebut = new Date(now);
-            this.dateDebut.setDate(now.getDate() - this.periodeSelectionnee);
+        // Reset la plage custom quand on choisit une période prédéfinie
+        if (this.periodeSelectionnee !== null) {
+            const now = new Date();
+            const debut = new Date();
+            if (this.periodeSelectionnee === 0) {
+                debut.setDate(1);
+            } else {
+                debut.setDate(now.getDate() - this.periodeSelectionnee);
+            }
+            this.rangeDates = [debut, now];
         }
-        this.dateFin = now;
         this.loadAll();
+    }
+
+    onRangeChange(): void {
+        if (this.rangeDates[0] && this.rangeDates[1]) {
+            // Désactive la période prédéfinie quand on choisit une plage custom
+            this.periodeSelectionnee = null;
+            this.loadAll();
+        }
+    }
+
+    telechargerRapportFinancier(): void {
+        this.loadingRapportFinancier = true;
+        const lang = navigator.language?.split('-')[0] ?? 'fr';
+        this.http
+            .get(`${environment.baseUrl}/api/rapport-financier/pdf?lang=${lang}`, {
+                responseType: 'blob'
+            })
+            .subscribe({
+                next: (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `rapport-financier.pdf`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    this.loadingRapportFinancier = false;
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Erreur',
+                        detail: 'Impossible de générer le rapport financier'
+                    });
+                    this.loadingRapportFinancier = false;
+                    this.cdr.markForCheck();
+                }
+            });
     }
 
     onDatesChange(): void {

@@ -1,27 +1,29 @@
 <!-- bons-commande-list.component.html -->
 <p-toast />
-
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
-      <h2 class="m-0 text-900 font-semibold">Bons de commande</h2>
-      <p-tag [value]="totalRecords + ' bon(s)'" severity="secondary" />
+      <i class="pi pi-file-import text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Bons de commande</h2>
+        <p class="m-0 text-400 text-sm mt-1">Commandes fournisseurs et suivi des livraisons</p>
+      </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3">
-      <input
-        pInputText
-        [ngModel]="search"
-        (ngModelChange)="onSearchInput($event)"
-        placeholder="Rechercher un fournisseur..."
-        class="w-14rem"
-      />
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
+          placeholder="Rechercher un fournisseur..." class="w-14rem" />
+      </p-iconfield>
       <p-select
         [(ngModel)]="filtreStatut"
         [options]="statutOptions"
         optionLabel="label"
         optionValue="value"
+        placeholder="Tous les statuts"
+        [showClear]="true"
         (onChange)="onFiltreChange()"
         styleClass="w-14rem"
       />

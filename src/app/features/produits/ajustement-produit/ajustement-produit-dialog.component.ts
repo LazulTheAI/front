@@ -109,7 +109,7 @@ export class AjustementProduitDialogComponent implements OnInit, OnChanges {
 
     private chargerStocks(): void {
         if (!this.produit?.id) return;
-        this.stockService.lister(0, 100, undefined).subscribe({
+        this.stockService.listerStockProduit(0, 100, undefined).subscribe({
             next: (data: any) => {
                 this.stocksEntrepot = (data.content ?? []).filter((s: StockProduitResponse) => s.produitId === this.produit!.id);
             }

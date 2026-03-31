@@ -1,5 +1,251 @@
 <p-toast />
+<p-confirmDialog />
 
+<!-- ═══ SECTION : Paramètres financiers ═══════════════════════ -->
+
+<p-toolbar styleClass="mb-4 mt-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <i class="pi pi-calculator text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Param&#232;tres financiers</h2>
+        <p class="m-0 text-400 text-sm mt-1">Charges fixes et taux horaires utilis&#233;s dans le calcul du co&#251;t de revient</p>
+      </div>
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<div class="grid">
+
+  <!-- ── Charges fixes ── -->
+  <div class="col-12 md:col-6">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="flex align-items-center justify-content-between mb-3">
+        <div>
+          <div class="font-semibold text-900">Charges fixes</div>
+          <div class="text-400 text-xs mt-1">Loyer, amortissement, assurance...</div>
+        </div>
+        <p-button
+          icon="pi pi-plus"
+          label="Ajouter"
+          size="small"
+          severity="secondary"
+          (onClick)="openCreateCharge()"
+        />
+      </div>
+
+      @if (loadingCharges) {
+        <p-skeleton height="3rem" styleClass="mb-2" />
+        <p-skeleton height="3rem" />
+      }
+
+      @if (!loadingCharges && charges.length === 0) {
+        <div class="text-center py-4 text-400 text-sm">
+          <i class="pi pi-inbox text-2xl block mb-2"></i>
+          Aucune charge fixe renseign&#233;e
+        </div>
+      }
+
+      @if (!loadingCharges && charges.length > 0) {
+        <div class="flex flex-column gap-2">
+          @for (c of charges; track c.id) {
+            <div class="flex align-items-center justify-content-between p-3 surface-50 border-round border-1 surface-border">
+              <div>
+                <div class="font-medium text-900 text-sm">{{ c.libelle }}</div>
+                <div class="text-400 text-xs mt-1">
+                  {{ c.montantMensuel | number:'1.2-2' }} &#8364;/mois
+                  &#183; vol. cible {{ c.volumeCibleMensuel | number:'1.0-0' }} u.
+                  &#8658; <strong class="text-primary">{{ getCoutUnitaireCharge(c) | number:'1.2-4' }} &#8364;/u.</strong>
+                </div>
+              </div>
+              <div class="flex gap-1">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true" [rounded]="true"
+                  severity="secondary" size="small"
+                  (onClick)="openEditCharge(c)"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true" [rounded]="true"
+                  severity="danger" size="small"
+                  (onClick)="supprimerCharge(c)"
+                />
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="mt-3 pt-3 border-top-1 surface-border flex justify-content-between text-sm">
+          <span class="text-500">Total mensuel</span>
+          <span class="font-bold text-900">{{ totalChargesFixesMensuelles | number:'1.2-2' }} &#8364;</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ── Taux horaires ── -->
+  <div class="col-12 md:col-6">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="flex align-items-center justify-content-between mb-3">
+        <div>
+          <div class="font-semibold text-900">Taux horaires main d'&#339;uvre</div>
+          <div class="text-400 text-xs mt-1">Utilis&#233; pour calculer le co&#251;t MO des runs</div>
+        </div>
+        <p-button
+          icon="pi pi-plus"
+          label="Ajouter"
+          size="small"
+          severity="secondary"
+          (onClick)="openCreateTaux()"
+        />
+      </div>
+
+      @if (loadingTaux) {
+        <p-skeleton height="3rem" styleClass="mb-2" />
+        <p-skeleton height="3rem" />
+      }
+
+      @if (!loadingTaux && tauxHoraires.length === 0) {
+        <div class="text-center py-4 text-400 text-sm">
+          <i class="pi pi-clock text-2xl block mb-2"></i>
+          Aucun taux horaire renseign&#233;
+        </div>
+      }
+
+      @if (!loadingTaux && tauxHoraires.length > 0) {
+        <div class="flex flex-column gap-2">
+          @for (t of tauxHoraires; track t.id) {
+            <div class="flex align-items-center justify-content-between p-3 surface-50 border-round border-1 surface-border">
+              <div>
+                <div class="font-medium text-900 text-sm">{{ t.libelle }}</div>
+                <div class="text-400 text-xs mt-1">
+                  {{ t.tauxHoraire | number:'1.2-2' }} &#8364;/h
+                  &#183; {{ t.nbOperateurs }} op&#233;rateur(s)
+                  &#8658; <strong class="text-primary">{{ getCoutMOParBatch(t) }}</strong>
+                </div>
+              </div>
+              <div class="flex gap-1">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true" [rounded]="true"
+                  severity="secondary" size="small"
+                  (onClick)="openEditTaux(t)"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true" [rounded]="true"
+                  severity="danger" size="small"
+                  (onClick)="supprimerTaux(t)"
+                />
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+</div>
+
+<!-- Dialog charge -->
+<p-dialog
+  [header]="editingCharge ? 'Modifier la charge' : 'Nouvelle charge fixe'"
+  [(visible)]="showChargeDialog"
+  [modal]="true"
+  [style]="{ width: '440px' }"
+  [draggable]="false"
+>
+  <div class="flex flex-column gap-4 pt-2">
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">Libell&#233; <span class="text-red-500">*</span></label>
+      <input pInputText [(ngModel)]="chargeForm.libelle" maxlength="255"
+        placeholder="Ex : Loyer atelier, Amortissement p&#233;trin..." />
+    </div>
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">Montant mensuel (&#8364;) <span class="text-red-500">*</span></label>
+      <p-inputNumber [(ngModel)]="chargeForm.montantMensuel" [min]="0"
+        [minFractionDigits]="2" [maxFractionDigits]="2"
+        suffix=" &#8364;" placeholder="Ex : 500" styleClass="w-full" />
+      <small class="text-400">Montant total de cette charge chaque mois</small>
+    </div>
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">Volume cible mensuel (unit&#233;s) <span class="text-red-500">*</span></label>
+      <p-inputNumber [(ngModel)]="chargeForm.volumeCibleMensuel" [min]="1"
+        [minFractionDigits]="0" [maxFractionDigits]="0"
+        placeholder="Ex : 200" styleClass="w-full" />
+      <small class="text-400">
+        Nombre d'unit&#233;s que vous produisez habituellement par mois.
+        Co&#251;t imput&#233; = montant / volume.
+      </small>
+    </div>
+    @if (chargeForm.montantMensuel > 0 && chargeForm.volumeCibleMensuel > 0) {
+      <div class="p-3 bg-primary-50 border-round flex justify-content-between align-items-center">
+        <span class="text-primary-700 text-sm font-medium">Co&#251;t imput&#233; par unit&#233;</span>
+        <span class="font-bold text-primary">
+          {{ (chargeForm.montantMensuel / chargeForm.volumeCibleMensuel) | number:'1.2-4' }} &#8364;
+        </span>
+      </div>
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" [text]="true"
+      (onClick)="showChargeDialog = false" [disabled]="savingCharge" />
+    <p-button
+      [label]="editingCharge ? 'Enregistrer' : 'Ajouter'"
+      icon="pi pi-check" [loading]="savingCharge"
+      (onClick)="submitCharge()"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog taux horaire -->
+<p-dialog
+  [header]="editingTaux ? 'Modifier le taux' : 'Nouveau taux horaire'"
+  [(visible)]="showTauxDialog"
+  [modal]="true"
+  [style]="{ width: '440px' }"
+  [draggable]="false"
+>
+  <div class="flex flex-column gap-4 pt-2">
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">Libell&#233; <span class="text-red-500">*</span></label>
+      <input pInputText [(ngModel)]="tauxForm.libelle" maxlength="255"
+        placeholder="Ex : Taux op&#233;rateur, Taux superviseur..." />
+    </div>
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">Taux horaire (&#8364;/h) <span class="text-red-500">*</span></label>
+      <p-inputNumber [(ngModel)]="tauxForm.tauxHoraire" [min]="0.01"
+        [minFractionDigits]="2" [maxFractionDigits]="4"
+        suffix=" &#8364;/h" placeholder="Ex : 15.00" styleClass="w-full" />
+    </div>
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">Nombre d'op&#233;rateurs <span class="text-red-500">*</span></label>
+      <p-inputNumber [(ngModel)]="tauxForm.nbOperateurs" [min]="1" [max]="100"
+        placeholder="Ex : 2" styleClass="w-full" />
+      <small class="text-400">
+        Co&#251;t MO total = taux &#215; nb op&#233;rateurs &#215; dur&#233;e fabrication
+      </small>
+    </div>
+    @if (tauxForm.tauxHoraire > 0 && tauxForm.nbOperateurs > 0) {
+      <div class="p-3 bg-primary-50 border-round flex justify-content-between align-items-center">
+        <span class="text-primary-700 text-sm font-medium">Co&#251;t MO total / heure</span>
+        <span class="font-bold text-primary">
+          {{ (tauxForm.tauxHoraire * tauxForm.nbOperateurs) | number:'1.2-2' }} &#8364;/h
+        </span>
+      </div>
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" [text]="true"
+      (onClick)="showTauxDialog = false" [disabled]="savingTaux" />
+    <p-button
+      [label]="editingTaux ? 'Enregistrer' : 'Ajouter'"
+      icon="pi pi-check" [loading]="savingTaux"
+      (onClick)="submitTaux()"
+    />
+  </ng-template>
+</p-dialog>
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">

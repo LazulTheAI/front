@@ -2,12 +2,15 @@
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
-      <h2 class="m-0 text-900 font-semibold">Mon équipe</h2>
-           {{ nbActifs }} membre(s) actif(s) · {{ admins.length }} admin(s) · {{ operateurs.length }} opérateur(s)
-
+      <i class="pi pi-users text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Mon &#233;quipe</h2>
+        <p class="m-0 text-400 text-sm mt-1">
+          {{ nbActifs }} membre(s) actif(s) &#183; {{ admins.length }} admin(s) &#183; {{ operateurs.length }} op&#233;rateur(s)
+        </p>
+      </div>
     </div>
   </ng-template>
-
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3">
       <p-button

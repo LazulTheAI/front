@@ -1,61 +1,75 @@
 <p-toast />
-
-<p-toolbar styleClass="mb-3">
+<p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
-      <h2 class="m-0 text-900 font-semibold">Production</h2>
-      <p-tag [value]="totalRecords + ' run(s)'" severity="secondary" />
+      <i class="pi pi-cog text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Production</h2>
+        <p class="m-0 text-400 text-sm mt-1">Runs de production et tra&#231;abilit&#233; des lots</p>
+      </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">
-    <div class="flex align-items-center gap-2">
-      <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
-        placeholder="Rechercher une recette..." class="w-14rem" />
-      <p-button label="Planifier" icon="pi pi-calendar-plus" severity="secondary"
-        [outlined]="true" (onClick)="showPlanifierDialog = true" />
-      <p-button label="Lancer maintenant" icon="pi pi-play"
+    <div class="flex align-items-center gap-3 flex-wrap">
+      
+      <p-select
+        [(ngModel)]="filtreEntrepotId"
+        [options]="entrepotOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Tous les entrepôts"
+        [showClear]="true"
+        styleClass="w-12rem"
+        (onChange)="onFiltreChange()"
+      />
+
+      <p-select
+        [(ngModel)]="filtreStatut"
+        [options]="statutOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Tous les statuts"
+        [showClear]="true"
+        styleClass="w-12rem"
+        (onChange)="onFiltreChange()"
+      />
+
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText [ngModel]="search"
+          (ngModelChange)="onSearchInput($event)"
+          placeholder="Rechercher une recette..."
+          class="w-12rem" />
+      </p-iconfield>
+
+      <p-button label="Planifier" icon="pi pi-calendar-plus"
+        severity="secondary" [outlined]="true"
+        (onClick)="showPlanifierDialog = true" />
+      <p-button label="Lancer" icon="pi pi-play"
         (onClick)="showLancerDialog = true" />
     </div>
   </ng-template>
 </p-toolbar>
 
-@if (entrepots.length > 1) {
-  <div class="flex align-items-center gap-2 mb-3 flex-wrap">
-    <span class="text-500 text-sm font-medium mr-1">
-      <i class="pi pi-warehouse mr-1"></i>Entrepôt :
-    </span>
-    <p-button label="Tous"
-      [severity]="filtreEntrepotId === null ? 'primary' : 'secondary'"
-      [outlined]="filtreEntrepotId !== null" size="small"
-      (onClick)="filtreEntrepotId = null; onFiltreChange()" />
-    @for (entrepot of entrepots; track entrepot.id) {
-      <p-button [label]="entrepot.nom!"
-        [severity]="filtreEntrepotId === entrepot.id ? 'primary' : 'secondary'"
-        [outlined]="filtreEntrepotId !== entrepot.id" size="small"
-        (onClick)="filtreEntrepotId = entrepot.id!; onFiltreChange()" />
+@if (hasFiltresActifs) {
+  <div class="flex align-items-center gap-2 surface-100 border-round px-3 py-2 mb-3">
+    <i class="pi pi-filter-fill text-primary text-sm"></i>
+    <span class="text-sm text-900">Filtres actifs</span>
+    @if (filtreEntrepotId) {
+      <p-tag [value]="filtreEntrepotLabel" severity="secondary" />
     }
+    @if (filtreStatut) {
+      <p-tag [value]="getStatutLabel(filtreStatut)" severity="secondary" />
+    }
+    @if (search) {
+      <p-tag [value]="search" severity="secondary" />
+    }
+    <p-button label="Effacer" severity="secondary" [text]="true"
+      size="small" (onClick)="resetFiltres()" />
   </div>
 }
 
-<div class="flex align-items-center gap-3 mb-4">
-  <p-select [(ngModel)]="filtreStatut" [options]="statutOptions"
-    optionLabel="label" optionValue="value"
-    (onChange)="onFiltreChange()" styleClass="w-12rem" />
-  @if (hasFiltresActifs) {
-    <div class="flex align-items-center gap-2 surface-100 border-round px-3 py-2">
-      <i class="pi pi-filter-fill text-primary text-sm"></i>
-      <span class="text-sm text-900">
-        Filtres actifs
-        @if (filtreEntrepotId) { — <strong>{{ filtreEntrepotLabel }}</strong> }
-        @if (filtreStatut) { — <strong>{{ getStatutLabel(filtreStatut) }}</strong> }
-        @if (search) { — <strong>"{{ search }}"</strong> }
-      </span>
-      <p-button label="Effacer" severity="secondary" [text]="true" size="small"
-        (onClick)="resetFiltres()" />
-    </div>
-  }
-</div>
-
+<!-- ═══ TABLEAU ══════════════════════════════════════════════ -->
 <div class="card">
   <p-table
     [value]="runs"
@@ -68,7 +82,7 @@
     (onLazyLoad)="onLazyLoad($event)"
     [showCurrentPageReport]="true"
     [showGridlines]="true"
-    currentPageReportTemplate="{first} à {last} sur {totalRecords}"
+    currentPageReportTemplate="{first} &#224; {last} sur {totalRecords}"
     dataKey="id"
     [rowHover]="true"
     (onRowClick)="openDetail($event['data'])"
@@ -76,20 +90,20 @@
     <ng-template pTemplate="header">
       <tr>
         <th style="width:80px">#</th>
-        <th style="width:120px">N° lot</th>
+        <th style="width:120px">N&#176; lot</th>
         <th style="width:140px">Produit</th>
         <th pSortableColumn="recetteNom" style="min-width:100px">
           Recette <p-sortIcon field="recetteNom" />
         </th>
         <th style="width:130px">DLC produit</th>
-        <th style="width:100px">Entrepôt</th>
+        <th style="width:100px">Entrep&#244;t</th>
         <th style="width:120px">Statut</th>
-        <th style="width:130px" class="text-right">Unités prod.</th>
+        <th style="width:130px" class="text-right">Unit&#233;s prod.</th>
         <th pSortableColumn="createdAt" style="width:150px">
-          Créé le <p-sortIcon field="createdAt" />
+          Cr&#233;&#233; le <p-sortIcon field="createdAt" />
         </th>
         <th pSortableColumn="completeAt" style="width:150px">
-          Terminé le <p-sortIcon field="completeAt" />
+          Termin&#233; le <p-sortIcon field="completeAt" />
         </th>
         <th style="width:130px"></th>
       </tr>
@@ -97,33 +111,23 @@
 
     <ng-template pTemplate="body" let-run>
       <tr class="cursor-pointer">
-
-        <!-- # -->
-        <td>
-          <span class="text-400 font-mono text-sm">#{{ run.id }}</span>
-        </td>
-
-        <!-- N° lot -->
+        <td><span class="text-400 font-mono text-sm">#{{ run.id }}</span></td>
         <td>
           @if (run.numeroDeLot) {
             <span class="font-mono text-xs bg-gray-100 px-2 py-1 border-round text-700">
               {{ run.numeroDeLot }}
             </span>
           } @else {
-            <span class="text-400 text-sm">—</span>
+            <span class="text-400 text-sm">&#8212;</span>
           }
         </td>
-
-        <!-- Produit -->
         <td>
           @if (run.produitNom) {
             <span class="text-sm text-900">{{ run.produitNom }}</span>
           } @else {
-            <span class="text-400 text-sm">—</span>
+            <span class="text-400 text-sm">&#8212;</span>
           }
         </td>
-
-        <!-- Recette -->
         <td>
           <div class="flex align-items-center gap-2">
             @if (run.stockInsuffisant) {
@@ -139,8 +143,6 @@
             </div>
           }
         </td>
-
-        <!-- DLC produit -->
         <td>
           @if (run.dlcProduitFini) {
             <span class="text-sm"
@@ -149,66 +151,43 @@
               {{ run.dlcProduitFini | date:'dd/MM/yyyy' }}
             </span>
           } @else {
-            <span class="text-400 text-sm">—</span>
+            <span class="text-400 text-sm">&#8212;</span>
           }
         </td>
-
-        <!-- Entrepôt -->
+        <td><span class="text-sm text-500">{{ run.entrepotNom ?? '&#8212;' }}</span></td>
         <td>
-          <span class="text-sm text-500">{{ run.entrepotNom ?? '—' }}</span>
+          <p-tag [value]="getStatutLabel(run.statut)" [severity]="getStatutSeverity(run.statut)" />
         </td>
-
-        <!-- Statut -->
-        <td>
-          <p-tag
-            [value]="getStatutLabel(run.statut)"
-            [severity]="getStatutSeverity(run.statut)"
-          />
-        </td>
-
-        <!-- Unités produites -->
         <td class="text-right">
           @if (run.unitesProduite != null) {
             <span class="font-mono text-sm font-semibold text-900">
               {{ run.unitesProduite | number:'1.0-2' }}
             </span>
           } @else {
-            <span class="text-400">—</span>
+            <span class="text-400">&#8212;</span>
           }
         </td>
-
-        <!-- Créé le -->
-        <td>
-          <span class="text-sm text-500">
-            {{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}
-          </span>
-        </td>
-
-        <!-- Terminé le -->
+        <td><span class="text-sm text-500">{{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}</span></td>
         <td>
           @if (run.completeAt) {
-            <span class="text-sm text-500">
-              {{ run.completeAt | date:'dd/MM/yyyy HH:mm' }}
-            </span>
+            <span class="text-sm text-500">{{ run.completeAt | date:'dd/MM/yyyy HH:mm' }}</span>
           } @else {
-            <span class="text-400">—</span>
+            <span class="text-400">&#8212;</span>
           }
         </td>
-
-        <!-- Actions -->
         <td>
           <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
             <p-button icon="pi pi-eye" severity="secondary" [text]="true" [rounded]="true"
-              size="small" pTooltip="Détail" (onClick)="openDetail(run)" />
+              size="small" pTooltip="D&#233;tail" (onClick)="openDetail(run)" />
             @if (canExecuter(run)) {
               <p-button icon="pi pi-play" severity="success" [text]="true" [rounded]="true"
-                size="small" pTooltip="Exécuter ce run"
+                size="small" pTooltip="Ex&#233;cuter ce run"
                 [loading]="executingRunId === run.id"
                 (onClick)="executerRun(run, $event)" />
             }
             @if (canExport(run)) {
               <p-button icon="pi pi-download" severity="info" [text]="true" [rounded]="true"
-                size="small" pTooltip="Export CSV traçabilité"
+                size="small" pTooltip="Export CSV tra&#231;abilit&#233;"
                 [loading]="exportingRunId === run.id"
                 (onClick)="exportCsv(run, $event)" />
             }
@@ -219,7 +198,6 @@
             }
           </div>
         </td>
-
       </tr>
     </ng-template>
 

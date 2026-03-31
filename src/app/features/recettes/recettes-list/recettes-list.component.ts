@@ -79,6 +79,9 @@ export class RecettesListComponent implements OnInit {
             summary: result.success ? 'Succès' : 'Erreur',
             detail: result.message
         });
+        if (result.success) {
+            this.loadRecettes();
+        }
     }
 
     loadRecettes(): void {

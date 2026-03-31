@@ -6,13 +6,19 @@
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
-      <h2 class="m-0 text-900 font-semibold">Produits BigCommerce</h2>
-      <p-tag [value]="totalRecords + ' produits'" severity="secondary" />
+      <i class="pi pi-shopping-cart text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Produits BigCommerce</h2>
+        <p class="m-0 text-400 text-sm mt-1">Catalogue synchronis&#233; depuis votre boutique</p>
+      </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">
-    <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
-      placeholder="Rechercher..." class="w-16rem" />
+    <p-iconfield>
+      <p-inputicon styleClass="pi pi-search" />
+      <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
+        placeholder="Rechercher..." class="w-16rem" />
+    </p-iconfield>
   </ng-template>
 </p-toolbar>
 

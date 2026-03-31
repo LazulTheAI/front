@@ -4,8 +4,11 @@
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
-      <h2 class="m-0 text-900 font-semibold">Recettes</h2>
-      <p-tag [value]="recettes.length + ' recette(s)'" severity="secondary" />
+      <i class="pi pi-book text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Recettes</h2>
+        <p class="m-0 text-400 text-sm mt-1">Formules de fabrication et co&#251;ts th&#233;oriques</p>
+      </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">

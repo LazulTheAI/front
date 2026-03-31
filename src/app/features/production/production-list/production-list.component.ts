@@ -19,6 +19,8 @@ import { EntrepotControllerService, EntrepotResponse, ProductionControllerServic
 
 import { environment } from '@/environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { AnnulerRunDialogComponent } from '../annuler-run-dialog/annuler-run-dialog.component';
 import { LancerRunDialogComponent } from '../lancer-run-dialog/lancer-run-dialog.component';
 import { PlanifierRunDialogComponent } from '../planifier-run-dialog/planifier-run-dialog.component';
@@ -37,6 +39,8 @@ import { RunDetailDialogComponent } from '../run-detail-dialog/run-detail-dialog
         TooltipModule,
         ToastModule,
         ToolbarModule,
+        IconField,
+        InputIcon,
         SelectModule,
         DividerModule,
         InputTextModule,

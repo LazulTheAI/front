@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -12,7 +12,24 @@ import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CreateEntrepotRequest, EntrepotControllerService, EntrepotResponse, UpdateEntrepotRequest, UtilisateurMarchandControllerService, UtilisateurResponse } from '@/app/modules/openapi';
+import {
+    ChargeAtelierControllerService,
+    ChargeAtelierRequest,
+    ChargeAtelierResponse,
+    CreateEntrepotRequest,
+    EntrepotControllerService,
+    EntrepotResponse,
+    TauxHoraireControllerService,
+    TauxHoraireRequest,
+    TauxHoraireResponse,
+    UpdateEntrepotRequest,
+    UtilisateurMarchandControllerService,
+    UtilisateurResponse
+} from '@/app/modules/openapi';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
 
 interface LieuVm extends EntrepotResponse {
@@ -24,7 +41,24 @@ interface LieuVm extends EntrepotResponse {
     selector: 'app-lieux-production',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, ButtonModule, ToolbarModule, TagModule, ToastModule, InputTextModule, TextareaModule, DialogModule, TooltipModule, DividerModule],
+    imports: [
+        InputNumberModule,
+        ToolbarModule,
+        SkeletonModule,
+        TableModule,
+        ConfirmDialogModule,
+        CommonModule,
+        FormsModule,
+        ButtonModule,
+        ToolbarModule,
+        TagModule,
+        ToastModule,
+        InputTextModule,
+        TextareaModule,
+        DialogModule,
+        TooltipModule,
+        DividerModule
+    ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './lieux-production.component.html'
 })
@@ -42,12 +76,32 @@ export class LieuxProductionComponent implements OnInit {
     // Assignation en cours (lieuId → userId en loading)
     assignationLoading = new Set<string>();
 
+    // Charges
+    charges: ChargeAtelierResponse[] = [];
+    loadingCharges = false;
+    showChargeDialog = false;
+    editingCharge: ChargeAtelierResponse | null = null;
+    savingCharge = false;
+    chargeForm: ChargeAtelierRequest = { libelle: '', montantMensuel: 0, volumeCibleMensuel: 0 };
+
+    // Taux horaires
+    tauxHoraires: TauxHoraireResponse[] = [];
+    loadingTaux = false;
+    showTauxDialog = false;
+    editingTaux: TauxHoraireResponse | null = null;
+    savingTaux = false;
+    tauxForm: TauxHoraireRequest = { libelle: '', tauxHoraire: 0, nbOperateurs: 1 };
+
     constructor(
         private entrepotService: EntrepotControllerService,
         private utilisateurService: UtilisateurMarchandControllerService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        @Inject(ChargeAtelierControllerService)
+        private chargeService: ChargeAtelierControllerService,
+        @Inject(TauxHoraireControllerService)
+        private tauxService: TauxHoraireControllerService
     ) {}
 
     ngOnInit(): void {
@@ -58,6 +112,157 @@ export class LieuxProductionComponent implements OnInit {
             }
         });
         this.loadLieux();
+    }
+    // ── Charges ──────────────────────────────────────────────────
+
+    get totalChargesFixesMensuelles(): number {
+        return this.charges.reduce((s, c) => s + (c.montantMensuel ?? 0), 0);
+    }
+
+    loadCharges(): void {
+        this.loadingCharges = true;
+        this.chargeService.listerChargeAtelier().subscribe({
+            next: (data) => {
+                this.charges = data;
+                this.loadingCharges = false;
+                this.cdr.detectChanges();
+            },
+            error: () => {
+                this.loadingCharges = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    openCreateCharge(): void {
+        this.editingCharge = null;
+        this.chargeForm = { libelle: '', montantMensuel: 0, volumeCibleMensuel: 0 };
+        this.showChargeDialog = true;
+        this.cdr.detectChanges();
+    }
+
+    openEditCharge(c: ChargeAtelierResponse): void {
+        this.editingCharge = c;
+        this.chargeForm = {
+            libelle: c.libelle ?? '',
+            montantMensuel: c.montantMensuel ?? 0,
+            volumeCibleMensuel: c.volumeCibleMensuel ?? 0
+        };
+        this.showChargeDialog = true;
+        this.cdr.detectChanges();
+    }
+
+    submitCharge(): void {
+        if (!this.chargeForm.libelle || !this.chargeForm.montantMensuel || !this.chargeForm.volumeCibleMensuel) return;
+        this.savingCharge = true;
+        const action$ = this.editingCharge?.id ? this.chargeService.modifierChargeAtelier(this.editingCharge.id, this.chargeForm) : this.chargeService.creerChargeAtelier(this.chargeForm);
+        action$.subscribe({
+            next: () => {
+                this.savingCharge = false;
+                this.showChargeDialog = false;
+                this.messageService.add({ severity: 'success', summary: 'Succès', detail: this.editingCharge ? 'Charge modifiée' : 'Charge ajoutée' });
+                this.loadCharges();
+            },
+            error: () => {
+                this.savingCharge = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    supprimerCharge(c: ChargeAtelierResponse): void {
+        this.confirmationService.confirm({
+            message: `Supprimer "${c.libelle}" ?`,
+            header: 'Confirmer la suppression',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.chargeService.supprimerChargeAtelier(c.id!).subscribe({
+                    next: () => {
+                        this.messageService.add({ severity: 'success', summary: 'Supprimé', detail: c.libelle });
+                        this.loadCharges();
+                    }
+                });
+            }
+        });
+    }
+
+    getCoutUnitaireCharge(c: ChargeAtelierResponse): number {
+        if (!c.montantMensuel || !c.volumeCibleMensuel) return 0;
+        return c.montantMensuel / c.volumeCibleMensuel;
+    }
+
+    // ── Taux horaires ─────────────────────────────────────────────
+
+    loadTaux(): void {
+        this.loadingTaux = true;
+        this.tauxService.lister().subscribe({
+            next: (data) => {
+                this.tauxHoraires = data;
+                this.loadingTaux = false;
+                this.cdr.detectChanges();
+            },
+            error: () => {
+                this.loadingTaux = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    openCreateTaux(): void {
+        this.editingTaux = null;
+        this.tauxForm = { libelle: '', tauxHoraire: 0, nbOperateurs: 1 };
+        this.showTauxDialog = true;
+        this.cdr.detectChanges();
+    }
+
+    openEditTaux(t: TauxHoraireResponse): void {
+        this.editingTaux = t;
+        this.tauxForm = {
+            libelle: t.libelle ?? '',
+            tauxHoraire: t.tauxHoraire ?? 0,
+            nbOperateurs: t.nbOperateurs ?? 1
+        };
+        this.showTauxDialog = true;
+        this.cdr.detectChanges();
+    }
+
+    submitTaux(): void {
+        if (!this.tauxForm.libelle || !this.tauxForm.tauxHoraire) return;
+        this.savingTaux = true;
+        const action$ = this.editingTaux?.id ? this.tauxService.modifier(this.editingTaux.id, this.tauxForm) : this.tauxService.creer(this.tauxForm);
+        action$.subscribe({
+            next: () => {
+                this.savingTaux = false;
+                this.showTauxDialog = false;
+                this.messageService.add({ severity: 'success', summary: 'Succès', detail: this.editingTaux ? 'Taux modifié' : 'Taux ajouté' });
+                this.loadTaux();
+            },
+            error: () => {
+                this.savingTaux = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    supprimerTaux(t: TauxHoraireResponse): void {
+        this.confirmationService.confirm({
+            message: `Supprimer "${t.libelle}" ?`,
+            header: 'Confirmer la suppression',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.tauxService.supprimer(t.id!).subscribe({
+                    next: () => {
+                        this.messageService.add({ severity: 'success', summary: 'Supprimé', detail: t.libelle });
+                        this.loadTaux();
+                    }
+                });
+            }
+        });
+    }
+
+    getCoutMOParBatch(t: TauxHoraireResponse): string {
+        if (!t.tauxHoraire || !t.nbOperateurs) return '—';
+        return (t.tauxHoraire * t.nbOperateurs).toFixed(2) + ' €/h';
     }
 
     loadLieux(): void {

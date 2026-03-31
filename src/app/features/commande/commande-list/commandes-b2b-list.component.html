@@ -7,29 +7,31 @@
       <i class="pi pi-shopping-bag text-primary text-2xl"></i>
       <div>
         <h2 class="m-0 text-900 font-semibold">Commandes B2B</h2>
-        <p class="m-0 text-400 text-sm mt-1">Commandes revendeurs</p>
+        <p class="m-0 text-400 text-sm mt-1">Suivi des commandes et exp&#233;ditions revendeurs</p>
       </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3 flex-wrap">
-      <!-- Filtre revendeur -->
       <p-select
         [options]="revendeurOptions"
         [(ngModel)]="filtreRevendeurId"
         optionLabel="label"
         optionValue="value"
+        placeholder="Tous les revendeurs"
+        [showClear]="true"
         (onChange)="onFiltreChange()"
-        class="w-14rem"
+        styleClass="w-14rem"
       />
-      <!-- Filtre statut -->
       <p-select
         [options]="statutOptions"
         [(ngModel)]="filtreStatut"
         optionLabel="label"
         optionValue="value"
+        placeholder="Tous les statuts"
+        [showClear]="true"
         (onChange)="onFiltreChange()"
-        class="w-12rem"
+        styleClass="w-12rem"
       />
       <p-button label="Nouvelle commande" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>

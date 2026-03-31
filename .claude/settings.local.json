@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(find c:Usersborisprojriche-front -name *manque*response* -type f)",
-      "Bash(python3 -c \":*)"
+      "Bash(python3 -c \":*)",
+      "Bash(find c:Usersborisprojriche-frontsrcappmodulesopenapi -name *request* -o -name *Request*)",
+      "Bash(grep -r coutTheorique c:Usersborisprojriche-frontsrc --include=*.ts)"
     ]
   }
 }

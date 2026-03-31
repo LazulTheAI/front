@@ -77,7 +77,7 @@ export class HistoriqueProduitDialogComponent implements OnChanges, OnInit {
         if (!this.produit?.id) return;
         this.loading = true;
 
-        this.stockService.historique(this.produit.id, this.filtreEntrepotId ?? undefined, this.page, this.pageSize).subscribe({
+        this.stockService.historiqueStockProduit(this.produit.id, this.filtreEntrepotId ?? undefined, this.page, this.pageSize).subscribe({
             next: (page) => {
                 this.mouvements = page.content ?? [];
                 this.totalElements = page.totalElements ?? 0;

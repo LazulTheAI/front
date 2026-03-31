@@ -22,6 +22,8 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { ProduitControllerService, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { AjustementProduitDialogComponent } from '../ajustement-produit/ajustement-produit-dialog.component';
 import { EntreeProduitDialogComponent } from '../entree-produit-dialog/entree-produit-dialog.component';
@@ -62,6 +64,8 @@ interface StockProduitResponse {
         SkeletonModule,
         AvatarModule,
         PopoverModule,
+        IconField,
+        InputIcon,
         ProgressBarModule,
         DialogModule,
         InputNumberModule,
@@ -136,7 +140,7 @@ export class ProduitsListComponent implements OnInit {
         // Réutilise stocksProduit déjà chargé par openStockDialog.
         // Si pas encore chargé, on charge via le service existant.
         if (!this.stocksProduit.some((s) => s.produitId === produit.id)) {
-            this.stockProduitService.lister(0, 100, undefined).subscribe({
+            this.stockProduitService.listerStockProduit(0, 100, undefined).subscribe({
                 next: (data: any) => {
                     this.stocksProduit = (data.content ?? []).filter((s: any) => s.produitId === produit.id);
                     this.cdr.markForCheck();
@@ -202,7 +206,7 @@ export class ProduitsListComponent implements OnInit {
         this.editingSeuil = null;
         this.cdr.markForCheck();
 
-        this.stockProduitService.lister(0, 100, undefined).subscribe({
+        this.stockProduitService.listerStockProduit(0, 100, undefined).subscribe({
             next: (data: any) => {
                 this.stocksProduit = (data.content ?? []).filter((s: StockProduitResponse) => s.produitId === produit.id);
                 this.stockDialogLoading = false;

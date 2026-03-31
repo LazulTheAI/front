@@ -173,6 +173,26 @@
           </div>
 
           <div class="field">
+            <label class="font-semibold text-900 block mb-2">
+              Co&#251;t variable par batch
+            </label>
+            <p-inputNumber
+              name="coutVariableParBatch"
+              [(ngModel)]="meta.coutVariableParBatch"
+              [min]="0"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="4"
+              placeholder="Ex : 0.50"
+              suffix=" &#8364;"
+              styleClass="w-full"
+            />
+            <small class="text-400">
+              &#201;nergie, gaz, eau, emballage &#8212; co&#251;ts de transformation
+              sp&#233;cifiques &#224; cette recette. Multipli&#233; par le nombre de batches lors d'un run.
+            </small>
+          </div>
+
+          <div class="field">
             <label class="font-semibold text-900 block mb-2">Notes / Instructions</label>
             <textarea
               pTextarea

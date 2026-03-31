@@ -57,6 +57,7 @@ export class RecetteFormComponent implements OnChanges, OnInit {
         quantiteProduite: null as number | null,
         uniteProduite: '',
         dureeFabricationMinutes: null as number | null,
+        coutVariableParBatch: null as number | null,
         notes: ''
     };
 
@@ -75,6 +76,7 @@ export class RecetteFormComponent implements OnChanges, OnInit {
             quantiteProduite: this.meta.quantiteProduite!,
             uniteProduite: this.meta.uniteProduite,
             dureeFabricationMinutes: this.meta.dureeFabricationMinutes ?? undefined,
+            coutVariableParBatch: this.recette.coutVariableParBatch ?? null,
             notes: this.meta.notes || undefined
         };
         this.recetteService.modifierMetaRecette(this.recette!.id!, req).subscribe({
@@ -164,10 +166,11 @@ export class RecetteFormComponent implements OnChanges, OnInit {
                 quantiteProduite: this.recette.quantiteProduite ?? null,
                 uniteProduite: this.recette.uniteProduite ?? '',
                 dureeFabricationMinutes: this.recette.dureeFabricationMinutes ?? null,
+                coutVariableParBatch: this.recette.coutVariableParBatch ?? null,
                 notes: this.recette.notes ?? ''
             };
         } else {
-            this.meta = { nom: '', quantiteProduite: null, uniteProduite: '', dureeFabricationMinutes: null, notes: '' };
+            this.meta = { nom: '', quantiteProduite: null, uniteProduite: '', dureeFabricationMinutes: null, coutVariableParBatch: null, notes: '' };
             this.materiauxTarget = [];
             this.ingredientsSelectionnes = [];
             this.loadMateriaux();
@@ -233,6 +236,7 @@ export class RecetteFormComponent implements OnChanges, OnInit {
             quantiteProduite: this.meta.quantiteProduite!,
             uniteProduite: this.meta.uniteProduite,
             dureeFabricationMinutes: this.meta.dureeFabricationMinutes ?? undefined,
+            coutVariableParBatch: this.meta.coutVariableParBatch ?? undefined,
             notes: this.meta.notes || undefined,
             ingredients: this.ingredientsSelectionnes.map((i) => ({
                 materiauId: i.materiauId,

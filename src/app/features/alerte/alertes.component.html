@@ -1,36 +1,38 @@
 <p-toast />
 <p-confirmDialog />
 
-<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
-<div class="flex align-items-center justify-content-between mb-4 px-1">
-  <div class="flex align-items-center gap-3">
-    <i class="pi pi-bell text-primary text-2xl"></i>
-    <div>
-      <h1 class="text-900 font-bold text-xl m-0">Alertes stock</h1>
-      <p class="text-400 text-sm m-0 mt-1">
-        Actualisé toutes les 30 secondes
-      </p>
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <i class="pi pi-bell text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Alertes stock</h2>
+        <p class="m-0 text-400 text-sm mt-1">Actualis&#233; toutes les 30 secondes</p>
+      </div>
     </div>
-  </div>
-  <div class="flex align-items-center gap-2">
-    <p-select
-      [(ngModel)]="filtreType"
-      [options]="typeOptions"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Tous les types"
-      styleClass="w-14rem"
-      (onChange)="onFiltreTypeChange()"
-    />
-    <p-button
-      label="Actualiser"
-      icon="pi pi-refresh"
-      severity="secondary"
-      [text]="true"
-      (onClick)="alerteService.refresh()"
-    />
-  </div>
-</div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-2">
+      <p-select
+        [(ngModel)]="filtreType"
+        [options]="typeOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Tous les types"
+        [showClear]="true"
+        styleClass="w-14rem"
+        (onChange)="onFiltreTypeChange()"
+      />
+      <p-button
+        label="Actualiser"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [text]="true"
+        (onClick)="alerteService.refresh()"
+      />
+    </div>
+  </ng-template>
+</p-toolbar>
 
 <!-- ═══ KPIs ════════════════════════════════════════════════ -->
 <div class="grid mb-4">

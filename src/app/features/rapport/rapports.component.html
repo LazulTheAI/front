@@ -1,42 +1,42 @@
 <!-- rapports.component.html -->
 <p-toast />
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center justify-content-between w-full gap-3">
 
-<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
-<div class="flex align-items-center justify-content-between mb-4 px-1">
-  <div class="flex align-items-center gap-3">
-    <i class="pi pi-chart-bar text-primary text-2xl"></i>
-    <div>
-      <h1 class="text-900 font-bold text-xl m-0">Rapports</h1>
-      <p class="text-400 text-sm m-0 mt-1">Analyse de votre stock et consommation</p>
+      <!-- Titre -->
+      <div class="flex align-items-center gap-3 flex-shrink-0">
+        <i class="pi pi-chart-bar text-primary text-2xl"></i>
+        <div>
+          <h2 class="m-0 text-900 font-semibold">Rapports</h2>
+          <p class="m-0 text-400 text-sm mt-1">Analyse de votre stock et consommation</p>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="flex align-items-center gap-2 flex-shrink-0">
+        <p-select
+          [(ngModel)]="periodeSelectionnee"
+          [options]="periodeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '140px' }"
+          (onChange)="onPeriodeChange()"
+        />
+        <p-datePicker
+          [(ngModel)]="rangeDates"
+          selectionMode="range"
+          dateFormat="dd/mm/yy"
+          placeholder="Plage personnalis&#233;e"
+          [inputStyle]="{ width: '170px' }"
+          [ngClass]="{ 'p-highlight': isRangePersonnalisee }"
+          (onSelect)="onRangeChange()"
+        />
+      </div>
+
     </div>
-  </div>
-
-  <div class="flex align-items-center gap-2">
-    <p-select
-      [(ngModel)]="periodeSelectionnee"
-      [options]="periodeOptions"
-      optionLabel="label"
-      optionValue="value"
-      styleClass="w-12rem"
-      (onChange)="onPeriodeChange()"
-    />
-    <p-datePicker
-      [(ngModel)]="dateDebut"
-      dateFormat="dd/mm/yy"
-      placeholder="Début"
-      styleClass="w-8rem"
-      (onSelect)="onDatesChange()"
-    />
-    <span class="text-400">→</span>
-    <p-datePicker
-      [(ngModel)]="dateFin"
-      dateFormat="dd/mm/yy"
-      placeholder="Fin"
-      styleClass="w-8rem"
-      (onSelect)="onDatesChange()"
-    />
-  </div>
-</div>
+  </ng-template>
+</p-toolbar>
 
 <!-- ═══ SECTION : Valeur du stock ════════════════════════════ -->
 <div class="flex align-items-center gap-2 mb-3">
@@ -301,4 +301,98 @@
       </tr>
     </ng-template>
   </p-table>
+</div>
+
+<!-- ═══ SECTION : Rapport financier ══════════════════════════ -->
+<p-divider />
+
+<div class="flex align-items-center justify-content-between mb-4">
+  <div class="flex align-items-center gap-2">
+    <i class="pi pi-file-pdf text-primary"></i>
+    <div>
+      <h2 class="text-900 font-semibold text-lg m-0">Rapport financier</h2>
+      <p class="text-400 text-sm m-0 mt-1">
+        Coûts de revient, marges et projection 12 mois — document banquier
+      </p>
+    </div>
+  </div>
+  <p-button
+    label="Télécharger le rapport"
+    icon="pi pi-download"
+    severity="primary"
+    [loading]="loadingRapportFinancier"
+    (onClick)="telechargerRapportFinancier()"
+  />
+</div>
+
+<div class="grid mb-4">
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Contenu du rapport</div>
+      <ul class="m-0 p-0 list-none text-sm text-700 line-height-3">
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-check-circle text-green-500 text-xs"></i>
+          Synthèse exécutive (CA, COGS, marge brute)
+        </li>
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-check-circle text-green-500 text-xs"></i>
+          Détail des coûts par produit
+        </li>
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-check-circle text-green-500 text-xs"></i>
+          Structure des charges fixes
+        </li>
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-check-circle text-green-500 text-xs"></i>
+          Seuil de rentabilité (point mort)
+        </li>
+        <li class="flex align-items-center gap-2">
+          <i class="pi pi-check-circle text-green-500 text-xs"></i>
+          Projection CA et marge sur 12 mois
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Paramètres requis</div>
+      <ul class="m-0 p-0 list-none text-sm text-700 line-height-3">
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-info-circle text-blue-500 text-xs"></i>
+          Taux horaire main d'œuvre configuré
+        </li>
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-info-circle text-blue-500 text-xs"></i>
+          Charges fixes atelier renseignées
+        </li>
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-info-circle text-blue-500 text-xs"></i>
+          Coût variable par batch sur les recettes
+        </li>
+        <li class="flex align-items-center gap-2">
+          <i class="pi pi-info-circle text-blue-500 text-xs"></i>
+          Au moins un run de production terminé
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-12 md:col-4">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Conformité</div>
+      <ul class="m-0 p-0 list-none text-sm text-700 line-height-3">
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-shield text-primary text-xs"></i>
+          Méthode des coûts complets
+        </li>
+        <li class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-shield text-primary text-xs"></i>
+          Valorisation stock FIFO
+        </li>
+        <li class="flex align-items-center gap-2">
+          <i class="pi pi-shield text-primary text-xs"></i>
+          Mention légale incluse
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>
