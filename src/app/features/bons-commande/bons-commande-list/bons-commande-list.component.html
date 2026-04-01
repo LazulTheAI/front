@@ -56,7 +56,6 @@
           Fournisseur <p-sortIcon field="fournisseurNom" />
         </th>
         <th style="width:150px">Statut</th>
-        <th style="width:120px">Réception</th>
         <th pSortableColumn="dateCommande" style="width:130px">
           Date <p-sortIcon field="dateCommande" />
         </th>
@@ -79,39 +78,34 @@
         </td>
 
         <td>
-          <p-tag
-            [value]="getStatutLabel(bon.statut)"
-            [severity]="getStatutSeverity(bon.statut)"
-          />
+          <div class="flex flex-column gap-1">
+            <div class="flex justify-content-between align-items-center">
+              <span class="text-xs font-medium" [ngClass]="{
+                'text-400':        bon.statut === 'BROUILLON',
+                'text-blue-500':   bon.statut === 'ENVOYE',
+                'text-orange-500': bon.statut === 'PARTIELLEMENT_RECU',
+                'text-green-600':  bon.statut === 'RECU',
+                'text-red-500':    bon.statut === 'ANNULE'
+              }">{{ getStatutLabel(bon.statut) }}</span>
+              <span class="text-xs text-400 font-mono">{{ getWorkflowPct(bon) }}%</span>
+            </div>
+            <div class="border-round overflow-hidden" style="height:6px; background:#e9ecef">
+              <div
+                class="border-round h-full transition-all transition-duration-300"
+                [style.width]="getWorkflowPct(bon) + '%'"
+                [ngClass]="{
+                  'bg-400':        bon.statut === 'BROUILLON',
+                  'bg-blue-400':   bon.statut === 'ENVOYE',
+                  'bg-orange-400': bon.statut === 'PARTIELLEMENT_RECU',
+                  'bg-green-500':  bon.statut === 'RECU',
+                  'bg-red-400':    bon.statut === 'ANNULE'
+                }"
+              ></div>
+            </div>
+          </div>
         </td>
 
-        <td>
-          @if (bon.statut === 'RECU') {
-            <div class="flex align-items-center gap-2">
-              <i class="pi pi-check-circle text-green-500 text-sm"></i>
-              <span class="text-green-600 text-sm font-medium">Complet</span>
-            </div>
-          } @else if (bon.statut === 'PARTIELLEMENT_RECU') {
-            <div class="flex align-items-center gap-2">
-              <div class="flex-1" style="min-width:60px">
-                <div class="bg-200 border-round" style="height:6px">
-                  <div
-                    class="bg-orange-400 border-round"
-                    style="height:6px;transition:width 0.3s"
-                    [style.width]="getProgressionReception(bon) + '%'"
-                  ></div>
-                </div>
-              </div>
-              <span class="text-orange-500 text-xs font-mono">
-                {{ getProgressionReception(bon) }}%
-              </span>
-            </div>
-          } @else if (bon.statut === 'ENVOYE') {
-            <span class="text-400 text-sm">En attente</span>
-          } @else {
-            <span class="text-400">—</span>
-          }
-        </td>
+        
 
         <td>
           <span class="text-sm text-500">{{ bon.dateCommande | date:'dd/MM/yyyy' }}</span>

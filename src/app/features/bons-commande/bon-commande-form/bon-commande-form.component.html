@@ -9,8 +9,8 @@
   <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
 
     <!-- En-tête BC -->
-    <div class="grid">
-      <div class="col-6 flex flex-column gap-2">
+    <div class="flex gap-3">
+      <div class="flex flex-column gap-2" style="flex:1">
         <label class="font-medium text-900" for="fourn">
           Fournisseur <span class="text-red-500">*</span>
         </label>
@@ -20,35 +20,38 @@
           required
           [options]="fournisseurOptions"
           optionLabel="label" optionValue="value"
-          placeholder="Sélectionner un fournisseur..."
+          placeholder="S&#233;lectionner un fournisseur..."
           [filter]="true"
-          styleClass="w-full"
+          appendTo="body"
+          [style]="{'width':'100%'}"
         />
       </div>
-      <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="ref">Numéro de référence</label>
+      <div class="flex flex-column gap-2" style="flex:1">
+        <label class="font-medium text-900" for="ref">Num&#233;ro de r&#233;f&#233;rence</label>
         <input
           pInputText id="ref" name="numeroReference"
           [(ngModel)]="form.numeroReference"
           maxlength="100"
           placeholder="BC-2024-001..."
+          style="width:100%"
         />
       </div>
     </div>
 
-    <div class="grid">
-      <div class="col-6 flex flex-column gap-2">
+    <div class="flex gap-3">
+      <div class="flex flex-column gap-2" style="flex:1">
         <label class="font-medium text-900" for="dateCom">Date de commande</label>
         <p-datepicker
           inputId="dateCom" name="dateCommande"
           [(ngModel)]="form.dateCommande"
           dateFormat="dd/mm/yy"
           [showIcon]="true"
-          styleClass="w-full"
+          appendTo="body"
+          [style]="{'width':'100%'}"
         />
       </div>
-      <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="dateLiv">Livraison prévue</label>
+      <div class="flex flex-column gap-2" style="flex:1">
+        <label class="font-medium text-900" for="dateLiv">Livraison pr&#233;vue</label>
         <p-datepicker
           inputId="dateLiv" name="dateLivraisonPrevue"
           [(ngModel)]="form.dateLivraisonPrevue"
@@ -56,7 +59,8 @@
           [showIcon]="true"
           [showButtonBar]="true"
           placeholder="Optionnel..."
-          styleClass="w-full"
+          appendTo="body"
+          [style]="{'width':'100%'}"
         />
       </div>
     </div>
@@ -80,58 +84,81 @@
 
     @for (ligne of lignes; track $index; let i = $index) {
       <div class="surface-50 border-round border-1 surface-border p-3">
-        <div class="grid align-items-end">
-          <div class="col-12 md:col-4 flex flex-column gap-1">
-            @if (i === 0) { <label class="text-xs text-500">MATÉRIAU</label> }
-            <p-select
-              [name]="'mat_' + i"
-              [(ngModel)]="ligne.materiauId"
-              [options]="materiauOptions"
-              optionLabel="label" optionValue="value"
-              placeholder="Matériau..."
-              [filter]="true"
-              (onChange)="onMateriauChange(i, $event.value)"
-              styleClass="w-full"
-            />
+
+        <!-- Labels uniquement sur la première ligne -->
+        @if (i === 0) {
+          <div style="display:grid; grid-template-columns: minmax(0,2fr) 140px 160px 36px; gap:8px; margin-bottom:4px;">
+            <label class="text-xs text-500">MAT&#201;RIAU</label>
+            <label class="text-xs text-500">QUANTIT&#201;</label>
+            <label class="text-xs text-500">PRIX UNITAIRE</label>
+            <span></span>
           </div>
-          <div class="col-12 md:col-2 flex flex-column gap-1">
-            @if (i === 0) { <label class="text-xs text-500">QUANTITÉ</label> }
+        }
+
+        <div style="display:grid; grid-template-columns: minmax(0,2fr) 140px 160px 36px; gap:8px; align-items:center;">
+
+          <!-- Matériau -->
+          <p-select
+            [name]="'mat_' + i"
+            [(ngModel)]="ligne.materiauId"
+            [options]="materiauOptions"
+            optionLabel="label" optionValue="value"
+            placeholder="Mat&#233;riau..."
+            [filter]="true"
+            appendTo="body"
+            (onChange)="onMateriauChange(i, $event.value)"
+            [style]="{'width':'100%'}"
+          />
+
+          <!-- Quantité + unité -->
+          <div style="position:relative; width:100%;">
             <p-inputNumber
               [name]="'qty_' + i"
               [(ngModel)]="ligne.quantiteCommandee"
-              [min]="0.0001" [minFractionDigits]="0" [maxFractionDigits]="4"
-              [suffix]="ligne.unite ? ' ' + ligne.unite : ''"
-              styleClass="w-full"
+              mode="decimal"
+              [min]="0.0001"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="4"
+              [style]="{'width':'100%'}"
+              [inputStyle]="{'width':'100%', 'padding-right': ligne.unite ? '40px' : '12px'}"
             />
+            @if (ligne.unite) {
+              <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:11px; color:#888; background:#f1f5f9; padding:2px 6px; border-radius:4px; pointer-events:none;">
+                {{ ligne.unite }}
+              </span>
+            }
           </div>
-          <div class="col-12 md:col-2 flex flex-column gap-1">
-            @if (i === 0) { <label class="text-xs text-500">UNITÉ</label> }
-            <input
-              pInputText [name]="'unite_' + i"
-              [(ngModel)]="ligne.unite"
-              maxlength="20" placeholder="kg, L..."
-              class="w-full"
-            />
-          </div>
-          <div class="col-12 md:col-3 flex flex-column gap-1">
-            @if (i === 0) { <label class="text-xs text-500">PRIX UNITAIRE</label> }
-            <p-inputNumber
-              [name]="'prix_' + i"
-              [(ngModel)]="ligne.prixUnitaireCents"
-              mode="currency" currency="EUR" locale="fr-FR"
-              [minFractionDigits]="2" [maxFractionDigits]="4"
-              [min]="0"
-              styleClass="w-full"
-            />
-          </div>
-          <div class="col-12 md:col-1 flex justify-content-end">
-            <p-button
-              icon="pi pi-trash"
-              severity="danger" [text]="true" [rounded]="true" size="small"
-              (onClick)="removeLigne(i)"
-            />
-          </div>
+
+          <!-- Prix unitaire -->
+          <p-inputNumber
+            [name]="'prix_' + i"
+            [(ngModel)]="ligne.prixUnitaireCents"
+            mode="currency" currency="EUR" locale="fr-FR"
+            [minFractionDigits]="2" [maxFractionDigits]="4"
+            [min]="0"
+            [style]="{'width':'100%'}"
+            [inputStyle]="{'width':'100%'}"
+          />
+
+          <!-- Supprimer -->
+          <p-button
+            icon="pi pi-trash"
+            severity="danger" [text]="true" [rounded]="true" size="small"
+            (onClick)="removeLigne(i)"
+          />
+
         </div>
+
+        <!-- Total ligne -->
+        @if (ligne.prixUnitaireCents && ligne.quantiteCommandee) {
+          <div class="text-right text-xs text-500 mt-2">
+            Sous-total :
+            <span class="font-semibold text-900">
+              {{ (ligne.prixUnitaireCents * ligne.quantiteCommandee) | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
+          </div>
+        }
+
       </div>
     }
 
@@ -148,7 +175,7 @@
     @if (lignes.length > 0 && totalEstime > 0) {
       <div class="flex justify-content-end">
         <div class="surface-100 border-round px-4 py-2 flex align-items-center gap-3">
-          <span class="text-500 text-sm">Total estimé :</span>
+          <span class="text-500 text-sm">Total estim&#233; :</span>
           <span class="font-bold text-900 text-lg">{{ totalEstime | currency:'EUR':'symbol':'1.2-2' }}</span>
         </div>
       </div>
@@ -168,9 +195,10 @@
   </form>
 
   <ng-template pTemplate="footer">
-    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button label="Annuler" severity="secondary" [text]="true"
+      (onClick)="onHide()" [disabled]="saving" />
     <p-button
-      label="Créer le bon"
+      label="Cr&#233;er le bon"
       icon="pi pi-check"
       [loading]="saving"
       [disabled]="lignes.length === 0"

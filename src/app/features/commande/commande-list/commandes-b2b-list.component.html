@@ -117,9 +117,33 @@
         </td>
 
         <!-- Statut -->
-        <td class="text-center">
-          <p-tag [value]="getStatutLabel(c.statut)"
-            [severity]="getStatutSeverity(c.statut)" />
+        <td>
+          <div class="flex flex-column gap-1">
+            <div class="flex justify-content-between align-items-center">
+              <span class="text-xs font-medium" [ngClass]="{
+                'text-400':       c.statut === 'BROUILLON',
+                'text-blue-500':  c.statut === 'CONFIRMEE',
+                'text-orange-500':c.statut === 'EXPEDIEE',
+                'text-green-600': c.statut === 'LIVREE',
+                'text-red-500':   c.statut === 'ANNULEE'
+              }">{{ getStatutLabel(c.statut) }}</span>
+              <span class="text-xs text-400 font-mono">{{ getWorkflowPct(c.statut) }}%</span>
+            </div>
+            <div class="border-round overflow-hidden" style="height:6px;background:#e9ecef">
+              <div
+                class="border-round h-full transition-all transition-duration-300"
+                [style.width]="getWorkflowPct(c.statut) + '%'"
+                [ngClass]="{
+                  'bg-400':        c.statut === 'BROUILLON',
+                  'bg-blue-400':   c.statut === 'CONFIRMEE',
+                  'bg-orange-400': c.statut === 'EXPEDIEE',
+                  'bg-green-500':  c.statut === 'LIVREE',
+                  'bg-red-400':    c.statut === 'ANNULEE'
+                }"
+              ></div>
+            </div>
+            
+          </div>
         </td>
 
         <!-- Actions -->

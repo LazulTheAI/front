@@ -76,76 +76,96 @@
       </div>
     }
 
-    @for (ligne of lignes; track $index; let i = $index) {
-      <div class="surface-50 border-round border-1 surface-border p-3">
-        <div class="grid align-items-end">
+   @for (ligne of lignes; track $index; let i = $index) {
+  <div class="surface-50 border-round border-1 surface-border p-3">
+    <div style="display:grid; grid-template-columns: minmax(0,1fr) 80px 120px 70px 36px; gap:6px; align-items:end; width:100%; box-sizing:border-box;">
 
-          <!-- Produit -->
-          <div class="col-4 flex flex-column gap-1">
-            <label class="text-xs text-400">Produit</label>
-            <p-select
-              [(ngModel)]="ligne.produitId"
-              [options]="produitOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Sélectionner..."
-              [filter]="true"
-              (onChange)="onProduitChange(ligne)"
-              class="w-full"
-            />
-          </div>
+      <!-- Produit -->
+      <div style="display:flex; flex-direction:column; gap:4px; min-width:0; overflow:hidden;">
+        <label style="font-size:11px; color:#888;">Produit</label>
+        <p-select
+          [(ngModel)]="ligne.produitId"
+          [options]="produitOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="S&#233;lectionner..."
+          [filter]="true"
+          appendTo="body"
+          (onChange)="onProduitChange(ligne)"
+          [style]="{'width':'100%'}"
+        />
+      </div>
 
-          <!-- Quantité -->
-          <div class="col-2 flex flex-column gap-1">
-            <label class="text-xs text-400">Quantité</label>
-            <p-inputNumber [(ngModel)]="ligne.quantite"
-              [min]="0.01" [minFractionDigits]="0" [maxFractionDigits]="4"
-              placeholder="1" styleClass="w-full" />
-          </div>
+      <!-- Quantité -->
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; color:#888;">Qt&#233;</label>
+        <p-inputNumber [(ngModel)]="ligne.quantite"
+          mode="decimal"
+          [min]="0.01" [minFractionDigits]="0" [maxFractionDigits]="4"
+          placeholder="1" [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}" />
+      </div>
 
-          <!-- Prix unitaire -->
-          <div class="col-3 flex flex-column gap-1">
-            <label class="text-xs text-400">Prix unit. HT (cts)</label>
-            <p-inputNumber [(ngModel)]="ligne.prixUnitaireCents"
-              [min]="0" placeholder="Ex : 500 = 5,00€"
-              styleClass="w-full" />
-          </div>
+      <!-- Prix unitaire -->
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; color:#888;">Prix HT (cts)</label>
+        <p-inputNumber [(ngModel)]="ligne.prixUnitaireCents"
+          mode="decimal"
+          [min]="0" [maxFractionDigits]="0"
+          placeholder="500"
+          [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}" />
+      </div>
 
-          <!-- Remise ligne -->
-          <div class="col-2 flex flex-column gap-1">
-            <label class="text-xs text-400">Remise %</label>
-            <p-inputNumber [(ngModel)]="ligne.remise"
-              [min]="0" [max]="100" suffix="%" placeholder="0"
-              styleClass="w-full" />
-          </div>
+      <!-- Remise -->
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <label style="font-size:11px; color:#888;">Remise</label>
+        <p-inputNumber [(ngModel)]="ligne.remise"
+          mode="decimal"
+          [min]="0" [max]="100" [maxFractionDigits]="2"
+          suffix="%" placeholder="0"
+          [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}" />
+      </div>
 
-          <!-- Supprimer -->
-          <div class="col-1 flex justify-content-end">
-            <p-button icon="pi pi-times" [text]="true" [rounded]="true"
-              severity="danger" size="small" pTooltip="Supprimer"
-              (onClick)="supprimerLigne(i)" />
-          </div>
+      <!-- Supprimer -->
+      <p-button
+        icon="pi pi-trash"
+        severity="danger" [text]="true" [rounded]="true" size="small"
+        (onClick)="supprimerLigne(i)"
+      />
 
-        </div>
+    </div>
 
-        <!-- Total ligne -->
-        @if (ligne.prixUnitaireCents && ligne.quantite) {
-          <div class="text-right text-xs text-500 mt-2">
-            Sous-total :
-            <span class="font-semibold text-900">
-              {{ ((ligne.prixUnitaireCents / 100) * ligne.quantite * (ligne.remise ? (1 - ligne.remise / 100) : 1)) | currency:'EUR':'symbol':'1.2-2' }}
-            </span>
-          </div>
-        }
+    @if (ligne.prixUnitaireCents && ligne.quantite) {
+      <div class="text-right text-xs text-500 mt-2">
+        Sous-total :
+        <span class="font-semibold text-900">
+          {{ ((ligne.prixUnitaireCents / 100) * ligne.quantite *
+            (ligne.remise ? (1 - ligne.remise / 100) : 1))
+            | currency:'EUR':'symbol':'1.2-2' }}
+        </span>
       </div>
     }
+  </div>
+}
 
     <!-- ── Total HT ──────────────────────────────────────────── -->
     @if (lignes.length > 0) {
       <div class="flex justify-content-end">
-        <div class="surface-100 border-round px-4 py-2 flex align-items-center gap-3">
-          <span class="text-500 text-sm">Total HT estimé</span>
-          <span class="font-bold text-xl text-primary">{{ totalHT | currency:'EUR':'symbol':'1.2-2' }}</span>
+        <div class="surface-100 border-round px-4 py-2 flex flex-column gap-1" style="min-width:220px">
+          <div class="flex justify-content-between text-sm text-500">
+            <span>Sous-total</span>
+            <span>{{ sousTotal | currency:'EUR':'symbol':'1.2-2' }}</span>
+          </div>
+          @if (form.remise) {
+            <div class="flex justify-content-between text-sm text-orange-500">
+              <span>Remise globale ({{ form.remise }}%)</span>
+              <span>- {{ sousTotal * form.remise / 100 | currency:'EUR':'symbol':'1.2-2' }}</span>
+            </div>
+          }
+          <p-divider styleClass="my-1" />
+          <div class="flex justify-content-between">
+            <span class="font-semibold text-900">Total HT</span>
+            <span class="font-bold text-xl text-primary">{{ totalHT | currency:'EUR':'symbol':'1.2-2' }}</span>
+          </div>
         </div>
       </div>
     }

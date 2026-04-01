@@ -76,7 +76,7 @@
     </div>
 
     <!-- Tabs -->
-    <p-tabs>
+    <p-tabs  [(value)]="activeTab">
       <p-tablist>
         <p-tab value="0">
           <i class="pi pi-list mr-2"></i>Traçabilité lots
@@ -396,7 +396,7 @@
           severity="secondary"
           [outlined]="true"
           [loading]="exportingCsv"
-          (onClick)="exportCsv()"
+          (onClick)="exportCsv(run, $event)"
         />
       } @else {
         <span></span>

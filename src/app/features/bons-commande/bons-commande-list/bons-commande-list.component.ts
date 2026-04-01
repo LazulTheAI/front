@@ -82,6 +82,17 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
         this.search$.next(value);
     }
 
+    getWorkflowPct(bon: any): number {
+        const map: Record<string, number> = {
+            BROUILLON: 10,
+            ENVOYE: 40,
+            PARTIELLEMENT_RECU: 70,
+            RECU: 100,
+            ANNULE: 0
+        };
+        return map[bon.statut] ?? 0;
+    }
+
     loadBons(): void {
         this.loading = true;
         this.bonService.listerBonCommande(this.page, this.size, this.sortBy, this.sortDir, (this.filtreStatut as any) ?? undefined, this.search || undefined).subscribe({

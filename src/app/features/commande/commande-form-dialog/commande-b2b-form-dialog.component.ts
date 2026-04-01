@@ -58,6 +58,17 @@ export class CommandeB2BFormDialogComponent implements OnInit, OnChanges {
     }
 
     get totalHT(): number {
+        const sousTotal = this.lignes.reduce((sum, l) => {
+            if (!l.prixUnitaireCents || !l.quantite) return sum;
+            let montant = (l.prixUnitaireCents / 100) * l.quantite;
+            if (l.remise) montant *= 1 - l.remise / 100;
+            return sum + montant;
+        }, 0);
+        if (this.form.remise) return sousTotal * (1 - this.form.remise / 100);
+        return sousTotal;
+    }
+
+    get sousTotal(): number {
         return this.lignes.reduce((sum, l) => {
             if (!l.prixUnitaireCents || !l.quantite) return sum;
             let montant = (l.prixUnitaireCents / 100) * l.quantite;

@@ -8,7 +8,6 @@ import { Button } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Select } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 import { Toolbar } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
@@ -27,7 +26,7 @@ interface SelectOption {
     selector: 'app-commandes-b2b-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, Button, Tag, Tooltip, Toast, Toolbar, ConfirmDialog, Select, CommandeB2BFormDialogComponent, CommandeB2BDetailDialogComponent],
+    imports: [CommonModule, FormsModule, TableModule, Button, Tooltip, Toast, Toolbar, ConfirmDialog, Select, CommandeB2BFormDialogComponent, CommandeB2BDetailDialogComponent],
     providers: [MessageService, ConfirmationService],
     templateUrl: './commandes-b2b-list.component.html'
 })
@@ -160,6 +159,17 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
                     this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de générer le PDF' });
                 }
             });
+    }
+
+    getWorkflowPct(statut: string): number {
+        const map: Record<string, number> = {
+            BROUILLON: 10,
+            CONFIRMEE: 40,
+            EXPEDIEE: 70,
+            LIVREE: 100,
+            ANNULEE: 0
+        };
+        return map[statut] ?? 0;
     }
 
     downloadFacture(c: CommandeB2BResponse, event: Event): void {
