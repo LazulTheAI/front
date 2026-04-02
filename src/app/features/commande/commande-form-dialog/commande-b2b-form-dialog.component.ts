@@ -11,6 +11,7 @@ import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 
 import { CommandeB2BControllerService, ProduitControllerService, ProduitResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 
 interface LigneForm {
     produitId: number | null;
@@ -28,7 +29,7 @@ interface SelectOption {
 @Component({
     selector: 'app-commande-b2b-form-dialog',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, Button, Select, InputNumber, InputText, DatePicker, Divider],
+    imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, Button, Select, InputNumber, InputText, DatePicker, Divider],
     templateUrl: './commande-b2b-form-dialog.component.html'
 })
 export class CommandeB2BFormDialogComponent implements OnInit, OnChanges {

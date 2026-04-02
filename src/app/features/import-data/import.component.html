@@ -1,0 +1,471 @@
+<p-toast />
+
+<!-- ═══ TOOLBAR ═════════════════════════════════════════════ -->
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <i class="pi pi-upload text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">Import de donn&#233;es</h2>
+        <p class="m-0 text-400 text-sm mt-1">
+          Importez vos mati&#232;res, fournisseurs, stock et recettes depuis CSV ou Excel
+        </p>
+      </div>
+    </div>
+  </ng-template>
+  @if (activeStep > 0) {
+    <ng-template pTemplate="end">
+      <p-button label="Recommencer" icon="pi pi-refresh"
+        severity="secondary" [outlined]="true" (onClick)="reset()" />
+    </ng-template>
+  }
+</p-toolbar>
+<!-- ═══ GUIDE D'ORDRE ════════════════════════════════════════ -->
+<div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
+  <div class="flex align-items-center gap-2 mb-3">
+    <i class="pi pi-info-circle text-primary"></i>
+    <span class="font-semibold text-900">Ordre d'import recommand&#233;</span>
+  </div>
+  <div class="flex align-items-center gap-2 flex-wrap">
+    @for (step of ordreImport; track step.ordre; let last = $last) {
+      <div class="flex align-items-center gap-2 px-3 py-2 border-round border-1 surface-border surface-50">
+        <div class="border-circle flex align-items-center justify-content-center font-bold text-xs text-white bg-primary flex-shrink-0"
+          style="width:22px;height:22px">
+          {{ step.ordre }}
+        </div>
+        <i class="pi {{ step.icon }} text-primary text-sm"></i>
+        <span class="text-900 text-sm font-medium">{{ step.label }}</span>
+        @if (step.note) {
+          <span class="text-400 text-xs">({{ step.note }})</span>
+        }
+      </div>
+      @if (!last) {
+        <i class="pi pi-arrow-right text-300 text-sm"></i>
+      }
+    }
+  </div>
+  <div class="text-400 text-xs mt-3">
+    <i class="pi pi-exclamation-circle mr-1"></i>
+    Les mati&#232;res inconnues dans les recettes sont cr&#233;&#233;es automatiquement,
+    mais sans co&#251;t ni seuil — pensez &#224; les compl&#233;ter ensuite.
+  </div>
+</div>
+<!-- ═══ STEPPER ═════════════════════════════════════════════ -->
+<div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
+  <div class="flex align-items-center">
+    @for (step of [
+      { label: 'Fichier', icon: 'pi-file-arrow-up' },
+      { label: 'Mapping', icon: 'pi-sliders-h' },
+      { label: 'Import',  icon: 'pi-check-circle' }
+    ]; track step.label; let i = $index) {
+      <div class="flex align-items-center gap-2 cursor-pointer"
+        (click)="i < activeStep ? activeStep = i : null">
+        <div class="border-circle flex align-items-center justify-content-center font-bold flex-shrink-0"
+          style="width:36px;height:36px"
+          [class.bg-primary]="i <= activeStep"
+          [class.text-white]="i <= activeStep"
+          [class.surface-200]="i > activeStep"
+          [class.text-400]="i > activeStep">
+          @if (i < activeStep) {
+            <i class="pi pi-check text-sm"></i>
+          } @else {
+            <i class="pi {{ step.icon }} text-sm"></i>
+          }
+        </div>
+        <span class="font-medium hidden md:block"
+          [class.text-primary]="i === activeStep"
+          [class.text-400]="i !== activeStep">
+          {{ step.label }}
+        </span>
+      </div>
+      @if (i < 2) {
+        <div class="flex-1 mx-3 border-top-1"
+          [class.border-primary]="i < activeStep"
+          [class.surface-border]="i >= activeStep">
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- ═══ STEP 0 : TYPE + UPLOAD ══════════════════════════════ -->
+@if (activeStep === 0) {
+  <div class="surface-card border-round-xl border-1 surface-border p-5">
+
+    <h3 class="text-900 font-semibold m-0 mb-4">
+      <i class="pi pi-database text-primary mr-2"></i>
+      Type de donn&#233;es &#224; importer
+    </h3>
+
+    <!-- Choix du type -->
+    <div class="grid mb-5">
+      @for (opt of typeOptions; track opt.value) {
+        <div class="col-6 md:col-3">
+          <div class="border-round-xl border-2 p-4 cursor-pointer transition-all transition-duration-150 text-center"
+            [class.border-primary]="typeSelectionne === opt.value"
+            [class.bg-primary-50]="typeSelectionne === opt.value"
+            [class.surface-border]="typeSelectionne !== opt.value"
+            [class.surface-50]="typeSelectionne !== opt.value"
+            (click)="typeSelectionne = opt.value">
+            <i class="pi text-3xl mb-3 block"
+              [class.text-primary]="typeSelectionne === opt.value"
+              [class.text-400]="typeSelectionne !== opt.value"
+              [ngClass]="{
+                'pi-box':            opt.value === 'MATIERES',
+                'pi-truck':          opt.value === 'FOURNISSEURS',
+                'pi-warehouse':      opt.value === 'STOCK',
+                'pi-book':           opt.value === 'RECETTES'
+              }"></i>
+            <div class="font-semibold text-900 text-sm">{{ opt.label }}</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (typeSelectionne) {
+
+      <!-- Champs attendus -->
+      <div class="surface-50 border-round p-4 mb-4">
+        <div class="text-400 text-xs font-semibold uppercase mb-3">
+          Champs disponibles pour {{ getTypeLabel(typeSelectionne) }}
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (champ of champsSysteme; track champ.value) {
+            <p-tag
+              [value]="champ.label"
+              [severity]="champ.requis ? 'danger' : 'secondary'"
+              [pTooltip]="champ.requis ? 'Obligatoire' : 'Optionnel'"
+            />
+          }
+        </div>
+        <div class="text-400 text-xs mt-2">
+          <i class="pi pi-info-circle mr-1"></i>
+          Les colonnes marqu&#233;es en rouge sont obligatoires.
+          Votre fichier peut avoir des colonnes dans n'importe quel ordre et n'importe quel nom.
+        </div>
+      </div>
+
+      <!-- Upload -->
+      <p-fileUpload
+        mode="advanced"
+        accept=".csv,.xlsx,.xls"
+        [maxFileSize]="10000000"
+        [auto]="true"
+        [customUpload]="true"
+        (uploadHandler)="onFileSelect($event)"
+        chooseLabel="Choisir un fichier"
+        [showUploadButton]="false"
+        [showCancelButton]="false"
+        styleClass="w-full"
+      >
+        <ng-template pTemplate="empty">
+          <div class="flex flex-column align-items-center py-4 text-400">
+            <i class="pi pi-cloud-upload text-4xl mb-3"></i>
+            <span class="text-sm">Glissez votre fichier CSV ou Excel ici</span>
+            <span class="text-xs mt-1">Max 10 MB</span>
+          </div>
+        </ng-template>
+      </p-fileUpload>
+
+      @if (uploading) {
+        <div class="mt-3">
+          <p-progressBar mode="indeterminate" styleClass="h-1rem" style="height:4px" />
+          <div class="text-400 text-sm text-center mt-2">Analyse du fichier en cours...</div>
+        </div>
+      }
+    }
+
+  </div>
+}
+
+<!-- ═══ STEP 1 : MAPPING ═════════════════════════════════════ -->
+@if (activeStep === 1) {
+  <div class="surface-card border-round-xl border-1 surface-border p-5">
+
+    <div class="flex align-items-center justify-content-between mb-4">
+      <div>
+        <h3 class="text-900 font-semibold m-0">
+          <i class="pi pi-sliders-h text-primary mr-2"></i>
+          Correspondance des colonnes
+        </h3>
+        <p class="text-400 text-sm m-0 mt-1">
+          Associez les colonnes de votre fichier aux champs du syst&#232;me.
+          Le mapping a &#233;t&#233; pr&#233;-rempli automatiquement.
+        </p>
+      </div>
+    </div>
+
+    <!-- Alerte champs requis manquants -->
+    @if (!mappingComplet) {
+      <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-4">
+        <i class="pi pi-exclamation-triangle text-orange-500"></i>
+        <span class="text-sm text-orange-800">
+          Champs obligatoires non assign&#233;s :
+          <strong>{{ champsMappesRequisManquants.join(', ') }}</strong>
+        </span>
+      </div>
+    }
+
+    <!-- Tableau de mapping -->
+    <div class="flex flex-column gap-2 mb-4">
+
+      <!-- Header -->
+      <div style="display:grid; grid-template-columns:1fr 40px 1fr; gap:12px; align-items:center;"
+        class="text-400 text-xs font-semibold uppercase px-3">
+        <span>Colonne dans votre fichier</span>
+        <span></span>
+        <span>Champ syst&#232;me</span>
+      </div>
+
+      @for (col of colonnes; track col) {
+        <div style="display:grid; grid-template-columns:1fr 40px 1fr; gap:12px; align-items:center;"
+          class="surface-50 border-round border-1 px-3 py-2"
+          [class.border-primary]="isMapped(col)"
+          [class.surface-border]="!isMapped(col)">
+
+          <!-- Colonne fichier -->
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-table text-400 text-sm"></i>
+            <span class="font-medium text-900">{{ col }}</span>
+            @if (apercu[0]?.[col]) {
+              <span class="text-400 text-xs font-mono">
+                ex: {{ apercu[0][col] }}
+              </span>
+            }
+          </div>
+
+          <!-- Flèche -->
+          <div class="text-center">
+            <i class="pi text-lg"
+              [class.pi-arrow-right]="isMapped(col)"
+              [class.text-primary]="isMapped(col)"
+              [class.pi-minus]="!isMapped(col)"
+              [class.text-300]="!isMapped(col)"></i>
+          </div>
+
+          <!-- Champ système -->
+          <p-select
+            [(ngModel)]="mapping[col]"
+            [options]="champOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="— Ignorer —"
+            appendTo="body"
+            [style]="{'width':'100%'}"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- Aperçu données -->
+    <p-divider align="left">
+      <span class="text-400 text-xs font-semibold uppercase">
+        Aper&#231;u ({{ apercu.length }} premi&#232;res lignes)
+      </span>
+    </p-divider>
+
+    <div style="overflow-x:auto">
+      <p-table [value]="apercu" styleClass="p-datatable-sm" [showGridlines]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            @for (col of colonnes; track col) {
+              <th style="white-space:nowrap; font-size:11px">
+                {{ col }}
+                @if (mapping[col]) {
+                  <p-tag [value]="getMappingLabel(mapping[col])"
+                    severity="info" styleClass="ml-1 text-xs" />
+                }
+              </th>
+            }
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            @for (col of colonnes; track col) {
+              <td style="font-size:12px; white-space:nowrap; max-width:200px;
+                overflow:hidden; text-overflow:ellipsis"
+                [pTooltip]="row[col]">
+                {{ row[col] || '—' }}
+              </td>
+            }
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-content-between align-items-center mt-4">
+      <p-button label="Retour" icon="pi pi-arrow-left" severity="secondary"
+        [text]="true" (onClick)="activeStep = 0" />
+      <p-button
+        label="Lancer l'import"
+        icon="pi pi-arrow-right" iconPos="right"
+        [disabled]="!mappingComplet"
+        (onClick)="saveMapping()"
+      />
+    </div>
+
+  </div>
+}
+
+<!-- ═══ STEP 2 : PROCESS + RÉSULTAT ═════════════════════════ -->
+@if (activeStep === 2) {
+  <div class="surface-card border-round-xl border-1 surface-border p-5">
+
+    @if (!resultat && !processing) {
+      <div class="text-center py-6">
+        <i class="pi pi-play-circle text-primary text-5xl mb-4 block"></i>
+        <h3 class="text-900 font-semibold mb-2">Pr&#234;t &#224; importer</h3>
+        <p class="text-400 mb-4">
+          Le mapping est configur&#233;. Cliquez pour lancer le traitement.
+        </p>
+        <p-button label="Lancer l'import" icon="pi pi-play"
+          size="large" (onClick)="process()" />
+      </div>
+    }
+
+    @if (processing) {
+      <div class="text-center py-6">
+        <i class="pi pi-spinner pi-spin text-primary text-4xl mb-4 block"></i>
+        <h3 class="text-900 font-semibold mb-2">Import en cours...</h3>
+        <p class="text-400 mb-4">Traitement des lignes en cours, veuillez patienter.</p>
+        <p-progressBar mode="indeterminate" style="height:4px" />
+      </div>
+    }
+
+    @if (resultat) {
+
+      <!-- KPIs -->
+      <div class="grid mb-4">
+        <div class="col-4">
+          <div class="surface-50 border-round-xl border-1 p-4 text-center"
+            [class.border-green-300]="resultat.statut === 'DONE'"
+            [class.border-red-300]="resultat.statut === 'ERROR'"
+            [class.surface-border]="resultat.statut === 'PROCESSING'">
+            <p-tag
+              [value]="resultat.statut === 'DONE' ? 'Terminé' : 'Erreur'"
+              [severity]="resultat.statut === 'DONE' ? 'success' : 'danger'"
+              styleClass="mb-2"
+            />
+            <div class="text-400 text-xs mt-1">Statut</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="surface-50 border-round-xl border-1 surface-border p-4 text-center">
+            <div class="text-3xl font-bold text-green-600">{{ resultat.ok }}</div>
+            <div class="text-400 text-xs mt-1">Lignes import&#233;es</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="surface-50 border-round-xl border-1 surface-border p-4 text-center">
+            <div class="text-3xl font-bold"
+              [class.text-red-500]="resultat.erreurs > 0"
+              [class.text-400]="resultat.erreurs === 0">
+              {{ resultat.erreurs }}
+            </div>
+            <div class="text-400 text-xs mt-1">Erreurs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Erreurs détaillées -->
+      @if (resultat.details?.length > 0) {
+        <p-divider align="left">
+          <span class="text-red-500 text-xs font-semibold uppercase">
+            D&#233;tail des erreurs
+          </span>
+        </p-divider>
+        <p-table [value]="resultat.details" styleClass="p-datatable-sm"
+          [showGridlines]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width:80px">Ligne</th>
+              <th style="width:150px">Colonne</th>
+              <th>Message</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-err>
+            <tr>
+              <td><span class="font-mono text-sm text-500">#{{ err.ligne }}</span></td>
+              <td><span class="text-sm text-900">{{ err.colonne }}</span></td>
+              <td><span class="text-sm text-red-600">{{ err.message }}</span></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+      <div class="flex justify-content-between mt-4">
+        <p-button label="Nouvel import" icon="pi pi-plus"
+          severity="secondary" [outlined]="true" (onClick)="reset()" />
+      </div>
+    }
+  </div>
+}
+
+<!-- ═══ HISTORIQUE ═══════════════════════════════════════════ -->
+<div class="surface-card border-round-xl border-1 surface-border p-4 mt-4">
+  <div class="flex align-items-center justify-content-between mb-3">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-history text-primary"></i>
+      <span class="font-semibold text-900">Historique des imports</span>
+    </div>
+    <p-button icon="pi pi-refresh" severity="secondary" [text]="true"
+      size="small" (onClick)="loadHistorique()" [loading]="loadingHistorique" />
+  </div>
+
+  @if (historique.length === 0 && !loadingHistorique) {
+    <div class="text-center py-4 text-400 text-sm">
+      <i class="pi pi-inbox text-2xl block mb-2"></i>
+      Aucun import effectu&#233;
+    </div>
+  }
+
+  @if (historique.length > 0) {
+    <p-table [value]="historique" styleClass="p-datatable-sm"
+      [showGridlines]="true" [loading]="loadingHistorique">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width:80px">#</th>
+          <th style="width:160px">Type</th>
+          <th>Fichier</th>
+          <th style="width:120px">Statut</th>
+          <th style="width:80px" class="text-center">OK</th>
+          <th style="width:80px" class="text-center">Erreurs</th>
+          <th style="width:150px">Date</th>
+          <th style="width:60px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-job>
+        <tr>
+          <td><span class="text-400 font-mono text-sm">#{{ job.id }}</span></td>
+          <td><span class="text-sm text-900">{{ getTypeLabel(job.type) }}</span></td>
+          <td><span class="text-sm text-500 font-mono">{{ job.nomFichier }}</span></td>
+          <td>
+            <p-tag [value]="job.statut" [severity]="getStatutSeverity(job.statut)" />
+          </td>
+          <td class="text-center">
+            <span class="font-semibold text-green-600">{{ job.nbLignesOk ?? '—' }}</span>
+          </td>
+          <td class="text-center">
+            <span [class.text-red-500]="job.nbLignesErreur > 0"
+              [class.text-400]="!job.nbLignesErreur">
+              {{ job.nbLignesErreur ?? '—' }}
+            </span>
+          </td>
+          <td><span class="text-sm text-500">{{ job.createdAt | date:'dd/MM/yyyy HH:mm' }}</span></td>
+          <td>
+            @if (job.statut === 'DONE') {
+              <p-button
+                icon="pi pi-undo"
+                severity="danger"
+                [text]="true" [rounded]="true" size="small"
+                pTooltip="Annuler cet import"
+                (onClick)="undoImport(job)"
+              />
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

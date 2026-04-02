@@ -1,7 +1,7 @@
 <p-toast />
 
 <p-dialog
-  [header]="recette?.nom ?? 'Détail recette'"
+  [header]="recette?.nom ?? ('recette_detail.titre' | transloco)"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -21,21 +21,21 @@
     <div class="grid mb-3">
       <div class="col-6 md:col-3">
         <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">PRODUCTION</div>
+          <div class="text-400 text-xs font-medium mb-1">{{ 'recette_detail.production' | transloco }}</div>
           <div class="font-bold text-900">{{ recette.quantiteProduite | number:'1.0-2' }}</div>
           <div class="text-500 text-xs">{{ recette.uniteProduite }} / batch</div>
         </div>
       </div>
       <div class="col-6 md:col-3">
         <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">DURÉE</div>
+          <div class="text-400 text-xs font-medium mb-1">{{ 'recette_detail.duree' | transloco }}</div>
           <div class="font-bold text-900">{{ getDureeFabricationLabel() }}</div>
-          <div class="text-500 text-xs">de fabrication</div>
+          <div class="text-500 text-xs">{{ 'recette_detail.de_fabrication' | transloco }}</div>
         </div>
       </div>
       <div class="col-6 md:col-3">
         <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">COÛT THÉORIQUE</div>
+          <div class="text-400 text-xs font-medium mb-1">{{ 'recette_detail.cout_theorique' | transloco }}</div>
           <div class="font-bold text-primary">
             {{ recette.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
           </div>
@@ -44,9 +44,9 @@
       </div>
       <div class="col-6 md:col-3">
         <div class="surface-50 border-round p-3 text-center">
-          <div class="text-400 text-xs font-medium mb-1">INGRÉDIENTS</div>
+          <div class="text-400 text-xs font-medium mb-1">{{ 'recette_detail.ingredients' | transloco }}</div>
           <div class="font-bold text-900">{{ recette.ingredients?.length ?? 0 }}</div>
-          <div class="text-500 text-xs">référencé(s)</div>
+          <div class="text-500 text-xs">{{ 'recette_detail.reference_s' | transloco }}</div>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
       <p-tabpanel>
         <ng-template pTemplate="header">
           <span>
-            Ingrédients
+            {{ 'recette_detail.onglet_ingredients' | transloco }}
             @if (recette.ingredients | ingredientsEnAlerte; as alertes) {
               @if (alertes.length > 0) {
                 <p-tag value="!" severity="danger" styleClass="ml-2 text-xs" />
@@ -69,11 +69,11 @@
 
         <!-- Toolbar ingrédients -->
         <div class="flex justify-content-between align-items-center mb-3">
-          <span class="text-500 text-sm">{{ recette.ingredients?.length ?? 0 }} ingrédient(s)</span>
+          <span class="text-500 text-sm">{{ recette.ingredients?.length ?? 0 }} {{ 'recette_detail.ingredient_s' | transloco }}</span>
           @if (!recette.archive) {
             @if (!editingIngredients) {
               <p-button
-                label="Modifier les ingrédients"
+                [label]="'recette_detail.modifier_ingredients' | transloco"
                 icon="pi pi-pencil"
                 severity="secondary"
                 size="small"
@@ -88,11 +88,11 @@
           <p-table [value]="recette.ingredients ?? []" styleClass="p-datatable-sm">
             <ng-template pTemplate="header">
               <tr>
-                <th>Matériau</th>
-                <th style="width: 130px" class="text-right">Quantité</th>
-                <th>Stock (par entrepôt)</th>
-                <th style="width: 120px" class="text-right">Coût ligne</th>
-                <th style="width: 80px" class="text-right">% coût</th>
+                <th>{{ 'recette_detail.col_materiau' | transloco }}</th>
+                <th style="width: 130px" class="text-right">{{ 'recette_detail.col_quantite' | transloco }}</th>
+                <th>{{ 'recette_detail.col_stock' | transloco }}</th>
+                <th style="width: 120px" class="text-right">{{ 'recette_detail.col_cout_ligne' | transloco }}</th>
+                <th style="width: 80px" class="text-right">{{ 'recette_detail.col_pct_cout' | transloco }}</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-ing>
@@ -100,7 +100,7 @@
                 <td>
                   <div class="flex align-items-center gap-2">
                     @if (ing.enAlerte) {
-                      <i class="pi pi-exclamation-circle text-red-500 text-sm" pTooltip="Stock insuffisant"></i>
+                      <i class="pi pi-exclamation-circle text-red-500 text-sm" [pTooltip]="'recette_detail.tooltip_stock_insuffisant' | transloco"></i>
                     }
                     <span class="font-medium text-900">{{ ing.materiauNom }}</span>
                   </div>
@@ -139,7 +139,7 @@
             </ng-template>
             <ng-template pTemplate="footer">
               <tr>
-                <td colspan="3" class="text-right font-medium text-500">Total coût théorique</td>
+                <td colspan="3" class="text-right font-medium text-500">{{ 'recette_detail.total_cout_theorique' | transloco }}</td>
                 <td class="text-right font-bold text-900">
                   {{ recette.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
                 </td>
@@ -155,14 +155,14 @@
 
           <div class="flex justify-content-end gap-2 mt-4">
             <p-button
-              label="Annuler"
+              [label]="'common.annuler' | transloco"
               severity="secondary"
               [text]="true"
               (onClick)="cancelEditIngredients()"
               [disabled]="savingIngredients"
             />
             <p-button
-              label="Enregistrer les ingrédients"
+              [label]="'recette_detail.enregistrer_ingredients' | transloco"
               icon="pi pi-check"
               severity="success"
               [loading]="savingIngredients"
@@ -174,38 +174,45 @@
       </p-tabpanel>
 
       <!-- Onglet Notes -->
-      <p-tabpanel header="Notes">
+      <p-tabpanel>
+        <ng-template pTemplate="header">
+            {{ 'recette_detail.onglet_notes' | transloco }}
+        </ng-template>
         @if (recette.notes) {
           <div class="surface-50 border-round p-4 text-900 line-height-3 white-space-pre-line">{{ recette.notes }}</div>
         } @else {
           <div class="text-center py-5 text-400">
             <i class="pi pi-file text-3xl mb-2 block"></i>
-            Aucune note pour cette recette
+            {{ 'recette_detail.aucune_note' | transloco }}
           </div>
         }
       </p-tabpanel>
 
       <!-- Onglet Infos -->
-      <p-tabpanel header="Informations">
+      <p-tabpanel>
+        <ng-template pTemplate="header">
+            {{ 'recette_detail.onglet_informations' | transloco }}
+        </ng-template>
+
         <div class="flex flex-column gap-3">
           <div class="flex justify-content-between py-2 border-bottom-1 surface-border">
-            <span class="text-500">Créée le</span>
+            <span class="text-500">{{ 'recette_detail.creee_le' | transloco }}</span>
             <span class="text-900 font-medium">{{ recette.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="flex justify-content-between py-2 border-bottom-1 surface-border">
-            <span class="text-500">Modifiée le</span>
+            <span class="text-500">{{ 'recette_detail.modifiee_le' | transloco }}</span>
             <span class="text-900 font-medium">{{ recette.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="flex justify-content-between py-2 border-bottom-1 surface-border">
-            <span class="text-500">ID</span>
+            <span class="text-500">{{ 'recette_detail.id' | transloco }}</span>
             <span class="text-900 font-mono">{{ recette.id }}</span>
           </div>
           <div class="flex justify-content-between py-2">
-            <span class="text-500">Statut</span>
+            <span class="text-500">{{ 'recette_detail.statut' | transloco }}</span>
             @if (recette.archive) {
-              <p-tag value="Archivée" severity="secondary" />
+              <p-tag [value]="'recettes.archivee' | transloco" severity="secondary" />
             } @else {
-              <p-tag value="Active" severity="success" />
+              <p-tag [value]="'recettes.active' | transloco" severity="success" />
             }
           </div>
         </div>
@@ -216,7 +223,7 @@
   }
 
   <ng-template pTemplate="footer">
-    <p-button label="Fermer"(onClick)="onHide()" />
+    <p-button [label]="'common.fermer' | transloco" (onClick)="onHide()" />
   </ng-template>
 </p-dialog>
 

@@ -7,8 +7,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-box text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Stock & matériaux</h2>
-        <p class="m-0 text-400 text-sm mt-1">Vue unifiée — stock par entrepôt</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'materiaux.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'materiaux.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -19,7 +19,7 @@
         <input pInputText
           [ngModel]="filters.get('search')!.value"
           (ngModelChange)="filters.get('search')!.setValue($event)"
-          placeholder="Rechercher un matériau..."
+          [placeholder]="'materiaux.search_placeholder' | transloco"
           class="w-14rem" />
       </p-iconfield>
       <p-select
@@ -34,17 +34,17 @@
         [formControl]="$any(filters.get('statut'))"
         optionLabel="label"
         optionValue="value"
-        placeholder="Tous les statuts"
+        [placeholder]="'materiaux.all_statuses' | transloco"
         [showClear]="true"
         class="w-11rem"
       />
       <div class="flex align-items-center gap-2">
         <p-toggleswitch [formControl]="$any(filters.get('archive'))" inputId="archiveSwitch" />
-        <label for="archiveSwitch" class="text-sm text-500 cursor-pointer">Archives</label>
+        <label for="archiveSwitch" class="text-sm text-500 cursor-pointer">{{ 'materiaux.archives' | transloco }}</label>
       </div>
       <p-button icon="pi pi-refresh" severity="secondary" [outlined]="true"
-        size="small" pTooltip="Réinitialiser les filtres" (onClick)="resetFilters()" />
-      <p-button label="Nouveau matériau" icon="pi pi-plus" (onClick)="openCreate()" />
+        size="small" [pTooltip]="'common.reset_filters' | transloco" (onClick)="resetFilters()" />
+      <p-button [label]="'materiaux.new_material' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>
   </ng-template>
 </p-toolbar>
@@ -52,7 +52,7 @@
 <!-- Chips filtres actifs -->
 @if (activeChips.length) {
   <div class="flex align-items-center gap-2 mb-3 flex-wrap px-1">
-    <span class="text-400 text-xs">Filtres actifs :</span>
+    <span class="text-400 text-xs">{{ 'materiaux.active_filters' | transloco }}</span>
     @for (chip of activeChips; track chip.field) {
       <p-chip [label]="chip.label" [removable]="true"
         (onRemove)="removeChip(chip.field)" styleClass="text-sm" />
@@ -64,7 +64,7 @@
 @if (nbAlertes > 0) {
   <div class="flex align-items-center gap-2 p-3 bg-red-50 border-round border-1 border-red-200 mb-3">
     <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
-    <span class="text-red-800 font-medium">{{ nbAlertes }} matériau(x) en alerte de stock</span>
+    <span class="text-red-800 font-medium">{{ nbAlertes }} {{ 'materiaux.alert_banner' | transloco }}</span>
   </div>
 }
 
@@ -92,11 +92,11 @@
         </th>
         <th colspan="3"
           style="background:#E1F5EE;color:#085041;text-align:center;font-size:11px;border-bottom:2px solid #5DCAA5;padding:4px 8px;font-weight:600">
-          Stock
+          {{ 'materiaux.stock_section' | transloco }}
         </th>
         <th colspan="3"
           style="background:#E6F1FB;color:#0C447C;text-align:center;font-size:11px;border-bottom:2px solid #85B7EB;padding:4px 8px;font-weight:600">
-          Finance
+          {{ 'materiaux.finance_section' | transloco }}
         </th>
         <th style="padding:4px 8px"></th>
       </tr>
@@ -105,27 +105,27 @@
       <tr>
         <!-- Identification -->
         <th pSortableColumn="nom">
-          Matière <p-sortIcon field="nom" />
+          {{ 'materiaux.material_name' | transloco }} <p-sortIcon field="nom" />
         </th>
-        <th>Unité</th>
+        <th>{{ 'materiaux.unit' | transloco }}</th>
 
         <!-- Stock -->
-        <th style="width:190px;background:#E1F5EE;color:#085041">Stock par entrepôt</th>
+        <th style="width:190px;background:#E1F5EE;color:#085041">{{ 'materiaux.stock_by_warehouse' | transloco }}</th>
         <th pSortableColumn="stockActuel" style="width:120px;text-align:right;background:#E1F5EE;color:#085041">
-          Stock total <p-sortIcon field="stockActuel" />
+          {{ 'materiaux.total_stock' | transloco }} <p-sortIcon field="stockActuel" />
         </th>
         <th pSortableColumn="seuilAlerte" style="width:110px;text-align:right;background:#E1F5EE;color:#085041">
-          Seuil alerte <p-sortIcon field="seuilAlerte" />
+          {{ 'materiaux.alert_threshold' | transloco }} <p-sortIcon field="seuilAlerte" />
         </th>
 
         <!-- Finance -->
         <th pSortableColumn="coutUnitaire" style="width:130px;text-align:right;background:#E6F1FB;color:#0C447C">
-          Coût unit. <p-sortIcon field="coutUnitaire" />
+          {{ 'materiaux.unit_cost' | transloco }} <p-sortIcon field="coutUnitaire" />
         </th>
         <th pSortableColumn="valeurStock" style="width:120px;text-align:right;background:#E6F1FB;color:#0C447C">
-          Valeur stock <p-sortIcon field="valeurStock" />
+          {{ 'materiaux.stock_value' | transloco }} <p-sortIcon field="valeurStock" />
         </th>
-        <th style="width:110px;text-align:center;background:#E6F1FB;color:#0C447C">Recettes</th>
+        <th style="width:110px;text-align:center;background:#E6F1FB;color:#0C447C">{{ 'materiaux.recipes' | transloco }}</th>
 
         <!-- Actions -->
         <th style="width:120px"></th>
@@ -140,7 +140,7 @@
         <td>
           <div class="flex align-items-center gap-2">
             @if (m.statut === 'alert') {
-              <i class="pi pi-exclamation-circle text-red-500 text-sm" pTooltip="Stock en alerte"></i>
+              <i class="pi pi-exclamation-circle text-red-500 text-sm" [pTooltip]="'materiaux.in_alert' | transloco"></i>
             } @else if (m.archive) {
               <i class="pi pi-lock text-400 text-sm"></i>
             } @else {
@@ -218,7 +218,7 @@
             </span>
             <span class="text-400 text-xs ml-1">/ {{ m.unite }}</span>
           } @else {
-            <span class="text-400 text-sm" pTooltip="Coût non renseigné">—</span>
+            <span class="text-400 text-sm" [pTooltip]="'materiaux.unit_cost' | transloco">—</span>
           }
         </td>
 
@@ -245,22 +245,22 @@
           @if (!m.archive) {
             <div class="flex gap-1 justify-content-end">
               <p-button icon="pi pi-history" severity="secondary" [text]="true"
-                [rounded]="true" size="small" pTooltip="Historique"
+                [rounded]="true" size="small" [pTooltip]="'materiaux.history_tooltip' | transloco"
                 (onClick)="openHistorique(m)" />
               <p-button icon="pi pi-arrow-down" severity="success" [text]="true"
-                [rounded]="true" size="small" pTooltip="Entrée de stock"
+                [rounded]="true" size="small" [pTooltip]="'materiaux.entry_stock_tooltip' | transloco"
                 (onClick)="openEntreeStock(m)" />
               <p-button icon="pi pi-sliders-h" severity="warn" [text]="true"
-                [rounded]="true" size="small" pTooltip="Ajustement"
+                [rounded]="true" size="small" [pTooltip]="'materiaux.adjustment_tooltip' | transloco"
                 (onClick)="openAjustement(m)" />
               <p-button icon="pi pi-arrow-right-arrow-left" severity="secondary" [text]="true"
-                [rounded]="true" size="small" pTooltip="Transfert inter-entrepôts"
+                [rounded]="true" size="small" [pTooltip]="'materiaux.transfer_tooltip' | transloco"
                 (onClick)="openTransfert(m)" />
               <p-button icon="pi pi-pencil" severity="info" [text]="true" [rounded]="true"
-                size="small" pTooltip="Modifier"
+                size="small" [pTooltip]="'materiaux.edit_tooltip' | transloco"
                 (onClick)="openEdit(m)" />
               <p-button icon="pi pi-inbox" severity="danger" [text]="true" [rounded]="true"
-                size="small" pTooltip="Archiver" (onClick)="confirmArchive(m)" />
+                size="small" [pTooltip]="'materiaux.archive_tooltip' | transloco" (onClick)="confirmArchive(m)" />
             </div>
           }
         </td>
@@ -272,7 +272,7 @@
       <tr>
         <td colspan="9" class="text-center py-6 text-400">
           <i class="pi pi-box text-4xl mb-3 block"></i>
-          Aucun matériau ne correspond aux filtres
+          {{ 'materiaux.no_results' | transloco }}
         </td>
       </tr>
     </ng-template>

@@ -1,5 +1,5 @@
 <p-dialog
-  [header]="'Entrée de stock — ' + (materiau?.nom ?? '')"
+  [header]="('entree_stock.title' | transloco) + ' — ' + (materiau?.nom ?? '')"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -13,14 +13,14 @@
       <i class="pi pi-box text-primary text-2xl"></i>
       <div>
         <div class="font-semibold text-900">{{ materiau?.nom }}</div>
-        <div class="text-500 text-sm">Unité : {{ materiau?.unite }}</div>
+        <div class="text-500 text-sm">{{ 'common.unit' | transloco }} : {{ materiau?.unite }}</div>
       </div>
     </div>
 
     <!-- Quantité + Entrepôt (côte à côte) -->
     <div class="grid">
       <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="quantite">Quantité <span class="text-red-500">*</span></label>
+        <label class="font-medium text-900" for="quantite">{{ 'entree_stock.quantity' | transloco }} <span class="text-red-500">*</span></label>
         <p-inputNumber
           inputId="quantite"
           name="quantite"
@@ -36,26 +36,26 @@
       </div>
 
       <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="entrepot">Entrepôt <span class="text-red-500">*</span></label>
+        <label class="font-medium text-900" for="entrepot">{{ 'common.warehouse' | transloco }} <span class="text-red-500">*</span></label>
         <p-select
           inputId="entrepot"
           name="entrepotId"
           [(ngModel)]="form.entrepotId"
           required
           [options]="entrepotOptions"
-          placeholder="Sélectionner..."
+          [placeholder]="'entree_stock.select_warehouse' | transloco"
           [class.ng-invalid]="ngForm.submitted && ngForm.controls['entrepotId']?.invalid"
         />
       </div>
     </div>
 
     <p-divider align="left">
-      <span class="text-500 text-sm font-medium">Informations optionnelles</span>
+      <span class="text-500 text-sm font-medium">{{ 'entree_stock.optional_info' | transloco }}</span>
     </p-divider>
 
     <!-- Coût unitaire -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="cout">Coût unitaire à l'achat</label>
+      <label class="font-medium text-900" for="cout">{{ 'entree_stock.unit_cost' | transloco }}</label>
       <p-inputNumber
         inputId="cout"
         name="coutUnitaire"
@@ -66,39 +66,39 @@
         [minFractionDigits]="2"
         [maxFractionDigits]="4"
         [min]="0"
-        placeholder="Laisser vide pour utiliser le coût par défaut"
+        [placeholder]="'entree_stock.cost_placeholder' | transloco"
       />
     </div>
 
     <!-- Référence + Lot -->
     <div class="grid">
       <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="ref">Référence</label>
+        <label class="font-medium text-900" for="ref">{{ 'common.reference' | transloco }}</label>
         <input
           pInputText
           id="ref"
           name="referenceId"
           [(ngModel)]="form.referenceId"
           maxlength="255"
-          placeholder="N° bon de livraison..."
+          [placeholder]="'entree_stock.reference_placeholder' | transloco"
         />
       </div>
       <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="lot">N° de lot</label>
+        <label class="font-medium text-900" for="lot">{{ 'entree_stock.lot_number' | transloco }}</label>
         <input
           pInputText
           id="lot"
           name="numeroLot"
           [(ngModel)]="form.numeroLot"
           maxlength="100"
-          placeholder="Lot fournisseur..."
+          [placeholder]="'entree_stock.lot_placeholder' | transloco"
         />
       </div>
     </div>
 
     <!-- Date expiration -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="expiration">Date d'expiration</label>
+      <label class="font-medium text-900" for="expiration">{{ 'entree_stock.expiration_date' | transloco }}</label>
       <p-datepicker
         inputId="expiration"
         name="expiresAt"
@@ -106,20 +106,20 @@
         dateFormat="dd/mm/yy"
         [showIcon]="true"
         [minDate]="today"
-        placeholder="JJ/MM/AAAA"
+        [placeholder]="'entree_stock.expiration_placeholder' | transloco"
       />
     </div>
 
     <!-- Notes -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="notes">Notes</label>
+      <label class="font-medium text-900" for="notes">{{ 'common.notes' | transloco }}</label>
       <input
         pInputText
         id="notes"
         name="notes"
         [(ngModel)]="form.notes"
         maxlength="1000"
-        placeholder="Remarques..."
+        [placeholder]="'common.notes_placeholder' | transloco"
       />
     </div>
 
@@ -127,14 +127,14 @@
 
   <ng-template pTemplate="footer">
     <p-button
-      label="Annuler"
+      [label]="'common.cancel' | transloco"
       severity="secondary"
       [text]="true"
       (onClick)="onHide()"
       [disabled]="saving"
     />
     <p-button
-      label="Enregistrer l'entrée"
+      [label]="'entree_stock.save_entry' | transloco"
       icon="pi pi-arrow-down"
       severity="success"
       [loading]="saving"

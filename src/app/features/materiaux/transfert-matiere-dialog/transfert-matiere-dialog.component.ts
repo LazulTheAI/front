@@ -8,6 +8,7 @@ import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 
 import { EntrepotControllerService, EntrepotResponse, MateriauControllerService, MateriauResponse, TransfertStockRequest } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 import { DialogModule } from 'primeng/dialog';
 
 interface SelectOption {
@@ -19,7 +20,7 @@ interface SelectOption {
     selector: 'app-transfert-matiere-dialog',
     templateUrl: './transfert-matiere-dialog.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, Button, DialogModule, Select, InputNumber, Textarea]
+    imports: [CommonModule, FormsModule, TranslocoModule, Button, DialogModule, Select, InputNumber, Textarea]
 })
 export class TransfertMatiereDialogComponent implements OnInit, OnChanges {
     @Input() visible = false;

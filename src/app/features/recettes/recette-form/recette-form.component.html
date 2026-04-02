@@ -23,39 +23,39 @@
 
       <div class="field">
         <label class="font-semibold text-900 block mb-2" for="nom">
-          Nom de la recette <span class="text-red-400">*</span>
+          {{ 'recette_form.nom_recette' | transloco }} <span class="text-red-400">*</span>
         </label>
         <input pInputText id="nom" name="nom" [(ngModel)]="meta.nom"
           required maxlength="255" class="w-full"
-          placeholder="Ex: Bougie Vanille 200g..." />
+          [placeholder]="'recette_form.nom_placeholder' | transloco" />
       </div>
 
       <div class="field">
         <label class="font-semibold text-900 block mb-2">
-          Quantité produite / batch <span class="text-red-400">*</span>
+          {{ 'recette_form.quantite_produite_batch' | transloco }} <span class="text-red-400">*</span>
         </label>
         <div class="flex gap-3">
           <p-inputNumber name="quantiteProduite" [(ngModel)]="meta.quantiteProduite"
             required [min]="0.0001" [minFractionDigits]="0" [maxFractionDigits]="4"
-            placeholder="Ex: 12" styleClass="flex-1" />
+            [placeholder]="'recette_form.quantite_placeholder' | transloco" styleClass="flex-1" />
           <input pInputText name="uniteProduite" [(ngModel)]="meta.uniteProduite"
-            required maxlength="20" placeholder="pièce, kg, L..."
+            required maxlength="20" [placeholder]="'recette_form.unite_placeholder' | transloco"
             style="width: 120px" />
         </div>
-        <small class="text-400">Quantité et unité produites par batch</small>
+        <small class="text-400">{{ 'recette_form.quantite_unite_hint' | transloco }}</small>
       </div>
 
       <div class="field">
-        <label class="font-semibold text-900 block mb-2">Durée de fabrication</label>
+        <label class="font-semibold text-900 block mb-2">{{ 'recette_form.duree_fabrication' | transloco }}</label>
         <p-inputNumber name="dureeFabricationMinutes"
           [(ngModel)]="meta.dureeFabricationMinutes"
-          [min]="1" suffix=" min" placeholder="Durée en minutes..."
+          [min]="1" suffix=" min" [placeholder]="'recette_form.duree_placeholder' | transloco"
           styleClass="w-full" />
-        <small class="text-400">Utilisée pour la planification des runs de production</small>
+        <small class="text-400">{{ 'recette_form.duree_hint' | transloco }}</small>
       </div>
       <div class="field">
         <label class="font-semibold text-900 block mb-2">
-            Co&#251;t variable par batch
+          {{ 'recette_form.cout_variable' | transloco }}
         </label>
         <p-inputNumber
           name="coutVariableParBatch"
@@ -63,21 +63,20 @@
           [min]="0"
           [minFractionDigits]="2"
           [maxFractionDigits]="4"
-          placeholder="Ex : 0.50"
-          suffix=" &#8364;"
+          [placeholder]="'recette_form.cout_variable_placeholder' | transloco"
+          suffix=" €"
           styleClass="w-full"
         />
         <small class="text-400">
-          &#201;nergie, gaz, eau, emballage &#8212; co&#251;ts de transformation
-          sp&#233;cifiques &#224; cette recette.
+          {{ 'recette_form.cout_variable_hint' | transloco }}
         </small>
       </div>
 
       <div class="field">
-        <label class="font-semibold text-900 block mb-2">Notes / Instructions</label>
+        <label class="font-semibold text-900 block mb-2">{{ 'recette_form.notes' | transloco }}</label>
         <textarea pTextarea name="notes" [(ngModel)]="meta.notes"
           [rows]="4" maxlength="5000"
-          placeholder="Instructions de fabrication, précautions, conseils..."
+          [placeholder]="'recette_form.notes_placeholder' | transloco"
           class="w-full"></textarea>
       </div>
 
@@ -104,9 +103,9 @@
         [class.bg-primary]="step >= 2" [class.text-white]="step >= 2"
         [class.bg-200]="step < 2" [class.text-400]="step < 2">3</div>
       <div class="ml-3 text-500 text-sm">
-        @if (step === 0) { Informations générales }
-        @if (step === 1) { Sélection des ingrédients }
-        @if (step === 2) { Quantités par batch }
+        @if (step === 0) { {{ 'recette_form.step_infos_generales' | transloco }} }
+        @if (step === 1) { {{ 'recette_form.step_selection_ingredients' | transloco }} }
+        @if (step === 2) { {{ 'recette_form.step_quantites_batch' | transloco }} }
       </div>
     </div>
 
@@ -116,41 +115,41 @@
 
         <div class="field">
           <label class="font-semibold text-900 block mb-2" for="nom">
-            Nom de la recette <span class="text-red-400">*</span>
+            {{ 'recette_form.nom_recette' | transloco }} <span class="text-red-400">*</span>
           </label>
           <input pInputText id="nom" name="nom" [(ngModel)]="meta.nom"
             required maxlength="255" class="w-full"
-            placeholder="Ex: Bougie Vanille 200g, Pain au levain..." />
+            [placeholder]="'recette_form.nom_placeholder' | transloco" />
         </div>
 
         <div class="field">
           <label class="font-semibold text-900 block mb-2">
-            Production par batch <span class="text-red-400">*</span>
+            {{ 'recette_form.production_batch' | transloco }} <span class="text-red-400">*</span>
           </label>
           <div class="flex gap-3">
             <p-inputNumber name="quantiteProduite" [(ngModel)]="meta.quantiteProduite"
               required [min]="0.0001" [minFractionDigits]="0" [maxFractionDigits]="4"
-              placeholder="Ex: 12" styleClass="flex-1" />
+              [placeholder]="'recette_form.quantite_placeholder' | transloco" styleClass="flex-1" />
             <input pInputText name="uniteProduite" [(ngModel)]="meta.uniteProduite"
-              required maxlength="20" placeholder="pièce, kg, L..."
+              required maxlength="20" [placeholder]="'recette_form.unite_placeholder' | transloco"
               style="width: 120px" />
           </div>
-          <small class="text-400">Quantité produite et son unité par batch de fabrication</small>
+          <small class="text-400">{{ 'recette_form.production_batch_hint' | transloco }}</small>
         </div>
 
         <div class="field">
-          <label class="font-semibold text-900 block mb-2">Durée de fabrication</label>
+          <label class="font-semibold text-900 block mb-2">{{ 'recette_form.duree_fabrication' | transloco }}</label>
           <p-inputNumber name="dureeFabricationMinutes"
             [(ngModel)]="meta.dureeFabricationMinutes"
-            [min]="1" suffix=" min" placeholder="Ex: 120 min" styleClass="w-full" />
-          <small class="text-400">Utilisée pour la planification des runs de production</small>
+            [min]="1" suffix=" min" [placeholder]="'recette_form.duree_ex_placeholder' | transloco" styleClass="w-full" />
+          <small class="text-400">{{ 'recette_form.duree_hint' | transloco }}</small>
         </div>
 
         <div class="field">
-          <label class="font-semibold text-900 block mb-2">Notes / Instructions</label>
+          <label class="font-semibold text-900 block mb-2">{{ 'recette_form.notes' | transloco }}</label>
           <textarea pTextarea name="notes" [(ngModel)]="meta.notes"
             [rows]="3" maxlength="5000"
-            placeholder="Instructions de fabrication, précautions..."
+            [placeholder]="'recette_form.notes_placeholder_court' | transloco"
             class="w-full"></textarea>
         </div>
 
@@ -162,13 +161,13 @@
       <p-pick-list
         [source]="materiauxSource"
         [target]="materiauxTarget"
-        sourceHeader="Matériaux disponibles"
-        targetHeader="Ingrédients sélectionnés"
+        [sourceHeader]="'recette_form.materiaux_disponibles' | transloco"
+        [targetHeader]="'recette_form.ingredients_selectionnes' | transloco"
         [showSourceControls]="false"
         [showTargetControls]="false"
         filterBy="nom"
-        sourceFilterPlaceholder="Rechercher..."
-        targetFilterPlaceholder="Rechercher..."
+        [sourceFilterPlaceholder]="'common.rechercher' | transloco"
+        [targetFilterPlaceholder]="'common.rechercher' | transloco"
         (onMoveToSource)="onMoveToSource($event)"
         (onMoveAllToTarget)="onMoveAllToTarget($event)"
         (onMoveAllToSource)="onMoveAllToSource($event)"
@@ -180,7 +179,7 @@
             <div class="flex align-items-center gap-2">
               @if (item.enAlerte) {
                 <i class="pi pi-exclamation-circle text-orange-500 text-xs"
-                  pTooltip="En alerte stock"></i>
+                  [pTooltip]="'recette_form.en_alerte_stock' | transloco"></i>
               }
               <span class="font-medium text-900 text-sm">{{ item.nom }}</span>
             </div>
@@ -199,7 +198,7 @@
       @if (materiauxTarget.length > 0) {
         <div class="mt-3 flex align-items-center gap-2 text-sm text-500">
           <i class="pi pi-check-circle text-green-500"></i>
-          {{ materiauxTarget.length }} ingrédient(s) sélectionné(s)
+          {{ materiauxTarget.length }} {{ 'recette_form.ingredient_s_selectionne_s' | transloco }}
         </div>
       }
     }
@@ -212,7 +211,7 @@
           <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-2">
             <i class="pi pi-exclamation-triangle text-orange-500"></i>
             <span class="text-sm text-orange-800">
-              Renseignez la quantité de chaque ingrédient avant de créer la recette.
+              {{ 'recette_form.renseigner_quantites_avant_creation' | transloco }}
             </span>
           </div>
         }
@@ -251,14 +250,14 @@
                   <div class="surface-50 border-round p-3 flex align-items-center gap-3">
                     <i class="pi pi-box text-primary"></i>
                     <div>
-                      <div class="text-400 text-xs mb-1">Stock disponible</div>
+                      <div class="text-400 text-xs mb-1">{{ 'recette_form.stock_disponible' | transloco }}</div>
                       <div class="font-semibold text-900">
                         {{ ing.stockTotal | number:'1.0-2' }} {{ ing.unite }}
                       </div>
                     </div>
                     @if (ing.coutUnitaire) {
                       <div class="ml-4">
-                        <div class="text-400 text-xs mb-1">Coût unitaire</div>
+                        <div class="text-400 text-xs mb-1">{{ 'recette_form.cout_unitaire' | transloco }}</div>
                         <div class="font-semibold text-900">
                           {{ ing.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }} / {{ ing.unite }}
                         </div>
@@ -268,27 +267,27 @@
 
                   <div class="field">
                     <label class="font-semibold text-900 block mb-2">
-                      Quantité nécessaire / batch <span class="text-red-400">*</span>
+                      {{ 'recette_form.quantite_necessaire_batch' | transloco }} <span class="text-red-400">*</span>
                     </label>
                     <p-inputNumber [(ngModel)]="ing.quantite"
                       [ngModelOptions]="{ standalone: true }"
                       [min]="0.0001" [minFractionDigits]="0" [maxFractionDigits]="4"
-                      placeholder="Ex: 0.250" styleClass="w-full" />
+                      [placeholder]="'recette_form.quantite_ex_placeholder' | transloco" styleClass="w-full" />
                     @if (ing.coutUnitaire && ing.quantite) {
                       <small class="text-primary">
-                        Coût estimé : {{ (ing.coutUnitaire * ing.quantite) | currency:'EUR':'symbol':'1.2-4' }} / batch
+                        {{ 'recette_form.cout_estime' | transloco }} {{ (ing.coutUnitaire * ing.quantite) | currency:'EUR':'symbol':'1.2-4' }} / batch
                       </small>
                     }
                   </div>
 
                   <div class="field">
-                    <label class="font-semibold text-900 block mb-2">Unité</label>
+                    <label class="font-semibold text-900 block mb-2">{{ 'recette_form.unite' | transloco }}</label>
                     <input pInputText [(ngModel)]="ing.uniteOverride"
                       [ngModelOptions]="{ standalone: true }"
                       maxlength="20" class="w-full"
                       [placeholder]="'Par défaut : ' + ing.unite" />
                     <small class="text-400">
-                      Modifiez si l'unité dans la recette diffère de l'unité de stock ({{ ing.unite }})
+                      {{ 'recette_form.unite_hint' | transloco }} ({{ ing.unite }})
                     </small>
                   </div>
 
@@ -303,7 +302,7 @@
           <div class="mt-3 p-3 bg-primary-50 border-round flex align-items-center justify-content-between">
             <div class="flex align-items-center gap-2 text-primary-700">
               <i class="pi pi-calculator"></i>
-              <span class="font-medium text-sm">Coût théorique estimé / batch</span>
+              <span class="font-medium text-sm">{{ 'recette_form.cout_theorique_estime_batch' | transloco }}</span>
             </div>
             <span class="font-bold text-primary text-lg">
               {{ coutTheoriqueTotal | currency:'EUR':'symbol':'1.2-2' }}
@@ -319,26 +318,26 @@
   <!-- ═══ FOOTER UNIQUE ═══ -->
   <ng-template pTemplate="footer">
     @if (isEdit) {
-      <p-button label="Annuler" severity="secondary" [text]="true"
+      <p-button [label]="'common.annuler' | transloco" severity="secondary" [text]="true"
         (onClick)="onHide()" [disabled]="saving" />
-      <p-button label="Enregistrer" icon="pi pi-check"
+      <p-button [label]="'common.enregistrer' | transloco" icon="pi pi-check"
         [loading]="saving" (onClick)="submit(ngForm)" />
     }
     @if (!isEdit && step === 0) {
-      <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" />
-      <p-button label="Suivant" icon="pi pi-arrow-right" iconPos="right"
+      <p-button [label]="'common.annuler' | transloco" severity="secondary" [text]="true" (onClick)="onHide()" />
+      <p-button [label]="'common.suivant' | transloco" icon="pi pi-arrow-right" iconPos="right"
         (onClick)="submitStep0()" />
     }
     @if (!isEdit && step === 1) {
-      <p-button label="Précédent" icon="pi pi-arrow-left" severity="secondary"
+      <p-button [label]="'common.precedent' | transloco" icon="pi pi-arrow-left" severity="secondary"
         [text]="true" (onClick)="step = 0" />
-      <p-button label="Suivant" icon="pi pi-arrow-right" iconPos="right"
+      <p-button [label]="'common.suivant' | transloco" icon="pi pi-arrow-right" iconPos="right"
         [disabled]="materiauxTarget.length === 0" (onClick)="goToQuantites()" />
     }
     @if (!isEdit && step === 2) {
-      <p-button label="Précédent" icon="pi pi-arrow-left" severity="secondary"
+      <p-button [label]="'common.precedent' | transloco" icon="pi pi-arrow-left" severity="secondary"
         [text]="true" (onClick)="step = 1" [disabled]="saving" />
-      <p-button label="Créer la recette" icon="pi pi-check"
+      <p-button [label]="'recette_form.creer_recette' | transloco" icon="pi pi-check"
         [loading]="saving" [disabled]="!ingredientsValides" (onClick)="submitCreate()" />
     }
   </ng-template>

@@ -1,5 +1,5 @@
 <p-dialog
-  header="Nouveau bon de commande"
+  [header]="'bon_form.titre' | transloco"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -12,7 +12,7 @@
     <div class="flex gap-3">
       <div class="flex flex-column gap-2" style="flex:1">
         <label class="font-medium text-900" for="fourn">
-          Fournisseur <span class="text-red-500">*</span>
+          {{ 'bon_form.fournisseur' | transloco }} <span class="text-red-500">*</span>
         </label>
         <p-select
           inputId="fourn" name="fournisseurId"
@@ -20,14 +20,14 @@
           required
           [options]="fournisseurOptions"
           optionLabel="label" optionValue="value"
-          placeholder="S&#233;lectionner un fournisseur..."
+          [placeholder]="'bon_form.selectionner_fournisseur' | transloco"
           [filter]="true"
           appendTo="body"
           [style]="{'width':'100%'}"
         />
       </div>
       <div class="flex flex-column gap-2" style="flex:1">
-        <label class="font-medium text-900" for="ref">Num&#233;ro de r&#233;f&#233;rence</label>
+        <label class="font-medium text-900" for="ref">{{ 'bon_form.numero_reference' | transloco }}</label>
         <input
           pInputText id="ref" name="numeroReference"
           [(ngModel)]="form.numeroReference"
@@ -40,7 +40,7 @@
 
     <div class="flex gap-3">
       <div class="flex flex-column gap-2" style="flex:1">
-        <label class="font-medium text-900" for="dateCom">Date de commande</label>
+        <label class="font-medium text-900" for="dateCom">{{ 'bon_form.date_commande' | transloco }}</label>
         <p-datepicker
           inputId="dateCom" name="dateCommande"
           [(ngModel)]="form.dateCommande"
@@ -51,14 +51,14 @@
         />
       </div>
       <div class="flex flex-column gap-2" style="flex:1">
-        <label class="font-medium text-900" for="dateLiv">Livraison pr&#233;vue</label>
+        <label class="font-medium text-900" for="dateLiv">{{ 'bon_form.livraison_prevue' | transloco }}</label>
         <p-datepicker
           inputId="dateLiv" name="dateLivraisonPrevue"
           [(ngModel)]="form.dateLivraisonPrevue"
           dateFormat="dd/mm/yy"
           [showIcon]="true"
           [showButtonBar]="true"
-          placeholder="Optionnel..."
+          [placeholder]="'bon_form.optionnel' | transloco"
           appendTo="body"
           [style]="{'width':'100%'}"
         />
@@ -67,7 +67,7 @@
 
     <p-divider align="left">
       <div class="flex align-items-center gap-2">
-        <span class="font-medium text-900">Lignes de commande</span>
+        <span class="font-medium text-900">{{ 'bon_form.lignes_commande' | transloco }}</span>
         @if (lignes.length > 0) {
           <p-tag [value]="lignes.length + ' ligne(s)'" severity="secondary" />
         }
@@ -78,7 +78,7 @@
     @if (lignes.length === 0) {
       <div class="surface-50 border-round p-4 text-center text-400">
         <i class="pi pi-list text-2xl mb-2 block"></i>
-        Aucune ligne. Cliquez sur "Ajouter" pour commencer.
+        {{ 'bon_form.aucune_ligne' | transloco }}
       </div>
     }
 
@@ -88,9 +88,9 @@
         <!-- Labels uniquement sur la première ligne -->
         @if (i === 0) {
           <div style="display:grid; grid-template-columns: minmax(0,2fr) 140px 160px 36px; gap:8px; margin-bottom:4px;">
-            <label class="text-xs text-500">MAT&#201;RIAU</label>
-            <label class="text-xs text-500">QUANTIT&#201;</label>
-            <label class="text-xs text-500">PRIX UNITAIRE</label>
+            <label class="text-xs text-500">{{ 'bon_form.col_materiau' | transloco }}</label>
+            <label class="text-xs text-500">{{ 'bon_form.col_quantite' | transloco }}</label>
+            <label class="text-xs text-500">{{ 'bon_form.col_prix_unitaire' | transloco }}</label>
             <span></span>
           </div>
         }
@@ -103,7 +103,7 @@
             [(ngModel)]="ligne.materiauId"
             [options]="materiauOptions"
             optionLabel="label" optionValue="value"
-            placeholder="Mat&#233;riau..."
+            [placeholder]="'bon_form.materiau_placeholder' | transloco"
             [filter]="true"
             appendTo="body"
             (onChange)="onMateriauChange(i, $event.value)"
@@ -152,7 +152,7 @@
         <!-- Total ligne -->
         @if (ligne.prixUnitaireCents && ligne.quantiteCommandee) {
           <div class="text-right text-xs text-500 mt-2">
-            Sous-total :
+            {{ 'bon_form.sous_total' | transloco }} :
             <span class="font-semibold text-900">
               {{ (ligne.prixUnitaireCents * ligne.quantiteCommandee) | currency:'EUR':'symbol':'1.2-2' }}
             </span>
@@ -163,7 +163,7 @@
     }
 
     <p-button
-      label="Ajouter une ligne"
+      [label]="'bon_form.ajouter_ligne' | transloco"
       icon="pi pi-plus"
       severity="secondary"
       size="small"
@@ -175,7 +175,7 @@
     @if (lignes.length > 0 && totalEstime > 0) {
       <div class="flex justify-content-end">
         <div class="surface-100 border-round px-4 py-2 flex align-items-center gap-3">
-          <span class="text-500 text-sm">Total estim&#233; :</span>
+          <span class="text-500 text-sm">{{ 'bon_form.total_estime' | transloco }} :</span>
           <span class="font-bold text-900 text-lg">{{ totalEstime | currency:'EUR':'symbol':'1.2-2' }}</span>
         </div>
       </div>
@@ -183,11 +183,11 @@
 
     <!-- Notes -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="notes">Notes</label>
+      <label class="font-medium text-900" for="notes">{{ 'bon_form.notes' | transloco }}</label>
       <textarea
         pTextarea id="notes" name="notes"
         [(ngModel)]="form.notes"
-        [rows]="2" placeholder="Instructions de livraison, remarques..."
+        [rows]="2" [placeholder]="'bon_form.notes_placeholder' | transloco"
         class="w-full"
       ></textarea>
     </div>
@@ -195,10 +195,10 @@
   </form>
 
   <ng-template pTemplate="footer">
-    <p-button label="Annuler" severity="secondary" [text]="true"
+    <p-button [label]="'common.annuler' | transloco" severity="secondary" [text]="true"
       (onClick)="onHide()" [disabled]="saving" />
     <p-button
-      label="Cr&#233;er le bon"
+      [label]="'bon_form.creer_bon' | transloco"
       icon="pi pi-check"
       [loading]="saving"
       [disabled]="lignes.length === 0"

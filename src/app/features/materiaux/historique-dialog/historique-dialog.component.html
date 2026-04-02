@@ -1,5 +1,5 @@
 <p-dialog
-  [header]="'Historique — ' + (materiau?.nom ?? '')"
+  [header]="('historique.title' | transloco) + ' — ' + (materiau?.nom ?? '')"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -10,12 +10,12 @@
   <!-- Filtres -->
   <div class="flex align-items-center gap-3 mb-4 flex-wrap">
     <div class="flex align-items-center gap-2">
-      <label class="text-sm text-500 white-space-nowrap">Du</label>
+      <label class="text-sm text-500 white-space-nowrap">{{ 'historique.from' | transloco }}</label>
       <p-datepicker
         [(ngModel)]="filtreDepuis"
         dateFormat="dd/mm/yy"
         [showIcon]="true"
-        placeholder="Depuis..."
+        [placeholder]="'historique.from_placeholder' | transloco"
         (onSelect)="loadHistorique()"
         (onClearClick)="loadHistorique()"
         [showButtonBar]="true"
@@ -23,12 +23,12 @@
       />
     </div>
     <div class="flex align-items-center gap-2">
-      <label class="text-sm text-500 white-space-nowrap">Au</label>
+      <label class="text-sm text-500 white-space-nowrap">{{ 'historique.to' | transloco }}</label>
       <p-datepicker
         [(ngModel)]="filtreJusqu"
         dateFormat="dd/mm/yy"
         [showIcon]="true"
-        placeholder="Jusqu'à..."
+        [placeholder]="'historique.to_placeholder' | transloco"
         (onSelect)="loadHistorique()"
         (onClearClick)="loadHistorique()"
         [showButtonBar]="true"
@@ -38,7 +38,7 @@
     <p-select
       [(ngModel)]="filtreEntrepotId"
       [options]="entrepotOptions"
-      placeholder="Tous les entrepôts"
+      [placeholder]="'historique.all_warehouses' | transloco"
       (onChange)="loadHistorique()"
       styleClass="w-12rem"
     />
@@ -46,7 +46,7 @@
       icon="pi pi-refresh"
       severity="secondary"
       [text]="true"
-      pTooltip="Rafraîchir"
+      [pTooltip]="'alerte.refresh' | transloco"
       (onClick)="loadHistorique()"
     />
   </div>
@@ -65,14 +65,14 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 160px">Date</th>
-        <th style="width: 130px">Type</th>
-        <th style="width: 110px" class="text-right">Quantité</th>
-        <th style="width: 110px" class="text-right">Restant</th>
-        <th style="width: 100px" class="text-right">Coût unit.</th>
-        <th>Référence</th>
-        <th style="width: 90px">Lot</th>
-        <th style="width: 100px">Expiration</th>
+        <th style="width: 160px">{{ 'historique.date' | transloco }}</th>
+        <th style="width: 130px">{{ 'historique.type' | transloco }}</th>
+        <th style="width: 110px" class="text-right">{{ 'historique.quantity' | transloco }}</th>
+        <th style="width: 110px" class="text-right">{{ 'historique.remaining' | transloco }}</th>
+        <th style="width: 100px" class="text-right">{{ 'historique.cost_unit' | transloco }}</th>
+        <th>{{ 'common.reference' | transloco }}</th>
+        <th style="width: 90px">{{ 'historique.lot' | transloco }}</th>
+        <th style="width: 100px">{{ 'historique.expiration' | transloco }}</th>
       </tr>
     </ng-template>
 
@@ -142,21 +142,21 @@
       <tr>
         <td colspan="8" class="text-center py-5 text-400">
           <i class="pi pi-history text-3xl mb-2 block"></i>
-          Aucun mouvement trouvé
+          {{ 'historique.no_movements' | transloco }}
         </td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="summary">
       <div class="flex justify-content-end">
-        <span class="text-500 text-sm">{{ mouvements.length }} mouvement(s)</span>
+        <span class="text-500 text-sm">{{ mouvements.length }} {{ 'historique.movements_count' | transloco }}</span>
       </div>
     </ng-template>
   </p-table>
 
   <ng-template pTemplate="footer">
     <p-button
-      label="Fermer"
+      [label]="'common.close' | transloco"
       severity="secondary"
       [text]="true"
       (onClick)="onHide()"

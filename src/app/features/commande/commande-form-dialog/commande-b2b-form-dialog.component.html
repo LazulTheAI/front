@@ -1,5 +1,5 @@
 <p-dialog
-  header="Nouvelle commande B2B"
+  [header]="'commande_form.titre' | transloco"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -13,21 +13,21 @@
     <!-- ── Revendeur + date ─────────────────────────────────── -->
     <div class="grid">
       <div class="col-6 flex flex-column gap-1">
-        <label class="text-sm font-medium text-700">Revendeur <span class="text-red-400">*</span></label>
+        <label class="text-sm font-medium text-700">{{ 'commande_form.revendeur' | transloco }} <span class="text-red-400">*</span></label>
         <p-select
           name="revendeurId"
           [(ngModel)]="form.revendeurId"
           [options]="revendeurOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="Sélectionner..."
+          [placeholder]="'common.selectionner' | transloco"
           [filter]="true"
           (onChange)="onRevendeurChange()"
           class="w-full"
         />
       </div>
       <div class="col-6 flex flex-column gap-1">
-        <label class="text-sm font-medium text-700">Livraison souhaitée</label>
+        <label class="text-sm font-medium text-700">{{ 'commande_form.livraison_souhaitee' | transloco }}</label>
         <p-datepicker
           name="dateLivraison"
           [(ngModel)]="form.dateLivraisonSouhaitee"
@@ -42,18 +42,18 @@
     <!-- ── Remise + notes ───────────────────────────────────── -->
     <div class="grid">
       <div class="col-4 flex flex-column gap-1">
-        <label class="text-sm font-medium text-700">Remise globale (%)</label>
+        <label class="text-sm font-medium text-700">{{ 'commande_form.remise_globale' | transloco }}</label>
         <p-inputNumber name="remise" [(ngModel)]="form.remise"
           [min]="0" [max]="100" [minFractionDigits]="0" [maxFractionDigits]="2"
           suffix="%" placeholder="0" styleClass="w-full" />
         @if (selectedRevendeur?.remiseGlobale) {
-          <small class="text-400">Défaut revendeur : {{ selectedRevendeur!.remiseGlobale }}%</small>
+          <small class="text-400">{{ 'commande_form.defaut_revendeur' | transloco }} {{ selectedRevendeur!.remiseGlobale }}%</small>
         }
       </div>
       <div class="col-8 flex flex-column gap-1">
-        <label class="text-sm font-medium text-700">Notes</label>
+        <label class="text-sm font-medium text-700">{{ 'commande_form.notes' | transloco }}</label>
         <input pInputText name="notes" [(ngModel)]="form.notes"
-          placeholder="Instructions de livraison..." class="w-full" />
+          [placeholder]="'commande_form.notes_placeholder' | transloco" class="w-full" />
       </div>
     </div>
 
@@ -62,9 +62,9 @@
     <!-- ── Lignes ────────────────────────────────────────────── -->
     <div class="flex align-items-center justify-content-between mb-2">
       <span class="font-semibold text-900">
-        Lignes <span class="text-400 font-normal text-sm">({{ lignes.length }})</span>
+        {{ 'commande_form.lignes' | transloco }} <span class="text-400 font-normal text-sm">({{ lignes.length }})</span>
       </span>
-      <p-button label="Ajouter un produit" icon="pi pi-plus"
+      <p-button [label]="'commande_form.ajouter_produit' | transloco" icon="pi pi-plus"
         severity="secondary" size="small" [outlined]="true"
         (onClick)="ajouterLigne()" />
     </div>
@@ -72,7 +72,7 @@
     @if (lignes.length === 0) {
       <div class="text-center py-4 text-400 border-1 surface-border border-round border-dashed">
         <i class="pi pi-shopping-cart text-2xl block mb-2 opacity-30"></i>
-        Aucun produit — cliquez sur "Ajouter un produit"
+        {{ 'commande_form.aucun_produit' | transloco }}
       </div>
     }
 
@@ -82,13 +82,13 @@
 
       <!-- Produit -->
       <div style="display:flex; flex-direction:column; gap:4px; min-width:0; overflow:hidden;">
-        <label style="font-size:11px; color:#888;">Produit</label>
+        <label style="font-size:11px; color:#888;">{{ 'commande_form.col_produit' | transloco }}</label>
         <p-select
           [(ngModel)]="ligne.produitId"
           [options]="produitOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="S&#233;lectionner..."
+          [placeholder]="'common.selectionner' | transloco"
           [filter]="true"
           appendTo="body"
           (onChange)="onProduitChange(ligne)"
@@ -98,7 +98,7 @@
 
       <!-- Quantité -->
       <div style="display:flex; flex-direction:column; gap:4px;">
-        <label style="font-size:11px; color:#888;">Qt&#233;</label>
+        <label style="font-size:11px; color:#888;">{{ 'commande_form.col_qte' | transloco }}</label>
         <p-inputNumber [(ngModel)]="ligne.quantite"
           mode="decimal"
           [min]="0.01" [minFractionDigits]="0" [maxFractionDigits]="4"
@@ -107,7 +107,7 @@
 
       <!-- Prix unitaire -->
       <div style="display:flex; flex-direction:column; gap:4px;">
-        <label style="font-size:11px; color:#888;">Prix HT (cts)</label>
+        <label style="font-size:11px; color:#888;">{{ 'commande_form.col_prix_ht' | transloco }}</label>
         <p-inputNumber [(ngModel)]="ligne.prixUnitaireCents"
           mode="decimal"
           [min]="0" [maxFractionDigits]="0"
@@ -117,7 +117,7 @@
 
       <!-- Remise -->
       <div style="display:flex; flex-direction:column; gap:4px;">
-        <label style="font-size:11px; color:#888;">Remise</label>
+        <label style="font-size:11px; color:#888;">{{ 'commande_form.col_remise' | transloco }}</label>
         <p-inputNumber [(ngModel)]="ligne.remise"
           mode="decimal"
           [min]="0" [max]="100" [maxFractionDigits]="2"
@@ -136,7 +136,7 @@
 
     @if (ligne.prixUnitaireCents && ligne.quantite) {
       <div class="text-right text-xs text-500 mt-2">
-        Sous-total :
+        {{ 'commande_form.sous_total' | transloco }} :
         <span class="font-semibold text-900">
           {{ ((ligne.prixUnitaireCents / 100) * ligne.quantite *
             (ligne.remise ? (1 - ligne.remise / 100) : 1))
@@ -152,18 +152,18 @@
       <div class="flex justify-content-end">
         <div class="surface-100 border-round px-4 py-2 flex flex-column gap-1" style="min-width:220px">
           <div class="flex justify-content-between text-sm text-500">
-            <span>Sous-total</span>
+            <span>{{ 'commande_form.sous_total' | transloco }}</span>
             <span>{{ sousTotal | currency:'EUR':'symbol':'1.2-2' }}</span>
           </div>
           @if (form.remise) {
             <div class="flex justify-content-between text-sm text-orange-500">
-              <span>Remise globale ({{ form.remise }}%)</span>
+              <span>{{ 'commande_form.remise_globale' | transloco }} ({{ form.remise }}%)</span>
               <span>- {{ sousTotal * form.remise / 100 | currency:'EUR':'symbol':'1.2-2' }}</span>
             </div>
           }
           <p-divider styleClass="my-1" />
           <div class="flex justify-content-between">
-            <span class="font-semibold text-900">Total HT</span>
+            <span class="font-semibold text-900">{{ 'commande_form.total_ht' | transloco }}</span>
             <span class="font-bold text-xl text-primary">{{ totalHT | currency:'EUR':'symbol':'1.2-2' }}</span>
           </div>
         </div>
@@ -174,9 +174,9 @@
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2">
-      <p-button label="Annuler" severity="secondary" [outlined]="true"
+      <p-button [label]="'common.annuler' | transloco" severity="secondary" [outlined]="true"
         (onClick)="onHide()" [disabled]="saving" />
-      <p-button label="Créer la commande" icon="pi pi-check"
+      <p-button [label]="'commande_form.creer_commande' | transloco" icon="pi pi-check"
         [loading]="saving" [disabled]="!isFormValid()"
         (onClick)="submit()" />
     </div>

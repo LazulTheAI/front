@@ -27,21 +27,21 @@
             styleClass="text-sm"
           />
           @if (bon.numeroReference) {
-            <span class="text-500 font-mono text-sm">Réf: {{ bon.numeroReference }}</span>
+            <span class="text-500 font-mono text-sm">{{ 'bon_detail.ref' | transloco }}: {{ bon.numeroReference }}</span>
           }
         </div>
         <div class="flex gap-4 text-sm text-500">
           <span><i class="pi pi-building mr-1"></i>{{ bon.fournisseurNom }}</span>
           @if (bon.dateCommande) {
-            <span><i class="pi pi-calendar mr-1"></i>Commandé le {{ bon.dateCommande | date:'dd/MM/yyyy' }}</span>
+            <span><i class="pi pi-calendar mr-1"></i>{{ 'bon_detail.commande_le' | transloco }} {{ bon.dateCommande | date:'dd/MM/yyyy' }}</span>
           }
           @if (bon.dateLivraisonPrevue) {
-            <span><i class="pi pi-truck mr-1"></i>Livraison prévue {{ bon.dateLivraisonPrevue | date:'dd/MM/yyyy' }}</span>
+            <span><i class="pi pi-truck mr-1"></i>{{ 'bon_detail.livraison_prevue' | transloco }} {{ bon.dateLivraisonPrevue | date:'dd/MM/yyyy' }}</span>
           }
         </div>
       </div>
       <div class="text-right">
-        <div class="text-400 text-xs mb-1">TOTAL</div>
+        <div class="text-400 text-xs mb-1">{{ 'bon_detail.total' | transloco }}</div>
         <div class="font-bold text-xl text-900">{{ getTotalBC() | currency:'EUR':'symbol':'1.2-2' }}</div>
       </div>
     </div>
@@ -53,13 +53,13 @@
       <p-table [value]="bon.lignes ?? []" styleClass="p-datatable-sm">
         <ng-template pTemplate="header">
           <tr>
-            <th>Matériau</th>
-            <th style="width: 120px" class="text-right">Commandé</th>
-            <th style="width: 120px" class="text-right">Reçu</th>
-            <th style="width: 130px">Progression</th>
-            <th style="width: 120px" class="text-right">Prix unit.</th>
-            <th style="width: 120px" class="text-right">Total ligne</th>
-            <th style="width: 100px">Statut</th>
+            <th>{{ 'bon_detail.col_materiau' | transloco }}</th>
+            <th style="width: 120px" class="text-right">{{ 'bon_detail.col_commande' | transloco }}</th>
+            <th style="width: 120px" class="text-right">{{ 'bon_detail.col_recu' | transloco }}</th>
+            <th style="width: 130px">{{ 'bon_detail.col_progression' | transloco }}</th>
+            <th style="width: 120px" class="text-right">{{ 'bon_detail.col_prix_unit' | transloco }}</th>
+            <th style="width: 120px" class="text-right">{{ 'bon_detail.col_total_ligne' | transloco }}</th>
+            <th style="width: 100px">{{ 'bon_detail.col_statut' | transloco }}</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-ligne>
@@ -131,14 +131,14 @@
     @if (modeReception) {
       <div class="flex flex-column gap-3">
         <div class="flex align-items-center justify-content-between">
-          <div class="font-medium text-900">Enregistrer une réception</div>
+          <div class="font-medium text-900">{{ 'bon_detail.enregistrer_reception' | transloco }}</div>
           <div class="flex flex-column gap-1">
-            <label class="text-xs text-500">Entrepôt de destination <span class="text-red-500">*</span></label>
+            <label class="text-xs text-500">{{ 'bon_detail.entrepot_destination' | transloco }} <span class="text-red-500">*</span></label>
             <p-select
               [(ngModel)]="entrepotReceptionId"
               [options]="entrepotOptions"
               optionLabel="label" optionValue="value"
-              placeholder="Sélectionner un entrepôt..."
+              [placeholder]="'bon_detail.selectionner_entrepot' | transloco"
               styleClass="w-14rem"
             />
           </div>
@@ -147,10 +147,10 @@
         <p-table [value]="lignesReception" styleClass="p-datatable-sm">
           <ng-template pTemplate="header">
             <tr>
-              <th>Matériau</th>
-              <th style="width: 120px" class="text-right">Commandé</th>
-              <th style="width: 120px" class="text-right">Déjà reçu</th>
-              <th style="width: 160px">Quantité à recevoir</th>
+              <th>{{ 'bon_detail.col_materiau' | transloco }}</th>
+              <th style="width: 120px" class="text-right">{{ 'bon_detail.col_commande' | transloco }}</th>
+              <th style="width: 120px" class="text-right">{{ 'bon_detail.col_deja_recu' | transloco }}</th>
+              <th style="width: 160px">{{ 'bon_detail.col_qte_recevoir' | transloco }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-ligne let-i="rowIndex">
@@ -158,7 +158,7 @@
               <td>
                 <span class="font-medium text-900">{{ ligne.materiauNom }}</span>
                 @if (ligne.statut === 'PARTIELLEMENT_RECU') {
-                  <p-tag value="Partiel" severity="warn" styleClass="text-xs ml-2" />
+                  <p-tag [value]="'bon_detail.partiel' | transloco" severity="warn" styleClass="text-xs ml-2" />
                 }
               </td>
               <td class="text-right">
@@ -185,7 +185,7 @@
 
         <div class="surface-50 border-round p-3 flex align-items-center gap-2 text-sm text-500">
           <i class="pi pi-info-circle text-primary"></i>
-          Les quantités reçues seront ajoutées au stock de l'entrepôt sélectionné.
+          {{ 'bon_detail.info_reception' | transloco }}
         </div>
       </div>
     }
@@ -199,7 +199,7 @@
       <div class="flex gap-2">
         @if (!modeReception && bon && canEnvoyer()) {
           <p-button
-            label="Marquer comme envoyé"
+            [label]="'bon_detail.marquer_envoye' | transloco"
             icon="pi pi-send"
             severity="info"
             [outlined]="true"
@@ -208,7 +208,7 @@
         }
         @if (!modeReception && bon && canReceptionner()) {
           <p-button
-            label="Réceptionner"
+            [label]="'bon_detail.receptionner' | transloco"
             icon="pi pi-arrow-down"
             severity="success"
             [outlined]="true"
@@ -217,14 +217,14 @@
         }
         @if (modeReception) {
           <p-button
-            label="Annuler"
+            [label]="'common.annuler' | transloco"
             severity="secondary"
             [text]="true"
             (onClick)="cancelReception()"
             [disabled]="savingReception"
           />
           <p-button
-            label="Enregistrer la réception"
+            [label]="'bon_detail.enregistrer_reception' | transloco"
             icon="pi pi-check"
             severity="success"
             [loading]="savingReception"
@@ -236,7 +236,7 @@
 
       <!-- Fermer -->
       @if (!modeReception) {
-        <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
+        <p-button [label]="'common.fermer' | transloco" severity="secondary" [text]="true" (onClick)="onHide()" />
       }
 
     </div>

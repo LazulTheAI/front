@@ -14,6 +14,7 @@ import { Tooltip } from 'primeng/tooltip';
 
 import { CommandeB2BControllerService, CommandeB2BResponse, PdfControllerService, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
 import { HttpClient as NgHttpClient } from '@angular/common/http';
+import { TranslocoModule } from '@jsverse/transloco';
 import { environment } from '../../../../environments/environment';
 import { CommandeB2BDetailDialogComponent } from '../commande-detail-dialog/commande-b2b-detail-dialog.component';
 import { CommandeB2BFormDialogComponent } from '../commande-form-dialog/commande-b2b-form-dialog.component';
@@ -26,7 +27,7 @@ interface SelectOption {
     selector: 'app-commandes-b2b-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, Button, Tooltip, Toast, Toolbar, ConfirmDialog, Select, CommandeB2BFormDialogComponent, CommandeB2BDetailDialogComponent],
+    imports: [CommonModule, TranslocoModule, FormsModule, TableModule, Button, Tooltip, Toast, Toolbar, ConfirmDialog, Select, CommandeB2BFormDialogComponent, CommandeB2BDetailDialogComponent],
     providers: [MessageService, ConfirmationService],
     templateUrl: './commandes-b2b-list.component.html'
 })

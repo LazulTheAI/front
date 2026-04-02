@@ -57,6 +57,7 @@ export class AppMenu {
                 label: 'Configuration',
                 items: [
                     { label: 'Ateliers', icon: 'pi pi-building', routerLink: ['lieux-production'] },
+                    { label: 'Import données', icon: 'pi pi-upload', routerLink: ['import'] },
                     { label: 'Utilisateurs', icon: 'pi pi-users', routerLink: ['utilisateurs'] }
                 ]
             }

@@ -6,8 +6,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-bell text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Alertes stock</h2>
-        <p class="m-0 text-400 text-sm mt-1">Actualis&#233; toutes les 30 secondes</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'alerte.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'alerte.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -18,13 +18,13 @@
         [options]="typeOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Tous les types"
+        [placeholder]="'alerte.filter_types' | transloco"
         [showClear]="true"
         styleClass="w-14rem"
         (onChange)="onFiltreTypeChange()"
       />
       <p-button
-        label="Actualiser"
+        [label]="'alerte.refresh' | transloco"
         icon="pi pi-refresh"
         severity="secondary"
         [text]="true"
@@ -38,7 +38,7 @@
 <div class="grid mb-4">
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Alertes actives</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'alerte.active_alerts' | transloco }}</div>
       <div class="text-3xl font-bold text-red-500">
         {{ (alertes$ | async)?.length ?? 0 }}
       </div>
@@ -46,7 +46,7 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Stock bas</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'alerte.low_stock' | transloco }}</div>
       <div class="text-3xl font-bold text-orange-500">
         {{ (nbStockBas$ | async) ?? 0 }}
       </div>
@@ -54,7 +54,7 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Autres alertes</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'alerte.other_alerts' | transloco }}</div>
       <div class="text-3xl font-bold text-red-700">
         {{ (nbAutres$ | async) ?? 0 }}
       </div>
@@ -76,11 +76,11 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width:150px">Type</th>
-        <th>Message</th>
-        <th style="width:130px">Entrepôt</th>
+        <th style="width:150px">{{ 'alerte.type' | transloco }}</th>
+        <th>{{ 'alerte.message' | transloco }}</th>
+        <th style="width:130px">{{ 'alerte.warehouse' | transloco }}</th>
         <th pSortableColumn="createdAt" style="width:140px">
-          Date <p-sortIcon field="createdAt" />
+          {{ 'alerte.column_date' | transloco }} <p-sortIcon field="createdAt" />
         </th>
         <th style="width:110px"></th>
       </tr>
@@ -115,7 +115,7 @@
 
         <td>
           <p-button
-            label="Acquitter"
+            [label]="'alerte.acknowledge' | transloco"
             icon="pi pi-check"
             severity="success"
             size="small"
@@ -133,7 +133,7 @@
       <tr>
         <td colspan="5" class="text-center py-6 text-400">
           <i class="pi pi-check-circle text-green-500 text-4xl mb-3 block"></i>
-          Aucune alerte active
+          {{ 'alerte.no_alerts' | transloco }}
         </td>
       </tr>
     </ng-template>

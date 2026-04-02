@@ -14,13 +14,14 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { IngredientResponse, ModifierIngredientsRequest, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 import { IngredientLine, IngredientsEditorComponent } from '../ingredients-editor/ingredients-editor.component';
 import { IngredientsEnAlertePipe } from '../recette.pipes';
 
 @Component({
     selector: 'app-recette-detail',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, TabsModule, TableModule, TagModule, DividerModule, ToastModule, TooltipModule, IngredientsEditorComponent, IngredientsEnAlertePipe],
+    imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, ButtonModule, TabsModule, TableModule, TagModule, DividerModule, ToastModule, TooltipModule, IngredientsEditorComponent, IngredientsEnAlertePipe],
     providers: [MessageService, ConfirmationService],
     templateUrl: './recette-detail.component.html'
 })

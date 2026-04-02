@@ -1,9 +1,11 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, LOCALE_ID } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, isDevMode } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
+import { provideTransloco } from '@jsverse/transloco';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
+import { TranslocoHttpLoader } from './app/core/transloco-loader';
 import { appRoutes } from './app.routes';
 import { authInterceptor } from './app/auth/auth.interceptor';
 import { AuthApiService } from './app/auth/services/api/auth.service';
@@ -18,6 +20,15 @@ export const appConfig: ApplicationConfig = {
             provide: LOCALE_ID,
             useFactory: (authService: AuthApiService) => authService.getDefaultLang(),
             deps: [AuthApiService]
-        }
+        },
+        provideTransloco({
+            config: {
+                availableLangs: ['fr', 'en', 'es'],
+                defaultLang: 'fr',
+                reRenderOnLangChange: true,
+                prodMode: !isDevMode()
+            },
+            loader: TranslocoHttpLoader
+        })
     ]
 };

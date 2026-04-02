@@ -4,7 +4,12 @@
       "Bash(find c:Usersborisprojriche-front -name *manque*response* -type f)",
       "Bash(python3 -c \":*)",
       "Bash(find c:Usersborisprojriche-frontsrcappmodulesopenapi -name *request* -o -name *Request*)",
-      "Bash(grep -r coutTheorique c:Usersborisprojriche-frontsrc --include=*.ts)"
+      "Bash(grep -r coutTheorique c:Usersborisprojriche-frontsrc --include=*.ts)",
+      "Bash(grep -r \"i18n\\\\|i18nPlural\\\\|i18nSelect\\\\|\\\\| translate\\\\|\\\\.xlf\" c:/Users/boris/proj/riche-front/src/app --include=*.html --include=*.ts)",
+      "Bash(find c:/Users/boris/proj/riche-front/src -name app.config* -o -name main.ts)",
+      "Bash(npm install:*)",
+      "Bash(mkdir -p c:/Users/boris/proj/riche-front/src/assets/i18n)",
+      "Bash(mkdir -p c:/Users/boris/proj/riche-front/src/app/core)"
     ]
   }
 }

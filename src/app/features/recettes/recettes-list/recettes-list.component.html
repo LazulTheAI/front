@@ -6,17 +6,17 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-book text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Recettes</h2>
-        <p class="m-0 text-400 text-sm mt-1">Formules de fabrication et co&#251;ts th&#233;oriques</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'recettes.titre' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'recettes.sous_titre' | transloco }}</p>
       </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-2">
-      <label class="text-500 text-sm">Inclure archives</label>
+      <label class="text-500 text-sm">{{ 'recettes.inclure_archives' | transloco }}</label>
       <p-toggleswitch [(ngModel)]="inclureArchives" (onChange)="loadRecettes()" />
       <p-button
-        label="Nouvelle recette"
+        [label]="'recettes.nouvelle_recette' | transloco"
         icon="pi pi-plus"
         (onClick)="navigateToCreate()"
       />
@@ -28,7 +28,7 @@
   <div class="surface-card border-round border-left-3 border-orange-500 p-3 mb-4 flex align-items-center gap-3">
     <i class="pi pi-exclamation-triangle text-orange-500 text-xl"></i>
     <span class="text-900 font-medium">
-      {{ recettesEnAlerte.length }} recette(s) ont des ingrédients en alerte de stock
+      {{ recettesEnAlerte.length }} {{ 'recettes.alerte_ingredients' | transloco }}
     </span>
   </div>
 }
@@ -50,18 +50,18 @@
     <ng-template pTemplate="header">
       <tr>
         <th pSortableColumn="nom" style="min-width:220px">
-          Nom <p-sortIcon field="nom" />
+          {{ 'recettes.col_nom' | transloco }} <p-sortIcon field="nom" />
         </th>
-        <th style="width:160px">Production</th>
-        <th style="width:110px">Durée</th>
-        <th style="width:120px">Ingrédients</th>
+        <th style="width:160px">{{ 'recettes.col_production' | transloco }}</th>
+        <th style="width:110px">{{ 'recettes.col_duree' | transloco }}</th>
+        <th style="width:120px">{{ 'recettes.col_ingredients' | transloco }}</th>
         <th pSortableColumn="coutTheorique" style="width:140px">
-          Coût théorique <p-sortIcon field="coutTheorique" />
+          {{ 'recettes.col_cout_theorique' | transloco }} <p-sortIcon field="coutTheorique" />
         </th>
-        <th style="width:200px">Produits liés</th>
-        <th style="width:100px">Statut</th>
+        <th style="width:200px">{{ 'recettes.col_produits_lies' | transloco }}</th>
+        <th style="width:100px">{{ 'recettes.col_statut' | transloco }}</th>
         <th pSortableColumn="updatedAt" style="width:140px">
-          Modifiée <p-sortIcon field="updatedAt" />
+          {{ 'recettes.col_modifiee' | transloco }} <p-sortIcon field="updatedAt" />
         </th>
         <th style="width:80px"></th>
       </tr>
@@ -74,7 +74,7 @@
           <div class="flex align-items-center gap-2">
             @if (hasAlerte(r)) {
               <i class="pi pi-exclamation-circle text-orange-500"
-                pTooltip="Un ou plusieurs ingrédients en alerte stock"></i>
+                [pTooltip]="'recettes.tooltip_alerte_stock' | transloco"></i>
             } @else if (r.archive) {
               <i class="pi pi-inbox text-400"></i>
             } @else {
@@ -96,7 +96,7 @@
 
         <td>
           <span class="font-semibold">{{ getNbIngredients(r) }}</span>
-          <span class="text-400 text-xs ml-1">ingrédient(s)</span>
+          <span class="text-400 text-xs ml-1">{{ 'recettes.ingredient_s' | transloco }}</span>
         </td>
 
         <td>
@@ -118,7 +118,7 @@
                 <div class="flex align-items-center gap-1">
                   @if (p.estPrincipale) {
                     <i class="pi pi-star-fill text-yellow-400 text-xs"
-                      pTooltip="Recette principale de ce produit"></i>
+                      [pTooltip]="'recettes.tooltip_recette_principale' | transloco"></i>
                   } @else {
                     <i class="pi pi-star text-300 text-xs"></i>
                   }
@@ -132,16 +132,16 @@
           } @else {
             <span class="text-orange-400 text-sm flex align-items-center gap-1">
               <i class="pi pi-exclamation-circle text-xs"></i>
-              Non lié
+              {{ 'recettes.non_lie' | transloco }}
             </span>
           }
         </td>
 
         <td>
           @if (r.archive) {
-            <p-tag value="Archivée" severity="secondary" />
+            <p-tag [value]="'recettes.archivee' | transloco" severity="secondary" />
           } @else {
-            <p-tag value="Active" severity="success" />
+            <p-tag [value]="'recettes.active' | transloco" severity="success" />
           }
         </td>
 
@@ -152,16 +152,16 @@
         <td>
           <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
             <p-button icon="pi pi-eye" severity="secondary" [text]="true" [rounded]="true"
-              size="small" pTooltip="Voir le détail" (onClick)="openDetail(r)" />
+              size="small" [pTooltip]="'recettes.tooltip_voir_detail' | transloco" (onClick)="openDetail(r)" />
             <p-button icon="pi pi-pencil" severity="info" [text]="true" [rounded]="true"
-              size="small" pTooltip="Modifier" [disabled]="r.archive"
+              size="small" [pTooltip]="'recettes.tooltip_modifier' | transloco" [disabled]="r.archive"
               (onClick)="openEdit(r, $event)" />
             <p-button icon="pi pi-link" severity="primary" [text]="true" [rounded]="true"
-              size="small" pTooltip="Lier à un produit" [disabled]="r.archive"
+              size="small" [pTooltip]="'recettes.tooltip_lier_produit' | transloco" [disabled]="r.archive"
               (onClick)="openLierProduit(r, $event)" />
             @if (!r.archive) {
               <p-button icon="pi pi-inbox" severity="danger" [text]="true" [rounded]="true"
-                size="small" pTooltip="Archiver" (onClick)="confirmArchive(r, $event)" />
+                size="small" [pTooltip]="'recettes.tooltip_archiver' | transloco" (onClick)="confirmArchive(r, $event)" />
             }
           </div>
         </td>
@@ -173,7 +173,7 @@
       <tr>
         <td colspan="9" class="text-center py-6 text-400">
           <i class="pi pi-book text-4xl mb-3 block"></i>
-          Aucune recette trouvée
+          {{ 'recettes.aucune_recette' | transloco }}
         </td>
       </tr>
     </ng-template>

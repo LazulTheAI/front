@@ -14,13 +14,14 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { AlerteControllerService, AlerteResponse } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ToolbarModule } from 'primeng/toolbar';
 import { AlerteService } from './alerte.service';
 
 @Component({
     selector: 'app-alertes',
     standalone: true,
-    imports: [CommonModule, ToolbarModule, AsyncPipe, FormsModule, TableModule, ButtonModule, TagModule, ToastModule, TooltipModule, SkeletonModule, ConfirmDialogModule, SelectModule],
+    imports: [CommonModule, TranslocoModule, ToolbarModule, AsyncPipe, FormsModule, TableModule, ButtonModule, TagModule, ToastModule, TooltipModule, SkeletonModule, ConfirmDialogModule, SelectModule],
     providers: [MessageService, ConfirmationService],
     templateUrl: './alertes.component.html'
 })

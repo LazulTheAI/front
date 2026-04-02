@@ -9,6 +9,7 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
 import { CommandeB2BControllerService, CommandeB2BResponse } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { environment } from '../../../../environments/environment';
@@ -16,7 +17,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-commande-b2b-detail-dialog',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, Button, Tag, TableModule, Toast],
+    imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, Button, Tag, TableModule, Toast],
     providers: [MessageService],
     templateUrl: './commande-b2b-detail-dialog.component.html'
 })

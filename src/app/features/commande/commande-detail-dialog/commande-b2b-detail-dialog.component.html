@@ -27,13 +27,13 @@
       <div class="flex gap-2">
         <!-- PDF bon de livraison -->
         @if (['CONFIRMEE','EXPEDIEE','LIVREE'].includes(commande.statut)) {
-          <p-button label="Bon de livraison" icon="pi pi-file-pdf"
+          <p-button [label]="'commande_detail.bon_livraison' | transloco" icon="pi pi-file-pdf"
             severity="secondary" [outlined]="true" size="small"
             (onClick)="downloadBonLivraison()" />
         }
         <!-- PDF facture -->
         @if (commande.statut === 'LIVREE') {
-          <p-button label="Facture" icon="pi pi-receipt"
+          <p-button [label]="'commande_detail.facture' | transloco" icon="pi pi-receipt"
             severity="info" [outlined]="true" size="small"
             (onClick)="downloadFacture()" />
         }
@@ -46,7 +46,7 @@
         }
         <!-- Annuler -->
         @if (canAnnuler(commande.statut)) {
-          <p-button label="Annuler" icon="pi pi-times"
+          <p-button [label]="'commande_detail.annuler' | transloco" icon="pi pi-times"
             severity="danger" [text]="true" size="small"
             [loading]="saving"
             (onClick)="changerStatut('ANNULEE')" />
@@ -58,33 +58,33 @@
     <div class="grid mb-4">
       <div class="col-6">
         <div class="surface-50 border-round border-1 surface-border p-3">
-          <div class="text-400 text-xs font-semibold uppercase mb-2">Revendeur</div>
+          <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'commande_detail.revendeur' | transloco }}</div>
           <div class="font-bold text-900">{{ commande.revendeurNom }}</div>
         </div>
       </div>
       <div class="col-6">
         <div class="surface-50 border-round border-1 surface-border p-3">
-          <div class="text-400 text-xs font-semibold uppercase mb-2">Livraison</div>
+          <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'commande_detail.livraison' | transloco }}</div>
           @if (commande.dateLivraisonSouhaitee) {
             <div class="text-sm">
-              <span class="text-500">Souhaitée : </span>
+              <span class="text-500">{{ 'commande_detail.souhaitee' | transloco }} </span>
               <span class="font-semibold">{{ commande.dateLivraisonSouhaitee | date:'dd/MM/yyyy' }}</span>
             </div>
           }
           @if (commande.dateExpedition) {
             <div class="text-sm mt-1">
-              <span class="text-500">Expédiée : </span>
+              <span class="text-500">{{ 'commande_detail.expediee' | transloco }} </span>
               <span class="font-semibold">{{ commande.dateExpedition | date:'dd/MM/yyyy' }}</span>
             </div>
           }
           @if (commande.dateLivraison) {
             <div class="text-sm mt-1">
-              <span class="text-500">Livrée : </span>
+              <span class="text-500">{{ 'commande_detail.livree' | transloco }} </span>
               <span class="font-semibold text-green-600">{{ commande.dateLivraison | date:'dd/MM/yyyy' }}</span>
             </div>
           }
           @if (!commande.dateLivraisonSouhaitee && !commande.dateExpedition) {
-            <span class="text-400 text-sm">Non renseignée</span>
+            <span class="text-400 text-sm">{{ 'commande_detail.non_renseignee' | transloco }}</span>
           }
         </div>
       </div>
@@ -101,11 +101,11 @@
     <p-table [value]="commande.lignes ?? []" [showGridlines]="true" styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
-          <th>Produit</th>
-          <th style="width:100px" class="text-right">Quantité</th>
-          <th style="width:130px" class="text-right">Prix unit. HT</th>
-          <th style="width:90px" class="text-right">Remise</th>
-          <th style="width:130px" class="text-right">Total HT</th>
+          <th>{{ 'commande_detail.col_produit' | transloco }}</th>
+          <th style="width:100px" class="text-right">{{ 'commande_detail.col_quantite' | transloco }}</th>
+          <th style="width:130px" class="text-right">{{ 'commande_detail.col_prix_unit' | transloco }}</th>
+          <th style="width:90px" class="text-right">{{ 'commande_detail.col_remise' | transloco }}</th>
+          <th style="width:130px" class="text-right">{{ 'commande_detail.col_total_ht' | transloco }}</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-ligne>
@@ -147,12 +147,12 @@
       <div class="surface-100 border-round px-4 py-3">
         @if (commande.remise) {
           <div class="flex justify-content-between gap-4 text-sm text-500 mb-2">
-            <span>Remise globale</span>
+            <span>{{ 'commande_detail.remise_globale' | transloco }}</span>
             <span class="font-semibold">{{ commande.remise }}%</span>
           </div>
         }
         <div class="flex justify-content-between gap-4">
-          <span class="font-semibold text-700">Total HT</span>
+          <span class="font-semibold text-700">{{ 'commande_detail.total_ht' | transloco }}</span>
           <span class="font-bold text-xl text-primary">
             {{ commande.totalHT | currency:'EUR':'symbol':'1.2-2' }}
           </span>
@@ -163,7 +163,7 @@
   }
 
   <ng-template pTemplate="footer">
-    <p-button label="Fermer" severity="secondary" (onClick)="onHide()" />
+    <p-button [label]="'common.fermer' | transloco" severity="secondary" (onClick)="onHide()" />
   </ng-template>
 
 </p-dialog>

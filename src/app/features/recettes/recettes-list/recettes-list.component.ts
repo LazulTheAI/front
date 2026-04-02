@@ -14,6 +14,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { LierProduitRecetteDialogComponent } from '../lier-produit-recette-dialog/lier-produit-recette-dialog.component';
 import { RecetteDetailComponent } from '../recette-detail/recette-detail.component';
@@ -32,6 +33,7 @@ import { RecetteFormComponent } from '../recette-form/recette-form.component';
         TableModule,
         ButtonModule,
         TagModule,
+        TranslocoModule,
         TooltipModule,
         ToastModule,
         ToolbarModule,

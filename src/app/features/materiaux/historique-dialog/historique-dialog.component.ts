@@ -2,6 +2,7 @@ import { EntrepotControllerService, EntrepotResponse, MateriauControllerService,
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -15,7 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 @Component({
     selector: 'app-historique-dialog',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, TableModule, TagModule, SelectModule, DatePickerModule, TooltipModule],
+    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, TranslocoModule, TableModule, TagModule, SelectModule, DatePickerModule, TooltipModule],
     templateUrl: './historique-dialog.component.html'
 })
 export class HistoriqueDialogComponent implements OnChanges {

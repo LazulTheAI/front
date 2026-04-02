@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { CreerRecetteRequest, MateriauControllerService, RecetteControllerService } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -44,7 +45,24 @@ export interface IngredientRow {
 @Component({
     selector: 'app-recette-create',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, InputNumberModule, TextareaModule, PickListModule, AccordionModule, ToastModule, TooltipModule, TagModule, DividerModule, SelectModule, ConfirmDialogModule, ProgressBarModule],
+    imports: [
+        CommonModule,
+        TranslocoModule,
+        FormsModule,
+        ButtonModule,
+        InputTextModule,
+        InputNumberModule,
+        TextareaModule,
+        PickListModule,
+        AccordionModule,
+        ToastModule,
+        TooltipModule,
+        TagModule,
+        DividerModule,
+        SelectModule,
+        ConfirmDialogModule,
+        ProgressBarModule
+    ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './recette-create.component.html'
 })

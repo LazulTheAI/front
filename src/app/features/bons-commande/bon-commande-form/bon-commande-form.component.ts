@@ -14,6 +14,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { BonCommandeControllerService, BonCommandeRequest, FournisseurControllerService, FournisseurResponse, LigneCommandeFournisseurRequest, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 
 interface LigneForm {
     materiauId: number | null;
@@ -28,7 +29,7 @@ interface LigneForm {
     selector: 'app-bon-commande-form',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputTextModule, InputNumberModule, SelectModule, DatePickerModule, TextareaModule, DividerModule, TagModule, TooltipModule],
+    imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, ButtonModule, InputTextModule, InputNumberModule, SelectModule, DatePickerModule, TextareaModule, DividerModule, TagModule, TooltipModule],
     providers: [],
     templateUrl: './bon-commande-form.component.html'
 })

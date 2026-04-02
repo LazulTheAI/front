@@ -7,9 +7,9 @@
   <div class="flex align-items-center gap-3">
     <i class="pi pi-book text-primary text-2xl"></i>
     <div>
-      <h1 class="text-900 font-bold text-xl m-0">Nouvelle recette</h1>
+      <h1 class="text-900 font-bold text-xl m-0">{{ 'recette_create.titre' | transloco }}</h1>
       <p class="text-400 text-sm m-0 mt-1">
-        {{ meta.nom || 'Sans titre' }}
+        {{ meta.nom || ('recette_create.sans_titre' | transloco) }}
       </p>
     </div>
   </div>
@@ -22,17 +22,17 @@
       [options]="recettesExistantes"
       optionLabel="label"
       optionValue="value"
-      placeholder="Dupliquer depuis..."
+      [placeholder]="'recette_create.dupliquer_depuis' | transloco"
       [loading]="loadingRecettes"
       [filter]="true"
-      filterPlaceholder="Rechercher une recette..."
+      [filterPlaceholder]="'recette_create.rechercher_recette' | transloco"
       styleClass="w-16rem"
       appendTo="body"
       (onChange)="onDupliquer()"
     />
 
     <p-button
-      label="Annuler"
+      [label]="'common.annuler' | transloco"
       severity="secondary"
       [text]="true"
       icon="pi pi-times"
@@ -111,29 +111,29 @@
         <div class="flex flex-column gap-4">
           <div>
             <h2 class="text-900 font-semibold text-lg m-0 mb-1">
-              <i class="pi pi-file-edit text-primary mr-2"></i>Informations générales
+              <i class="pi pi-file-edit text-primary mr-2"></i>{{ 'recette_create.infos_generales' | transloco }}
             </h2>
-            <p class="text-400 text-sm m-0">Définissez les informations de base de votre recette.</p>
+            <p class="text-400 text-sm m-0">{{ 'recette_create.infos_generales_desc' | transloco }}</p>
           </div>
 
           <p-divider styleClass="my-0" />
 
           <div class="field">
             <label class="font-semibold text-900 block mb-2" for="nom">
-              Nom de la recette <span class="text-red-400">*</span>
+              {{ 'recette_create.nom_recette' | transloco }} <span class="text-red-400">*</span>
             </label>
             <input
               pInputText id="nom" name="nom"
               [(ngModel)]="meta.nom"
               required maxlength="255"
               class="w-full"
-              placeholder="Ex : Bougie Vanille 200g, Pain au levain..."
+              [placeholder]="'recette_create.nom_placeholder' | transloco"
             />
           </div>
 
           <div class="field">
             <label class="font-semibold text-900 block mb-2">
-              Production par batch <span class="text-red-400">*</span>
+              {{ 'recette_create.production_batch' | transloco }} <span class="text-red-400">*</span>
             </label>
             <div class="flex gap-3">
               <p-inputNumber
@@ -142,7 +142,7 @@
                 [min]="0.0001"
                 [minFractionDigits]="0"
                 [maxFractionDigits]="4"
-                placeholder="Ex : 12"
+                [placeholder]="'recette_create.quantite_placeholder' | transloco"
                 styleClass="flex-1"
               />
               <input
@@ -150,31 +150,31 @@
                 name="uniteProduite"
                 [(ngModel)]="meta.uniteProduite"
                 maxlength="20"
-                placeholder="pièce, kg, L..."
+                [placeholder]="'recette_create.unite_placeholder' | transloco"
                 style="width:120px"
               />
             </div>
             <small class="text-400">
-              Quantité produite et son unité par batch de fabrication
+              {{ 'recette_create.production_batch_hint' | transloco }}
             </small>
           </div>
 
           <div class="field">
-            <label class="font-semibold text-900 block mb-2">Durée de fabrication</label>
+            <label class="font-semibold text-900 block mb-2">{{ 'recette_create.duree_fabrication' | transloco }}</label>
             <p-inputNumber
               name="dureeFabricationMinutes"
               [(ngModel)]="meta.dureeFabricationMinutes"
               [min]="1"
               suffix=" min"
-              placeholder="Ex : 120 min"
+              [placeholder]="'recette_create.duree_placeholder' | transloco"
               styleClass="w-full"
             />
-            <small class="text-400">Utilisée pour la planification des runs de production</small>
+            <small class="text-400">{{ 'recette_create.duree_hint' | transloco }}</small>
           </div>
 
           <div class="field">
             <label class="font-semibold text-900 block mb-2">
-              Co&#251;t variable par batch
+              {{ 'recette_create.cout_variable' | transloco }}
             </label>
             <p-inputNumber
               name="coutVariableParBatch"
@@ -182,25 +182,24 @@
               [min]="0"
               [minFractionDigits]="2"
               [maxFractionDigits]="4"
-              placeholder="Ex : 0.50"
-              suffix=" &#8364;"
+              [placeholder]="'recette_create.cout_variable_placeholder' | transloco"
+              suffix=" €"
               styleClass="w-full"
             />
             <small class="text-400">
-              &#201;nergie, gaz, eau, emballage &#8212; co&#251;ts de transformation
-              sp&#233;cifiques &#224; cette recette. Multipli&#233; par le nombre de batches lors d'un run.
+              {{ 'recette_create.cout_variable_hint' | transloco }}
             </small>
           </div>
 
           <div class="field">
-            <label class="font-semibold text-900 block mb-2">Notes / Instructions</label>
+            <label class="font-semibold text-900 block mb-2">{{ 'recette_create.notes' | transloco }}</label>
             <textarea
               pTextarea
               name="notes"
               [(ngModel)]="meta.notes"
               [rows]="4"
               maxlength="5000"
-              placeholder="Instructions de fabrication, précautions, conseils..."
+              [placeholder]="'recette_create.notes_placeholder' | transloco"
               class="w-full"
             ></textarea>
           </div>
@@ -214,10 +213,10 @@
         <div class="flex flex-column gap-4">
           <div>
             <h2 class="text-900 font-semibold text-lg m-0 mb-1">
-              <i class="pi pi-list text-primary mr-2"></i>Sélection des ingrédients
+              <i class="pi pi-list text-primary mr-2"></i>{{ 'recette_create.selection_ingredients' | transloco }}
             </h2>
             <p class="text-400 text-sm m-0">
-              Déplacez les matériaux nécessaires vers la liste de droite.
+              {{ 'recette_create.selection_ingredients_desc' | transloco }}
             </p>
           </div>
 
@@ -226,13 +225,13 @@
           <p-pick-list
             [source]="materiauxSource"
             [target]="materiauxTarget"
-            sourceHeader="Matériaux disponibles"
-            targetHeader="Ingrédients sélectionnés"
+            [sourceHeader]="'recette_create.materiaux_disponibles' | transloco"
+            [targetHeader]="'recette_create.ingredients_selectionnes' | transloco"
             [showSourceControls]="false"
             [showTargetControls]="false"
             filterBy="nom"
-            sourceFilterPlaceholder="Rechercher..."
-            targetFilterPlaceholder="Rechercher..."
+            [sourceFilterPlaceholder]="'common.rechercher' | transloco"
+            [targetFilterPlaceholder]="'common.rechercher' | transloco"
             (onMoveToSource)="onMoveToSource($event)"
             (onMoveAllToTarget)="onMoveAllToTarget($event)"
             (onMoveAllToSource)="onMoveAllToSource($event)"
@@ -245,7 +244,7 @@
                   @if (item.enAlerte) {
                     <i
                       class="pi pi-exclamation-circle text-orange-500 text-xs"
-                      pTooltip="Stock en alerte"
+                      [pTooltip]="'recette_create.stock_en_alerte' | transloco"
                     ></i>
                   }
                   <span class="font-medium text-900 text-sm">{{ item.nom }}</span>
@@ -267,7 +266,7 @@
           @if (materiauxTarget.length > 0) {
             <div class="flex align-items-center gap-2 text-sm text-500">
               <i class="pi pi-check-circle text-green-500"></i>
-              {{ materiauxTarget.length }} ingrédient(s) sélectionné(s)
+              {{ materiauxTarget.length }} {{ 'recette_create.ingredient_s_selectionne_s' | transloco }}
             </div>
           }
         </div>
@@ -280,10 +279,10 @@
         <div class="flex flex-column gap-3">
           <div>
             <h2 class="text-900 font-semibold text-lg m-0 mb-1">
-              <i class="pi pi-calculator text-primary mr-2"></i>Quantités par batch
+              <i class="pi pi-calculator text-primary mr-2"></i>{{ 'recette_create.quantites_batch' | transloco }}
             </h2>
             <p class="text-400 text-sm m-0">
-              Indiquez la quantité de chaque ingrédient nécessaire pour un batch.
+              {{ 'recette_create.quantites_batch_desc' | transloco }}
             </p>
           </div>
 
@@ -293,7 +292,7 @@
             <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200">
               <i class="pi pi-exclamation-triangle text-orange-500"></i>
               <span class="text-sm text-orange-800">
-                Renseignez la quantité de chaque ingrédient avant de continuer.
+                {{ 'recette_create.renseigner_quantites' | transloco }}
               </span>
             </div>
           }
@@ -334,14 +333,14 @@
 
                     <div class="surface-50 border-round p-3 flex align-items-center gap-4">
                       <div>
-                        <div class="text-400 text-xs mb-1">Stock disponible</div>
+                        <div class="text-400 text-xs mb-1">{{ 'recette_create.stock_disponible' | transloco }}</div>
                         <div class="font-semibold text-900">
                           {{ ing.stockTotal | number:'1.0-2' }} {{ ing.unite }}
                         </div>
                       </div>
                       @if (ing.coutUnitaire) {
                         <div>
-                          <div class="text-400 text-xs mb-1">Coût unitaire</div>
+                          <div class="text-400 text-xs mb-1">{{ 'recette_create.cout_unitaire' | transloco }}</div>
                           <div class="font-semibold text-900">
                             {{ ing.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }} / {{ ing.unite }}
                           </div>
@@ -351,7 +350,7 @@
 
                     <div class="field">
                       <label class="font-semibold text-900 block mb-2">
-                        Quantité / batch <span class="text-red-400">*</span>
+                        {{ 'recette_create.quantite_batch' | transloco }} <span class="text-red-400">*</span>
                       </label>
                       <p-inputNumber
                         [(ngModel)]="ing.quantite"
@@ -359,12 +358,12 @@
                         [min]="0.0001"
                         [minFractionDigits]="0"
                         [maxFractionDigits]="4"
-                        placeholder="Ex : 0.250"
+                        [placeholder]="'recette_create.quantite_ex' | transloco"
                         styleClass="w-full"
                       />
                       @if (ing.coutUnitaire && ing.quantite) {
                         <small class="text-primary">
-                          Coût estimé :
+                          {{ 'recette_create.cout_estime' | transloco }}
                           {{ ing.coutUnitaire * ing.quantite | currency:'EUR':'symbol':'1.2-4' }}
                           / batch
                         </small>
@@ -372,7 +371,7 @@
                     </div>
 
                     <div class="field">
-                      <label class="font-semibold text-900 block mb-2">Unité</label>
+                      <label class="font-semibold text-900 block mb-2">{{ 'recette_create.unite' | transloco }}</label>
                       <input
                         pInputText
                         [(ngModel)]="ing.uniteOverride"
@@ -382,7 +381,7 @@
                         [placeholder]="'Par défaut : ' + ing.unite"
                       />
                       <small class="text-400">
-                        Modifiez si l'unité recette diffère de l'unité stock ({{ ing.unite }})
+                        {{ 'recette_create.unite_hint' | transloco }} ({{ ing.unite }})
                       </small>
                     </div>
 
@@ -402,10 +401,10 @@
         <div class="flex flex-column gap-4">
           <div>
             <h2 class="text-900 font-semibold text-lg m-0 mb-1">
-              <i class="pi pi-check-square text-primary mr-2"></i>Récapitulatif
+              <i class="pi pi-check-square text-primary mr-2"></i>{{ 'recette_create.recapitulatif' | transloco }}
             </h2>
             <p class="text-400 text-sm m-0">
-              Vérifiez les informations avant de créer la recette.
+              {{ 'recette_create.recapitulatif_desc' | transloco }}
             </p>
           </div>
 
@@ -414,28 +413,28 @@
           <!-- Infos générales -->
           <div class="surface-50 border-round-lg border-1 surface-border p-4">
             <div class="text-400 text-xs font-semibold uppercase mb-3 tracking-widest">
-              Informations générales
+              {{ 'recette_create.infos_generales' | transloco }}
             </div>
             <div class="grid">
               <div class="col-12 md:col-6 mb-3">
-                <div class="text-400 text-xs mb-1">Nom</div>
+                <div class="text-400 text-xs mb-1">{{ 'recette_create.nom' | transloco }}</div>
                 <div class="font-semibold text-900">{{ meta.nom }}</div>
               </div>
               <div class="col-12 md:col-6 mb-3">
-                <div class="text-400 text-xs mb-1">Production / batch</div>
+                <div class="text-400 text-xs mb-1">{{ 'recette_create.production_par_batch' | transloco }}</div>
                 <div class="font-semibold text-900">
                   {{ meta.quantiteProduite | number:'1.0-4' }} {{ meta.uniteProduite }}
                 </div>
               </div>
               @if (meta.dureeFabricationMinutes) {
                 <div class="col-12 md:col-6 mb-3">
-                  <div class="text-400 text-xs mb-1">Durée de fabrication</div>
+                  <div class="text-400 text-xs mb-1">{{ 'recette_create.duree_fabrication' | transloco }}</div>
                   <div class="font-semibold text-900">{{ meta.dureeFabricationMinutes }} min</div>
                 </div>
               }
               @if (meta.notes) {
                 <div class="col-12">
-                  <div class="text-400 text-xs mb-1">Notes</div>
+                  <div class="text-400 text-xs mb-1">{{ 'recette_create.notes' | transloco }}</div>
                   <div class="text-900 text-sm white-space-pre-line">{{ meta.notes }}</div>
                 </div>
               }
@@ -445,7 +444,7 @@
           <!-- Ingrédients -->
           <div class="surface-50 border-round-lg border-1 surface-border p-4">
             <div class="text-400 text-xs font-semibold uppercase mb-3">
-              Ingrédients ({{ ingredientsSelectionnes.length }})
+              {{ 'recette_create.ingredients' | transloco }} ({{ ingredientsSelectionnes.length }})
             </div>
             <div class="flex flex-column gap-2">
               @for (ing of ingredientsSelectionnes; track ing.materiauId) {
@@ -472,9 +471,9 @@
           <!-- Total coût -->
           <div class="flex align-items-center justify-content-between p-4 bg-primary-50 border-round-lg">
             <div>
-              <div class="text-primary-700 font-semibold">Coût théorique / batch</div>
+              <div class="text-primary-700 font-semibold">{{ 'recette_create.cout_theorique_batch' | transloco }}</div>
               <div class="text-primary-500 text-xs mt-1">
-                Soit {{ coutParUnite | currency:'EUR':'symbol':'1.2-4' }} / {{ meta.uniteProduite || 'unité' }}
+                {{ 'recette_create.soit' | transloco }} {{ coutParUnite | currency:'EUR':'symbol':'1.2-4' }} / {{ meta.uniteProduite || ('recette_create.unite_default' | transloco) }}
               </div>
             </div>
             <span class="font-bold text-primary text-2xl">
@@ -489,7 +488,7 @@
       <p-divider styleClass="mb-3 mt-4" />
       <div class="flex justify-content-between align-items-center">
         <p-button
-          label="Précédent"
+          [label]="'common.precedent' | transloco"
           icon="pi pi-arrow-left"
           severity="secondary"
           [text]="true"
@@ -498,7 +497,7 @@
         />
         @if (step < 3) {
           <p-button
-            label="Suivant"
+            [label]="'common.suivant' | transloco"
             icon="pi pi-arrow-right"
             iconPos="right"
             (onClick)="nextStep()"
@@ -506,7 +505,7 @@
         }
         @if (step === 3) {
           <p-button
-            label="Créer la recette"
+            [label]="'recette_create.creer_recette' | transloco"
             icon="pi pi-check"
             [loading]="saving"
             (onClick)="submitCreate()"
@@ -522,7 +521,7 @@
     <div class="surface-card border-round-xl border-1 surface-border p-4 flex flex-column gap-4">
 
       <div>
-        <div class="text-400 text-xs font-semibold uppercase mb-1">Coût estimé / batch</div>
+        <div class="text-400 text-xs font-semibold uppercase mb-1">{{ 'recette_create.cout_estime_batch' | transloco }}</div>
         <div class="text-3xl font-bold text-primary">
           {{ coutTheoriqueTotal | currency:'EUR':'symbol':'1.2-2' }}
         </div>
@@ -536,9 +535,9 @@
       <p-divider styleClass="my-0" />
 
       <div>
-        <div class="text-400 text-xs font-semibold uppercase mb-2">Ingrédients</div>
+        <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'recette_create.ingredients' | transloco }}</div>
         @if (ingredientsSelectionnes.length === 0) {
-          <div class="text-400 text-sm font-italic">Aucun pour l'instant</div>
+          <div class="text-400 text-sm font-italic">{{ 'recette_create.aucun_pour_instant' | transloco }}</div>
         }
         @for (ing of ingredientsSelectionnes; track ing.materiauId) {
           <div class="flex align-items-center justify-content-between py-2 border-bottom-1 surface-border">
@@ -558,9 +557,9 @@
         <p-divider styleClass="my-0" />
 
         <div>
-          <div class="text-400 text-xs font-semibold uppercase mb-2">Progression</div>
+          <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'recette_create.progression' | transloco }}</div>
           <div class="text-sm text-900 mb-2">
-           {{ ingredientsRenseignesCount }} / {{ ingredientsSelectionnes.length }} quantités renseignées
+           {{ ingredientsRenseignesCount }} / {{ ingredientsSelectionnes.length }} {{ 'recette_create.quantites_renseignees' | transloco }}
           </div>
           <p-progressBar
             [value]="progressionIngredientsPct"

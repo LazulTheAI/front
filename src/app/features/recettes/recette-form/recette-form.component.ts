@@ -16,6 +16,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { CreerRecetteRequest, MateriauControllerService, MateriauResponse, ModifierRecetteMetaRequest, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { TranslocoModule } from '@jsverse/transloco';
 
 export interface IngredientSelectionne {
     materiauId: number;
@@ -30,7 +31,7 @@ export interface IngredientSelectionne {
 @Component({
     selector: 'app-recette-form',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputTextModule, InputNumberModule, TextareaModule, DividerModule, ToastModule, PickListModule, TagModule, TooltipModule, AccordionModule],
+    imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, ButtonModule, InputTextModule, InputNumberModule, TextareaModule, DividerModule, ToastModule, PickListModule, TagModule, TooltipModule, AccordionModule],
     providers: [MessageService],
     templateUrl: './recette-form.component.html'
 })

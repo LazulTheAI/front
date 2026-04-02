@@ -5,8 +5,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-file-import text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Bons de commande</h2>
-        <p class="m-0 text-400 text-sm mt-1">Commandes fournisseurs et suivi des livraisons</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'bons_commande.titre' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'bons_commande.sous_titre' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -15,19 +15,19 @@
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
         <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
-          placeholder="Rechercher un fournisseur..." class="w-14rem" />
+          [placeholder]="'bons_commande.rechercher' | transloco" class="w-14rem" />
       </p-iconfield>
       <p-select
         [(ngModel)]="filtreStatut"
         [options]="statutOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Tous les statuts"
+        [placeholder]="'bons_commande.filtre_statut' | transloco"
         [showClear]="true"
         (onChange)="onFiltreChange()"
         styleClass="w-14rem"
       />
-      <p-button label="Nouveau bon" icon="pi pi-plus" (onClick)="openCreate()" />
+      <p-button [label]="'bons_commande.nouveau_bon' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>
   </ng-template>
 </p-toolbar>
@@ -53,15 +53,15 @@
       <tr>
         <th style="width:80px">#</th>
         <th pSortableColumn="fournisseurNom" style="min-width:180px">
-          Fournisseur <p-sortIcon field="fournisseurNom" />
+          {{ 'bons_commande.col_fournisseur' | transloco }} <p-sortIcon field="fournisseurNom" />
         </th>
-        <th style="width:150px">Statut</th>
+        <th style="width:150px">{{ 'bons_commande.col_statut' | transloco }}</th>
         <th pSortableColumn="dateCommande" style="width:130px">
-          Date <p-sortIcon field="dateCommande" />
+          {{ 'bons_commande.col_date' | transloco }} <p-sortIcon field="dateCommande" />
         </th>
-        <th style="width:140px">Livraison prévue</th>
-        <th style="width:120px" class="text-right">Montant</th>
-        <th style="width:150px">Référence</th>
+        <th style="width:140px">{{ 'bons_commande.col_livraison_prevue' | transloco }}</th>
+        <th style="width:120px" class="text-right">{{ 'bons_commande.col_montant' | transloco }}</th>
+        <th style="width:150px">{{ 'bons_commande.col_reference' | transloco }}</th>
         <th style="width:120px"></th>
       </tr>
     </ng-template>
@@ -105,7 +105,7 @@
           </div>
         </td>
 
-        
+
 
         <td>
           <span class="text-sm text-500">{{ bon.dateCommande | date:'dd/MM/yyyy' }}</span>
@@ -149,25 +149,25 @@
         <td>
           <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
             <p-button icon="pi pi-eye" severity="secondary" [text]="true" [rounded]="true"
-              size="small" pTooltip="Voir le détail" (onClick)="openDetail(bon, $event)" />
+              size="small" [pTooltip]="'common.voir_detail' | transloco" (onClick)="openDetail(bon, $event)" />
             @if (canEnvoyer(bon)) {
               <p-button icon="pi pi-send" severity="info" [text]="true" [rounded]="true"
-                size="small" pTooltip="Marquer comme envoyé"
+                size="small" [pTooltip]="'bons_commande.marquer_envoye' | transloco"
                 (onClick)="envoyerBon(bon, $event)" />
             }
             @if (canReceptionner(bon)) {
               <p-button icon="pi pi-arrow-down" severity="success" [text]="true" [rounded]="true"
-                size="small" pTooltip="Réceptionner"
+                size="small" [pTooltip]="'bons_commande.receptionner' | transloco"
                 (onClick)="openDetail(bon, $event)" />
             }
             @if (canAnnuler(bon)) {
               <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true"
-                size="small" pTooltip="Annuler"
+                size="small" [pTooltip]="'common.annuler' | transloco"
                 (onClick)="confirmAnnuler(bon, $event)" />
             }
             @if (canSupprimer(bon)) {
               <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
-                size="small" pTooltip="Supprimer le brouillon"
+                size="small" [pTooltip]="'bons_commande.supprimer_brouillon' | transloco"
                 (onClick)="confirmSupprimer(bon, $event)" />
             }
           </div>
@@ -180,7 +180,7 @@
       <tr>
         <td colspan="9" class="text-center py-6 text-400">
           <i class="pi pi-shopping-cart text-4xl mb-3 block"></i>
-          Aucun bon de commande
+          {{ 'bons_commande.aucun_bon' | transloco }}
         </td>
       </tr>
     </ng-template>

@@ -25,6 +25,7 @@ import { Tooltip } from 'primeng/tooltip';
 import { EntrepotControllerService, EntrepotResponse, MateriauControllerService, MateriauResponse, PageMateriauResponse, StockParEntrepot } from '@/app/modules/openapi';
 
 // Dialogs
+import { TranslocoModule } from '@jsverse/transloco';
 import { AjustementDialogComponent } from '../ajustement-dialog/ajustement-dialog.component';
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
 import { HistoriqueDialogComponent } from '../historique-dialog/historique-dialog.component';
@@ -82,6 +83,7 @@ interface SelectOption {
         Toast,
         Button,
         InputText,
+        TranslocoModule,
         IconField,
         InputIcon,
         Select,

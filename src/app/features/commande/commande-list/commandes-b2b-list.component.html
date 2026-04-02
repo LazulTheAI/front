@@ -6,8 +6,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-shopping-bag text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Commandes B2B</h2>
-        <p class="m-0 text-400 text-sm mt-1">Suivi des commandes et exp&#233;ditions revendeurs</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'commandes_b2b.titre' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'commandes_b2b.sous_titre' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -18,7 +18,7 @@
         [(ngModel)]="filtreRevendeurId"
         optionLabel="label"
         optionValue="value"
-        placeholder="Tous les revendeurs"
+        [placeholder]="'commandes_b2b.filtre_revendeur' | transloco"
         [showClear]="true"
         (onChange)="onFiltreChange()"
         styleClass="w-14rem"
@@ -28,12 +28,12 @@
         [(ngModel)]="filtreStatut"
         optionLabel="label"
         optionValue="value"
-        placeholder="Tous les statuts"
+        [placeholder]="'commandes_b2b.filtre_statut' | transloco"
         [showClear]="true"
         (onChange)="onFiltreChange()"
         styleClass="w-12rem"
       />
-      <p-button label="Nouvelle commande" icon="pi pi-plus" (onClick)="openCreate()" />
+      <p-button [label]="'commandes_b2b.nouvelle_commande' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>
   </ng-template>
 </p-toolbar>
@@ -57,14 +57,14 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width:120px" pSortableColumn="numero">N° <p-sortIcon field="numero" /></th>
-        <th>Revendeur</th>
-        <th style="width:120px">Date</th>
-        <th style="width:130px">Livraison souhaitée</th>
-        <th style="width:80px" class="text-center">Lignes</th>
-        <th style="width:120px" class="text-right">Total HT</th>
-        <th style="width:110px" class="text-center">Statut</th>
-        <th style="width:140px" class="text-center">Actions</th>
+        <th style="width:120px" pSortableColumn="numero">{{ 'commandes_b2b.col_numero' | transloco }} <p-sortIcon field="numero" /></th>
+        <th>{{ 'commandes_b2b.col_revendeur' | transloco }}</th>
+        <th style="width:120px">{{ 'commandes_b2b.col_date' | transloco }}</th>
+        <th style="width:130px">{{ 'commandes_b2b.col_livraison' | transloco }}</th>
+        <th style="width:80px" class="text-center">{{ 'commandes_b2b.col_lignes' | transloco }}</th>
+        <th style="width:120px" class="text-right">{{ 'commandes_b2b.col_total_ht' | transloco }}</th>
+        <th style="width:110px" class="text-center">{{ 'commandes_b2b.col_statut' | transloco }}</th>
+        <th style="width:140px" class="text-center">{{ 'common.actions' | transloco }}</th>
       </tr>
     </ng-template>
 
@@ -81,7 +81,7 @@
           <div class="font-semibold text-900">{{ c.revendeurNom }}</div>
           @if (c.templateId) {
             <div class="text-400 text-xs mt-1">
-              <i class="pi pi-sync text-xs mr-1"></i>Depuis template
+              <i class="pi pi-sync text-xs mr-1"></i>{{ 'commandes_b2b.depuis_template' | transloco }}
             </div>
           }
         </td>
@@ -142,7 +142,7 @@
                 }"
               ></div>
             </div>
-            
+
           </div>
         </td>
 
@@ -161,20 +161,20 @@
             <!-- Bon de livraison PDF -->
             @if (c.statut === 'CONFIRMEE' || c.statut === 'EXPEDIEE' || c.statut === 'LIVREE') {
               <p-button icon="pi pi-file-pdf" [text]="true" [rounded]="true"
-                severity="secondary" size="small" pTooltip="Bon de livraison PDF"
+                severity="secondary" size="small" [pTooltip]="'commandes_b2b.bon_livraison_pdf' | transloco"
                 (onClick)="downloadBonLivraison(c, $event)" />
             }
 
             <!-- Facture PDF -->
             @if (c.statut === 'LIVREE') {
               <p-button icon="pi pi-receipt" [text]="true" [rounded]="true"
-                severity="info" size="small" pTooltip="Facture PDF"
+                severity="info" size="small" [pTooltip]="'commandes_b2b.facture_pdf' | transloco"
                 (onClick)="downloadFacture(c, $event)" />
             }
 
             <!-- Détail -->
             <p-button icon="pi pi-eye" [text]="true" [rounded]="true"
-              severity="secondary" size="small" pTooltip="Voir le détail"
+              severity="secondary" size="small" [pTooltip]="'common.voir_detail' | transloco"
               (onClick)="openDetail(c)" />
 
           </div>
@@ -187,7 +187,7 @@
       <tr>
         <td colspan="8" class="text-center py-6 text-400">
           <i class="pi pi-shopping-bag text-4xl block mb-3 opacity-30"></i>
-          Aucune commande trouvée
+          {{ 'commandes_b2b.aucune_commande' | transloco }}
         </td>
       </tr>
     </ng-template>

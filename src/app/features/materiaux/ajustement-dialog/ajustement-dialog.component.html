@@ -1,5 +1,5 @@
 <p-dialog
-  [header]="'Ajustement de stock — ' + (materiau?.nom ?? '')"
+  [header]="('ajustement.title' | transloco) + ' — ' + (materiau?.nom ?? '')"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -14,7 +14,7 @@
       <div>
         <div class="font-semibold text-900">{{ materiau?.nom }}</div>
         <div class="text-500 text-sm">
-          Stock total actuel :
+          {{ 'ajustement.current_stock' | transloco }}
           <strong class="text-900">
             {{ (materiau?.stocks | stockTotal) | number:'1.0-2' }} {{ materiau?.unite }}
           </strong>
@@ -24,7 +24,7 @@
 
     <!-- Direction -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900">Direction de l'ajustement <span class="text-red-500">*</span></label>
+      <label class="font-medium text-900">{{ 'ajustement.direction' | transloco }} <span class="text-red-500">*</span></label>
       <p-selectButton
         name="direction"
         [(ngModel)]="form.direction"
@@ -37,19 +37,19 @@
 
     <!-- Entrepôt -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="entrepot">Entrepôt concerné <span class="text-red-500">*</span></label>
+      <label class="font-medium text-900" for="entrepot">{{ 'common.warehouse' | transloco }} <span class="text-red-500">*</span></label>
       <p-select
         inputId="entrepot"
         name="entrepotId"
         [(ngModel)]="form.entrepotId"
         required
         [options]="entrepotOptions"
-        placeholder="Sélectionner un entrepôt..."
+        [placeholder]="'ajustement.select_warehouse' | transloco"
         [class.ng-invalid]="ngForm.submitted && ngForm.controls['entrepotId']?.invalid"
       />
       @if (selectedEntrepotStock !== null) {
         <small class="text-500">
-          Stock actuel dans cet entrepôt :
+          {{ 'ajustement.current_warehouse_stock' | transloco }}
           <strong>{{ selectedEntrepotStock | number:'1.0-2' }} {{ materiau?.unite }}</strong>
         </small>
       }
@@ -58,7 +58,7 @@
     <!-- Quantité -->
     <div class="flex flex-column gap-2">
       <label class="font-medium text-900" for="quantite">
-        Quantité à {{ form.direction === 'positif' ? 'ajouter' : 'retirer' }}
+        {{ 'common.quantity' | transloco }} {{ form.direction === 'positif' ? ('ajustement.add' | transloco) : ('ajustement.remove' | transloco) }}
         <span class="text-red-500">*</span>
       </label>
       <p-inputNumber
@@ -76,14 +76,14 @@
 
     <!-- Raison -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="raison">Raison de l'ajustement</label>
+      <label class="font-medium text-900" for="raison">{{ 'ajustement.reason' | transloco }}</label>
       <input
         pInputText
         id="raison"
         name="raison"
         [(ngModel)]="form.raison"
         maxlength="500"
-        placeholder="Inventaire physique, perte, correction..."
+        [placeholder]="'ajustement.reason_placeholder' | transloco"
       />
     </div>
 
@@ -91,14 +91,14 @@
 
   <ng-template pTemplate="footer">
     <p-button
-      label="Annuler"
+      [label]="'common.cancel' | transloco"
       severity="secondary"
       [text]="true"
       (onClick)="onHide()"
       [disabled]="saving"
     />
     <p-button
-      [label]="form.direction === 'positif' ? 'Enregistrer l\'ajout' : 'Enregistrer le retrait'"
+      [label]="form.direction === 'positif' ? ('ajustement.save_add' | transloco) : ('ajustement.save_remove' | transloco)"
       [icon]="form.direction === 'positif' ? 'pi pi-plus' : 'pi pi-minus'"
       [severity]="form.direction === 'positif' ? 'success' : 'warn'"
       [loading]="saving"
