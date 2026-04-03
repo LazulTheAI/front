@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
@@ -27,7 +28,7 @@ import { RevendeurFormDialogComponent } from '../revendeur-form-dialog/revendeur
     selector: 'app-revendeurs-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, Badge, FormsModule, TableModule, Button, Tag, Tooltip, Toast, Toolbar, ConfirmDialog, IconField, InputIcon, InputText, AvatarModule, RevendeurFormDialogComponent, RevendeurDetailDialogComponent],
+    imports: [CommonModule, Badge, FormsModule, TableModule, Button, Tag, Tooltip, Toast, Toolbar, ConfirmDialog, IconField, InputIcon, InputText, AvatarModule, RevendeurFormDialogComponent, RevendeurDetailDialogComponent, TranslocoModule],
     providers: [MessageService, ConfirmationService],
     templateUrl: './revendeurs-list.component.html'
 })

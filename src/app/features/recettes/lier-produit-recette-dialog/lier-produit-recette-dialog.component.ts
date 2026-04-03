@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { Button } from 'primeng/button';
@@ -20,7 +21,7 @@ interface SelectOption {
     selector: 'app-lier-produit-recette-dialog',
     templateUrl: './lier-produit-recette-dialog.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, Button, DialogModule, Select, InputNumber, Checkbox, Tooltip]
+    imports: [CommonModule, FormsModule, Button, DialogModule, Select, InputNumber, Checkbox, Tooltip, TranslocoModule]
 })
 export class LierProduitRecetteDialogComponent implements OnInit, OnChanges {
     @Input() visible = false;

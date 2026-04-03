@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 
 import { CommandeB2BControllerService, CommandeB2BResponse, RevendeurResponse } from '@/app/modules/openapi';
 import { MessageService } from 'primeng/api';
@@ -16,7 +17,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-revendeur-detail-dialog',
     standalone: true,
-    imports: [CommonModule, DialogModule, Button, Tag, Divider, TableModule, Tooltip, Toast],
+    imports: [CommonModule, DialogModule, TranslocoModule, Button, Tag, Divider, TableModule, Tooltip, Toast, TranslocoModule],
     providers: [MessageService],
     templateUrl: './revendeur-detail-dialog.component.html'
 })

@@ -31,7 +31,8 @@
   <p-tabs>
 
     <!-- ═══ Onglet 1 : Informations générales ═══ -->
-    <p-tabpanel header="Informations" leftIcon="pi pi-info-circle">
+    <p-tabpanel leftIcon="pi pi-info-circle">
+      <ng-template pTemplate="header"><i class="pi pi-info-circle mr-2"></i>{{ 'produit_detail.information' | transloco }}</ng-template>
 
       @if (loadingDetail) {
         <div class="grid mt-2">
@@ -48,14 +49,14 @@
 
           <!-- ID BigCommerce -->
           <div class="col-6 mb-3">
-            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">ID BigCommerce</label>
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">{{ 'produit_detail.bc_id' | transloco }}</label>
             <div class="flex align-items-center gap-2">
               <span class="text-900 font-mono">#{{ (produitDetail ?? produit)?.platformProductId ?? '—' }}</span>
               <p-button
                 icon="pi pi-external-link"
                 [text]="true"
                 size="small"
-                pTooltip="Voir dans BigCommerce"
+                [pTooltip]="'produit_detail.see_bc' | transloco"
                 (onClick)="openBigCommerce()"
               />
             </div>
@@ -63,7 +64,7 @@
 
           <!-- Variant ID -->
           <div class="col-6 mb-3">
-            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Variant ID</label>
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">{{ 'produit_detail.variant_id' | transloco }}</label>
             <span class="text-900 font-mono">
               {{ (produitDetail ?? produit)?.platformVariantId ?? '—' }}
             </span>
@@ -71,7 +72,7 @@
 
           <!-- Prix -->
           <div class="col-6 mb-3">
-            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Prix de vente</label>
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">{{ 'produit_detail.sale_price' | transloco }}</label>
             @if ((produitDetail ?? produit)?.prixCents != null) {
               <span class="text-900 text-xl font-semibold">
                 {{ ((produitDetail ?? produit)!.prixCents! / 100) | currency:'EUR':'symbol':'1.2-2' }}
@@ -83,7 +84,7 @@
 
           <!-- Stock plateforme -->
           <div class="col-6 mb-3">
-            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Stock côté BigCommerce</label>
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">{{ 'produit_detail.bc_stock' | transloco }}</label>
             <div class="flex align-items-center gap-2">
               @let stock = (produitDetail ?? produit)?.stockPlateforme;
               <span
@@ -94,13 +95,13 @@
               >
                 {{ stock ?? '—' }}
               </span>
-              <span class="text-400 text-sm">unités</span>
+              <span class="text-400 text-sm">{{ 'produit_detail.units' | transloco }}</span>
             </div>
           </div>
 
           <!-- Dernière sync -->
           <div class="col-6 mb-3">
-            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Dernière synchronisation</label>
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">{{ 'produit_detail.last_sync' | transloco }}</label>
             @if ((produitDetail ?? produit)?.derniereSyncAt) {
               <span class="text-700 text-sm">
                 {{ (produitDetail ?? produit)!.derniereSyncAt | date:'dd/MM/yyyy à HH:mm' }}
@@ -108,14 +109,14 @@
             } @else {
               <span class="text-orange-400 text-sm flex align-items-center gap-1">
                 <i class="pi pi-exclamation-triangle"></i>
-                Jamais synchronisé
+                {{ 'produit_detail.never_synced' | transloco }}
               </span>
             }
           </div>
 
           <!-- Plateforme -->
           <div class="col-6 mb-3">
-            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">Plateforme</label>
+            <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">{{ 'produit_detail.platform' | transloco }}</label>
             <div class="flex align-items-center gap-2">
               <i class="pi pi-shopping-cart text-primary"></i>
               <span class="text-900 font-medium">BigCommerce</span>
@@ -129,15 +130,16 @@
     </p-tabpanel>
 
     <!-- ═══ Onglet 2 : Recettes liées ═══ -->
-    <p-tabpanel header="Recettes liées" leftIcon="pi pi-book">
+    <p-tabpanel leftIcon="pi pi-book">
+      <ng-template pTemplate="header"><i class="pi pi-book mr-2"></i>{{ 'produit_detail.linked_recipes' | transloco }}</ng-template>
 
       <div class="flex justify-content-between align-items-center mb-3 mt-2">
         <span class="text-500 text-sm">
-          {{ produit?.recettes?.length ?? 0 }} recette(s) associée(s)
+          {{ produit?.recettes?.length ?? 0 }} {{ 'produit_detail.recipes_associated' | transloco }}
         </span>
         <p-button
           icon="pi pi-plus"
-          label="Lier une recette"
+          [label]="'produit_detail.link_recipe' | transloco"
           severity="primary"
           size="small"
           (onClick)="onLierRecette.emit($event)"
@@ -147,16 +149,16 @@
       @if (!produit?.recettes || produit!.recettes!.length === 0) {
         <div class="text-center py-5 text-400">
           <i class="pi pi-book text-4xl block mb-3 opacity-30"></i>
-          <p>Aucune recette liée à ce produit.</p>
-          <p class="text-sm mt-1">Liez une recette pour activer la déduction automatique de stock matières.</p>
+          <p>{{ 'produit_detail.no_recipes' | transloco }}</p>
+          <p class="text-sm mt-1">{{ 'produit_detail.no_recipes_desc' | transloco }}</p>
         </div>
       } @else {
         <p-table [value]="produit!.recettes!" styleClass="p-datatable-sm">
           <ng-template pTemplate="header">
             <tr>
-              <th>Recette</th>
-              <th style="width: 140px" class="text-right">Batches / unité</th>
-              <th style="width: 120px" class="text-center">Principale</th>
+              <th>{{ 'produit_detail.recipe' | transloco }}</th>
+              <th style="width: 140px" class="text-right">{{ 'produit_detail.batches_per_unit' | transloco }}</th>
+              <th style="width: 120px" class="text-center">{{ 'produit_detail.principal' | transloco }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-liaison>
@@ -172,9 +174,9 @@
               </td>
               <td class="text-center">
                 @if (liaison.estPrincipale) {
-                  <i class="pi pi-star-fill text-yellow-400" pTooltip="Recette principale"></i>
+                  <i class="pi pi-star-fill text-yellow-400" [pTooltip]="'produit_detail.principal' | transloco"></i>
                 } @else {
-                  <i class="pi pi-star text-400" pTooltip="Recette secondaire"></i>
+                  <i class="pi pi-star text-400" [pTooltip]="'produit_detail.secondary' | transloco"></i>
                 }
               </td>
             </tr>
@@ -185,7 +187,8 @@
     </p-tabpanel>
 
     <!-- ═══ Onglet 3 : Historique production ═══ -->
-    <p-tabpanel header="Productions" leftIcon="pi pi-cog">
+    <p-tabpanel leftIcon="pi pi-cog">
+      <ng-template pTemplate="header"><i class="pi pi-cog mr-2"></i>{{ 'produit_detail.productions' | transloco }}</ng-template>
 
       @if (loadingProductions) {
         <div class="mt-2">
@@ -196,20 +199,20 @@
       } @else if (productions.length === 0) {
         <div class="text-center py-5 text-400 mt-2">
           <i class="pi pi-cog text-4xl block mb-3 opacity-30"></i>
-          <p>Aucune production enregistrée.</p>
+          <p>{{ 'produit_detail.no_production' | transloco }}</p>
           @if (!produit?.recettes?.length) {
-            <p class="text-sm text-orange-400 mt-1">Liez d'abord une recette pour activer les productions.</p>
+            <p class="text-sm text-orange-400 mt-1">{{ 'produit_detail.no_recipe_link' | transloco }}</p>
           }
         </div>
       } @else {
         <p-table [value]="productions" styleClass="p-datatable-sm mt-2">
           <ng-template pTemplate="header">
             <tr>
-              <th>Date</th>
-              <th>Recette</th>
-              <th class="text-right">Batches</th>
-              <th class="text-right">Unités</th>
-              <th>Statut</th>
+              <th>{{ 'common.date' | transloco }}</th>
+              <th>{{ 'produit_detail.recipe' | transloco }}</th>
+              <th class="text-right">{{ 'produit_detail.batches' | transloco }}</th>
+              <th class="text-right">{{ 'produit_detail.units_produced' | transloco }}</th>
+              <th>{{ 'common.status' | transloco }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-run>
@@ -240,7 +243,7 @@
   </p-tabs>
 
   <ng-template pTemplate="footer">
-    <p-button label="Fermer" severity="secondary" (onClick)="close()" />
+    <p-button [label]="'common.close' | transloco" severity="secondary" (onClick)="close()" />
   </ng-template>
 
 </p-dialog>

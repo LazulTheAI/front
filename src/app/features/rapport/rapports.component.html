@@ -8,8 +8,8 @@
       <div class="flex align-items-center gap-3 flex-shrink-0">
         <i class="pi pi-chart-bar text-primary text-2xl"></i>
         <div>
-          <h2 class="m-0 text-900 font-semibold">Rapports</h2>
-          <p class="m-0 text-400 text-sm mt-1">Analyse de votre stock et consommation</p>
+          <h2 class="m-0 text-900 font-semibold">{{ 'rapports.title' | transloco }}</h2>
+          <p class="m-0 text-400 text-sm mt-1">{{ 'rapports.subtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -27,7 +27,7 @@
           [(ngModel)]="rangeDates"
           selectionMode="range"
           dateFormat="dd/mm/yy"
-          placeholder="Plage personnalis&#233;e"
+          [placeholder]="'rapports.custom_range' | transloco"
           [inputStyle]="{ width: '170px' }"
           [ngClass]="{ 'p-highlight': isRangePersonnalisee }"
           (onSelect)="onRangeChange()"
@@ -41,13 +41,13 @@
 <!-- ═══ SECTION : Valeur du stock ════════════════════════════ -->
 <div class="flex align-items-center gap-2 mb-3">
   <i class="pi pi-wallet text-primary"></i>
-  <h2 class="text-900 font-semibold text-lg m-0">Valeur du stock</h2>
+  <h2 class="text-900 font-semibold text-lg m-0">{{ 'rapports.stock_value' | transloco }}</h2>
 </div>
 
 <div class="grid mb-4">
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Valeur totale</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.total_value' | transloco }}</div>
       @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-primary">
@@ -58,21 +58,21 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Références valorisées</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.valued_references' | transloco }}</div>
       @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-900">
           {{ totalMateriaux - materiauSansCout }} / {{ totalMateriaux }}
         </div>
         @if (materiauSansCout > 0) {
-          <div class="text-orange-500 text-xs mt-1">{{ materiauSansCout }} sans coût unitaire</div>
+          <div class="text-orange-500 text-xs mt-1">{{ materiauSansCout }} {{ 'rapports.without_cost' | transloco }}</div>
         }
       }
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Valeur moyenne / matériau</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.average_value' | transloco }}</div>
       @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-900">
@@ -89,7 +89,7 @@
   <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-4">
     <i class="pi pi-exclamation-triangle text-orange-500"></i>
     <span class="text-sm text-orange-800">
-      {{ materiauSansCout }} matériau(x) sans coût unitaire sont exclus de la valorisation.
+      {{ materiauSansCout }} {{ 'rapports.materials_without_cost' | transloco }}
     </span>
   </div>
 }
@@ -99,20 +99,20 @@
 
 <div class="flex align-items-center gap-2 mb-3">
   <i class="pi pi-chart-bar text-primary"></i>
-  <h2 class="text-900 font-semibold text-lg m-0">Consommation</h2>
+  <h2 class="text-900 font-semibold text-lg m-0">{{ 'rapports.consumption' | transloco }}</h2>
 </div>
 
 <div class="grid mb-4">
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Matériaux consommés</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.materials_consumed' | transloco }}</div>
       @if (loadingConso) { <p-skeleton height="2.5rem" /> }
       @else { <div class="text-3xl font-bold text-900">{{ consoItems.length }}</div> }
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Coût total consommé</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.total_consumed_cost' | transloco }}</div>
       @if (loadingConso) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-primary">
@@ -123,7 +123,7 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Matériau le + consommé</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.most_consumed' | transloco }}</div>
       @if (loadingConso) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-lg font-bold text-900 overflow-hidden text-overflow-ellipsis white-space-nowrap">
@@ -136,8 +136,8 @@
 
 <div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
   <div class="flex align-items-center justify-content-between mb-3">
-    <span class="font-semibold text-900">Détail par matériau</span>
-    <p-button label="Exporter" icon="pi pi-download" severity="secondary"
+    <span class="font-semibold text-900">{{ 'rapports.detail_by_material' | transloco }}</span>
+    <p-button [label]="'rapports.export' | transloco" icon="pi pi-download" severity="secondary"
       size="small" [text]="true" (onClick)="exportCsv('consommation')" />
   </div>
   <p-table
@@ -193,13 +193,13 @@
 
 <div class="flex align-items-center gap-2 mb-3">
   <i class="pi pi-arrow-right-arrow-left text-primary"></i>
-  <h2 class="text-900 font-semibold text-lg m-0">Mouvements</h2>
+  <h2 class="text-900 font-semibold text-lg m-0">{{ 'rapports.movements' | transloco }}</h2>
 </div>
 
 <div class="grid mb-4">
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Total entrées</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.total_entries' | transloco }}</div>
       @if (loadingMouvements) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-green-600">+{{ totalEntrees | number:'1.0-2' }}</div>
@@ -208,7 +208,7 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Total sorties</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.total_exits' | transloco }}</div>
       @if (loadingMouvements) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-red-500">-{{ totalSorties | number:'1.0-2' }}</div>
@@ -217,7 +217,7 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Solde net</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.net_balance' | transloco }}</div>
       @if (loadingMouvements) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold"
@@ -233,10 +233,10 @@
 <div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
   <div class="flex align-items-center justify-content-between mb-3">
     <span class="font-semibold text-900">
-      Liste des mouvements
+      {{ 'rapports.movement_list' | transloco }}
       <p-tag [value]="mouvements.length.toString()" severity="secondary" styleClass="ml-2" />
     </span>
-    <p-button label="Exporter" icon="pi pi-download" severity="secondary"
+    <p-button [label]="'rapports.export' | transloco" icon="pi pi-download" severity="secondary"
       size="small" [text]="true" (onClick)="exportCsv('mouvements')" />
   </div>
   <p-table
@@ -252,19 +252,19 @@
     <ng-template pTemplate="header">
       <tr>
         <th pSortableColumn="createdAt" style="width:140px">
-          Date <p-sortIcon field="createdAt" />
+          {{ 'common.date' | transloco }} <p-sortIcon field="createdAt" />
         </th>
         <th pSortableColumn="materiauNom">Matériau <p-sortIcon field="materiauNom" /></th>
         <th pSortableColumn="typeMouvement" style="width:140px">
           Type <p-sortIcon field="typeMouvement" />
         </th>
         <th pSortableColumn="quantite" style="width:120px">
-          Quantité <p-sortIcon field="quantite" />
+          {{ 'common.quantity' | transloco }} <p-sortIcon field="quantite" />
         </th>
         <th pSortableColumn="coutUnitaireSnapshot" style="width:130px">
           Coût unitaire <p-sortIcon field="coutUnitaireSnapshot" />
         </th>
-        <th style="width:120px">Référence</th>
+        <th style="width:120px">{{ 'common.reference' | transloco }}</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-m>
@@ -310,14 +310,14 @@
   <div class="flex align-items-center gap-2">
     <i class="pi pi-file-pdf text-primary"></i>
     <div>
-      <h2 class="text-900 font-semibold text-lg m-0">Rapport financier</h2>
+      <h2 class="text-900 font-semibold text-lg m-0">{{ 'rapports.financial_report' | transloco }}</h2>
       <p class="text-400 text-sm m-0 mt-1">
-        Coûts de revient, marges et projection 12 mois — document banquier
+        {{ 'rapports.financial_report_desc' | transloco }}
       </p>
     </div>
   </div>
   <p-button
-    label="Télécharger le rapport"
+    [label]="'rapports.download_report' | transloco"
     icon="pi pi-download"
     severity="primary"
     [loading]="loadingRapportFinancier"
@@ -328,69 +328,69 @@
 <div class="grid mb-4">
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Contenu du rapport</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.report_content' | transloco }}</div>
       <ul class="m-0 p-0 list-none text-sm text-700 line-height-3">
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-check-circle text-green-500 text-xs"></i>
-          Synthèse exécutive (CA, COGS, marge brute)
+          {{ 'rapports.executive_summary' | transloco }}
         </li>
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-check-circle text-green-500 text-xs"></i>
-          Détail des coûts par produit
+          {{ 'rapports.cost_detail' | transloco }}
         </li>
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-check-circle text-green-500 text-xs"></i>
-          Structure des charges fixes
+          {{ 'rapports.fixed_costs' | transloco }}
         </li>
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-check-circle text-green-500 text-xs"></i>
-          Seuil de rentabilité (point mort)
+          {{ 'rapports.breakeven' | transloco }}
         </li>
         <li class="flex align-items-center gap-2">
           <i class="pi pi-check-circle text-green-500 text-xs"></i>
-          Projection CA et marge sur 12 mois
+          {{ 'rapports.projection_12m' | transloco }}
         </li>
       </ul>
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Paramètres requis</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.required_parameters' | transloco }}</div>
       <ul class="m-0 p-0 list-none text-sm text-700 line-height-3">
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-info-circle text-blue-500 text-xs"></i>
-          Taux horaire main d'œuvre configuré
+          {{ 'rapports.hourly_rate_config' | transloco }}
         </li>
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-info-circle text-blue-500 text-xs"></i>
-          Charges fixes atelier renseignées
+          {{ 'rapports.fixed_charges' | transloco }}
         </li>
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-info-circle text-blue-500 text-xs"></i>
-          Coût variable par batch sur les recettes
+          {{ 'rapports.variable_cost' | transloco }}
         </li>
         <li class="flex align-items-center gap-2">
           <i class="pi pi-info-circle text-blue-500 text-xs"></i>
-          Au moins un run de production terminé
+          {{ 'rapports.least_one_run' | transloco }}
         </li>
       </ul>
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Conformité</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.compliance' | transloco }}</div>
       <ul class="m-0 p-0 list-none text-sm text-700 line-height-3">
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-shield text-primary text-xs"></i>
-          Méthode des coûts complets
+          {{ 'rapports.full_cost' | transloco }}
         </li>
         <li class="flex align-items-center gap-2 mb-2">
           <i class="pi pi-shield text-primary text-xs"></i>
-          Valorisation stock FIFO
+          {{ 'rapports.fifo_valuation' | transloco }}
         </li>
         <li class="flex align-items-center gap-2">
           <i class="pi pi-shield text-primary text-xs"></i>
-          Mention légale incluse
+          {{ 'rapports.legal_mention' | transloco }}
         </li>
       </ul>
     </div>

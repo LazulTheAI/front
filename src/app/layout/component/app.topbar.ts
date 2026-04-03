@@ -1,16 +1,19 @@
 import { AlerteWidgetComponent } from '@/app/features/alerte/alerte-widget.component';
 import { LayoutService } from '@/app/layout/service/layout.service';
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { TranslocoService } from '@jsverse/transloco';
 import { MenuItem } from 'primeng/api';
+import { Select } from 'primeng/select';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, AlerteWidgetComponent],
+    imports: [RouterModule, CommonModule, FormsModule, StyleClassModule, AppConfigurator, AlerteWidgetComponent, Select],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -40,6 +43,15 @@ import { AppConfigurator } from './app.configurator';
 
         <div class="layout-topbar-actions">
             <div class="layout-config-menu">
+                <p-select
+                    [options]="langs"
+                    [(ngModel)]="activeLang"
+                    (ngModelChange)="setLang($event)"
+                    optionLabel="label"
+                    optionValue="value"
+                    styleClass="border-none text-sm font-semibold"
+                    [style]="{'min-width': '80px'}"
+                />
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>
@@ -73,6 +85,20 @@ export class AppTopbar {
     items!: MenuItem[];
 
     layoutService = inject(LayoutService);
+    private translocoService = inject(TranslocoService);
+
+    langs = [
+        { label: '🇫🇷 FR', value: 'fr' },
+        { label: '🇬🇧 EN', value: 'en' },
+        { label: '🇪🇸 ES', value: 'es' }
+    ];
+
+    activeLang = this.translocoService.getActiveLang();
+
+    setLang(lang: string) {
+        this.translocoService.setActiveLang(lang);
+        localStorage.setItem('lang', lang);
+    }
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({

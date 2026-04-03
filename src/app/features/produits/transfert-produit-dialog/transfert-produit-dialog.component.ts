@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 
 import { Button } from 'primeng/button';
@@ -20,7 +21,7 @@ interface SelectOption {
     selector: 'app-transfert-produit-dialog',
     templateUrl: './transfert-produit-dialog.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, Button, DialogModule, Select, InputNumber, Textarea]
+    imports: [CommonModule, FormsModule, Button, DialogModule, Select, InputNumber, Textarea, TranslocoModule]
 })
 export class TransfertProduitDialogComponent implements OnInit, OnChanges {
     @Input() visible = false;

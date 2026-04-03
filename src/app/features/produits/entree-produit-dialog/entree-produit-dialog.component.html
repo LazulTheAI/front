@@ -12,14 +12,14 @@
 
     <!-- Entrepôt -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Entrepôt <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'common.warehouse' | transloco }} <span class="text-red-400">*</span></label>
       <p-select
         name="entrepotId"
         [(ngModel)]="form.entrepotId"
         [options]="entrepotOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Sélectionner..."
+        [placeholder]="'entree_produit.select_warehouse' | transloco"
         [required]="true"
         class="w-full"
       />
@@ -27,7 +27,7 @@
 
     <!-- Quantité -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Quantité <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'common.quantity' | transloco }} <span class="text-red-400">*</span></label>
       <p-inputNumber
         name="quantite"
         [(ngModel)]="form.quantite"
@@ -42,7 +42,7 @@
 
     <!-- Coût unitaire snapshot -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Coût unitaire</label>
+      <label class="text-sm font-medium text-700">{{ 'entree_produit.unit_cost' | transloco }}</label>
       <p-inputNumber
         name="coutUnitaireSnapshot"
         [(ngModel)]="form.coutUnitaireSnapshot"
@@ -55,32 +55,32 @@
         placeholder="0,00 €"
         styleClass="w-full"
       />
-      <small class="text-400">Snapshot au moment de l'entrée — n'affecte pas le coût unitaire du produit</small>
+      <small class="text-400">{{ 'entree_produit.cost_note' | transloco }}</small>
     </div>
 
     <!-- Référence + Lot sur la même ligne -->
     <div class="grid">
       <div class="col-6 flex flex-column gap-1">
-        <label class="text-sm font-medium text-700">Référence</label>
+        <label class="text-sm font-medium text-700">{{ 'common.reference' | transloco }}</label>
         <input pInputText name="referenceId" [(ngModel)]="form.referenceId"
-          placeholder="BL-2024-001" class="w-full" />
+          [placeholder]="'entree_produit.reference_placeholder' | transloco" class="w-full" />
       </div>
       <div class="col-6 flex flex-column gap-1">
-        <label class="text-sm font-medium text-700">N° lot</label>
+        <label class="text-sm font-medium text-700">{{ 'entree_produit.lot_number' | transloco }}</label>
         <input pInputText name="numeroLot" [(ngModel)]="form.numeroLot"
-          placeholder="LOT-001" class="w-full" />
+          [placeholder]="'entree_produit.lot_placeholder' | transloco" class="w-full" />
       </div>
     </div>
 
     <!-- DLC -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">DLC</label>
+      <label class="text-sm font-medium text-700">{{ 'entree_produit.dlc' | transloco }}</label>
       <p-datepicker
         name="dlc"
         [(ngModel)]="form.dlc"
         [showIcon]="true"
         dateFormat="dd/mm/yy"
-        placeholder="jj/mm/aaaa"
+        [placeholder]="'entree_produit.dlc_placeholder' | transloco"
         [minDate]="today"
         styleClass="w-full"
       />
@@ -88,19 +88,19 @@
 
     <!-- Notes -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Notes</label>
+      <label class="text-sm font-medium text-700">{{ 'common.notes' | transloco }}</label>
       <textarea pTextarea name="notes" [(ngModel)]="form.notes"
-        rows="2" placeholder="Origine, sous-traitant..." class="w-full"></textarea>
+        rows="2" [placeholder]="'entree_produit.notes_placeholder' | transloco" class="w-full"></textarea>
     </div>
 
   </form>
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2">
-      <p-button label="Annuler" severity="secondary" [outlined]="true"
+      <p-button [label]="'common.cancel' | transloco" severity="secondary" [outlined]="true"
         (onClick)="onHide()" [disabled]="saving" />
       <p-button
-        label="Enregistrer l'entrée"
+        [label]="'entree_produit.save_entry' | transloco"
         icon="pi pi-check"
         severity="success"
         [loading]="saving"

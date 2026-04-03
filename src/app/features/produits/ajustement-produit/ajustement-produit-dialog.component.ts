@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { Button } from 'primeng/button';
@@ -20,7 +21,7 @@ interface SelectOption {
     selector: 'app-ajustement-produit-dialog',
     templateUrl: './ajustement-produit-dialog.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, Button, DialogModule, Select, SelectButton, InputNumber, Textarea]
+    imports: [CommonModule, FormsModule, Button, DialogModule, Select, SelectButton, InputNumber, Textarea, TranslocoModule]
 })
 export class AjustementProduitDialogComponent implements OnInit, OnChanges {
     @Input() visible = false;

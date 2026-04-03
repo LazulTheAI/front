@@ -9,7 +9,7 @@
   <ng-template pTemplate="header">
     <div class="flex align-items-center gap-2">
       <i class="pi pi-history text-primary"></i>
-      <span class="font-bold text-900">Historique — {{ produit?.nom }}</span>
+      <span class="font-bold text-900">{{ 'historique_produit.title' | transloco }} — {{ produit?.nom }}</span>
     </div>
   </ng-template>
 
@@ -20,12 +20,12 @@
       [options]="entrepotOptions"
       optionLabel="label"
       optionValue="value"
-      placeholder="Tous les entrepôts"
+      [placeholder]="'historique_produit.filter_warehouse' | transloco"
       [showClear]="true"
       (onChange)="charger()"
       class="w-14rem"
     />
-    <span class="text-400 text-xs">30 derniers jours</span>
+    <span class="text-400 text-xs">{{ 'historique_produit.days_30' | transloco }}</span>
   </div>
 
   @if (loading) {
@@ -35,7 +35,7 @@
   } @else if (mouvements.length === 0) {
     <div class="text-center py-6 text-400">
       <i class="pi pi-history text-4xl mb-3 block opacity-30"></i>
-      Aucun mouvement enregistré
+      {{ 'historique_produit.no_movements' | transloco }}
     </div>
   } @else {
     <p-table
@@ -45,12 +45,12 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th style="width:140px">Date</th>
+          <th style="width:140px">{{ 'common.date' | transloco }}</th>
           <th style="width:160px">Type</th>
-          <th style="width:130px">Entrepôt</th>
-          <th style="width:100px;text-align:right">Quantité</th>
-          <th style="width:110px;text-align:right">Coût unit.</th>
-          <th>Référence / Notes</th>
+          <th style="width:130px">{{ 'common.warehouse' | transloco }}</th>
+          <th style="width:100px;text-align:right">{{ 'common.quantity' | transloco }}</th>
+          <th style="width:110px;text-align:right">{{ 'historique_produit.cost_unit' | transloco }}</th>
+          <th>{{ 'historique_produit.reference_notes' | transloco }}</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-m>
@@ -96,7 +96,7 @@
                 </span>
               }
               @if (m.numeroLot) {
-                <span class="text-400 text-xs">Lot : {{ m.numeroLot }}</span>
+                <span class="text-400 text-xs">{{ 'historique_produit.lot' | transloco }} : {{ m.numeroLot }}</span>
               }
               @if (m.notes) {
                 <span class="text-400 text-xs">{{ m.notes }}</span>
@@ -121,7 +121,7 @@
   }
 
   <ng-template pTemplate="footer">
-    <p-button label="Fermer" severity="secondary" (onClick)="onHide()" />
+    <p-button [label]="'common.close' | transloco" severity="secondary" (onClick)="onHide()" />
   </ng-template>
 
 </p-dialog>

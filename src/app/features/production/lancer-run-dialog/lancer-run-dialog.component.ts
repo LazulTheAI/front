@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -23,7 +24,7 @@ interface SelectOption {
 @Component({
     selector: 'app-lancer-run-dialog',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule, InputTextModule, SelectModule, TextareaModule, DividerModule, TableModule, TagModule],
+    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule, InputTextModule, SelectModule, TextareaModule, DividerModule, TableModule, TagModule, TranslocoModule],
     templateUrl: './lancer-run-dialog.component.html'
 })
 export class LancerRunDialogComponent implements OnChanges, OnInit {

@@ -26,7 +26,7 @@
           styleClass="text-sm px-3"
         />
         @if (run.stockInsuffisant) {
-          <p-tag value="Stock insuffisant" severity="warn" styleClass="text-xs" />
+          <p-tag [value]="'run_detail.insufficient_stock' | transloco" severity="warn" styleClass="text-xs" />
         }
       </div>
       <div class="flex gap-4 text-sm text-500">
@@ -41,13 +41,13 @@
     <div class="grid mb-4">
       <div class="col-3">
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
-          <div class="text-400 text-xs font-medium mb-2">BATCHES</div>
+          <div class="text-400 text-xs font-medium mb-2">{{ 'run_detail.batches' | transloco }}</div>
           <div class="font-bold text-2xl text-900">{{ run.batchsProduits | number:'1.0-2' }}</div>
         </div>
       </div>
       <div class="col-3">
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
-          <div class="text-400 text-xs font-medium mb-2">UNITÉS PRODUITES</div>
+          <div class="text-400 text-xs font-medium mb-2">{{ 'run_detail.units_produced' | transloco }}</div>
           <div class="font-bold text-2xl text-green-600">
             {{ run.unitesProduite != null ? (run.unitesProduite | number:'1.0-2') : '—' }}
           </div>
@@ -55,7 +55,7 @@
       </div>
       <div class="col-3">
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
-          <div class="text-400 text-xs font-medium mb-2">COGS TOTAL</div>
+          <div class="text-400 text-xs font-medium mb-2">{{ 'run_detail.cogs_total' | transloco }}</div>
           @if (cogsTotal > 0) {
             <div class="font-bold text-2xl text-primary">{{ cogsTotal | currency:'EUR':'symbol':'1.2-2' }}</div>
           } @else {
@@ -65,7 +65,7 @@
       </div>
       <div class="col-3">
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
-          <div class="text-400 text-xs font-medium mb-2">COÛT / UNITÉ</div>
+          <div class="text-400 text-xs font-medium mb-2">{{ 'run_detail.cost_per_unit' | transloco }}</div>
           @if (coutParUniteValue > 0) {
             <div class="font-bold text-2xl text-900">{{ coutParUniteValue | currency:'EUR':'symbol':'1.2-4' }}</div>
           } @else {
@@ -79,22 +79,22 @@
     <p-tabs  [(value)]="activeTab">
       <p-tablist>
         <p-tab value="0">
-          <i class="pi pi-list mr-2"></i>Traçabilité lots
+          <i class="pi pi-list mr-2"></i>{{ 'run_detail.traceability_lots' | transloco }}
           @if (getLots().length > 0) {
             <p-tag [value]="getLots().length + ' lot(s)'" severity="secondary" styleClass="text-xs ml-2" />
           }
         </p-tab>
         <p-tab value="1">
-          <i class="pi pi-chart-pie mr-2"></i>Résumé par matière
+          <i class="pi pi-chart-pie mr-2"></i>{{ 'run_detail.summary_by_material' | transloco }}
         </p-tab>
         <p-tab value="2">
-          <i class="pi pi-exclamation-triangle mr-2"></i>Manques
+          <i class="pi pi-exclamation-triangle mr-2"></i>{{ 'run_detail.shortages' | transloco }}
           @if ((run.manques?.length ?? 0) > 0) {
             <p-tag [value]="run.manques!.length + ''" severity="warn" styleClass="text-xs ml-2" />
           }
         </p-tab>
         <p-tab value="3">
-          <i class="pi pi-history mr-2"></i>Chronologie
+          <i class="pi pi-history mr-2"></i>{{ 'run_detail.chronology' | transloco }}
         </p-tab>
       </p-tablist>
 
@@ -106,14 +106,14 @@
             <p-table [value]="getLots()" styleClass="p-datatable-sm mt-2">
               <ng-template pTemplate="header">
                 <tr>
-                  <th style="min-width: 160px">Matière première</th>
-                  <th style="width: 110px" class="text-right">Qté consommée</th>
-                  <th style="width: 110px">N° de lot</th>
-                  <th style="width: 130px">DLC lot</th>
-                  <th style="width: 140px">Entrepôt source</th>
-                  <th style="width: 140px">Fournisseur</th>
-                  <th style="width: 100px" class="text-right">Coût unit.</th>
-                  <th style="width: 100px" class="text-right">Coût total</th>
+                  <th style="min-width: 160px">{{ 'run_detail.material' | transloco }}</th>
+                  <th style="width: 110px" class="text-right">{{ 'run_detail.qty_consumed' | transloco }}</th>
+                  <th style="width: 110px">{{ 'run_detail.lot_number' | transloco }}</th>
+                  <th style="width: 130px">{{ 'run_detail.dlc_lot' | transloco }}</th>
+                  <th style="width: 140px">{{ 'run_detail.source_warehouse' | transloco }}</th>
+                  <th style="width: 140px">{{ 'run_detail.supplier' | transloco }}</th>
+                  <th style="width: 100px" class="text-right">{{ 'run_detail.cost_unit' | transloco }}</th>
+                  <th style="width: 100px" class="text-right">{{ 'run_detail.total_cost' | transloco }}</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-lot>
@@ -166,7 +166,7 @@
                         <i class="pi pi-truck text-xs mr-1"></i>{{ lot.fournisseurNom }}
                       </span>
                     } @else {
-                      <span class="text-400 text-sm">Non renseigné</span>
+                      <span class="text-400 text-sm">{{ 'run_detail.no_traceability' | transloco }}</span>
                     }
                   </td>
                   <td class="text-right">
@@ -189,7 +189,7 @@
               </ng-template>
               <ng-template pTemplate="footer">
                 <tr>
-                  <td colspan="7" class="text-right font-medium text-500">COGS Total</td>
+                  <td colspan="7" class="text-right font-medium text-500">{{ 'run_detail.cogs_total' | transloco }}</td>
                   <td class="text-right font-bold text-900">
                     {{ getTotalCogs() | currency:'EUR':'symbol':'1.2-2' }}
                   </td>
@@ -200,9 +200,9 @@
             <div class="text-center py-5 text-400">
               <i class="pi pi-info-circle text-2xl mb-2 block"></i>
               @if (run.statut === 'PLANIFIE') {
-                La traçabilité sera disponible après exécution du run.
+                {{ 'run_detail.no_traceability' | transloco }}
               } @else {
-                Aucun lot de traçabilité enregistré.
+                {{ 'run_detail.no_traceability_recorded' | transloco }}
               }
             </div>
           }
@@ -276,7 +276,7 @@
           } @else {
             <div class="text-center py-5 text-400">
               <i class="pi pi-chart-pie text-2xl mb-2 block"></i>
-              Aucune donnée de consommation disponible.
+              {{ 'run_detail.no_consumption' | transloco }}
             </div>
           }
         </p-tabpanel>
@@ -287,17 +287,17 @@
             <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round mb-3 mt-2 border-1 border-orange-200">
               <i class="pi pi-exclamation-triangle text-orange-500"></i>
               <span class="text-sm text-orange-800">
-                Ce run a été exécuté avec un stock insuffisant.
+                {{ 'run_detail.shortage_warning' | transloco }}
               </span>
             </div>
             <p-table [value]="run.manques ?? []" styleClass="p-datatable-sm">
               <ng-template pTemplate="header">
                 <tr>
-                  <th>Matériau</th>
-                  <th style="width: 120px" class="text-right">Besoin</th>
-                  <th style="width: 120px" class="text-right">Disponible</th>
-                  <th style="width: 120px" class="text-right">Manque</th>
-                  <th style="width: 120px">Couverture</th>
+                  <th>{{ 'run_detail.material' | transloco }}</th>
+                  <th style="width: 120px" class="text-right">{{ 'run_detail.need' | transloco }}</th>
+                  <th style="width: 120px" class="text-right">{{ 'run_detail.available' | transloco }}</th>
+                  <th style="width: 120px" class="text-right">{{ 'run_detail.shortage' | transloco }}</th>
+                  <th style="width: 120px">{{ 'run_detail.coverage' | transloco }}</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-m>
@@ -339,7 +339,7 @@
           } @else {
             <div class="text-center py-5 text-green-600">
               <i class="pi pi-check-circle text-3xl mb-2 block"></i>
-              Aucun manque de stock — toutes les matières étaient disponibles.
+              {{ 'run_detail.no_shortage' | transloco }}
             </div>
           }
         </p-tabpanel>
@@ -391,7 +391,7 @@
     <div class="flex justify-content-between w-full">
       @if (run?.statut === 'TERMINE') {
         <p-button
-          label="Exporter CSV traçabilité"
+          [label]="'run_detail.export_csv' | transloco"
           icon="pi pi-download"
           severity="secondary"
           [outlined]="true"
@@ -401,7 +401,7 @@
       } @else {
         <span></span>
       }
-      <p-button label="Fermer" severity="secondary" [text]="true" (onClick)="onHide()" />
+      <p-button [label]="'common.close' | transloco" severity="secondary" [text]="true" (onClick)="onHide()" />
     </div>
   </ng-template>
 

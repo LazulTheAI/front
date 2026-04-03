@@ -4,9 +4,9 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-users text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Mon &#233;quipe</h2>
+        <h2 class="m-0 text-900 font-semibold">{{ 'mon_equipe.title' | transloco }}</h2>
         <p class="m-0 text-400 text-sm mt-1">
-          {{ nbActifs }} membre(s) actif(s) &#183; {{ admins.length }} admin(s) &#183; {{ operateurs.length }} op&#233;rateur(s)
+          {{ nbActifs }} {{ 'mon_equipe.member_count' | transloco }} &middot; {{ admins.length }} {{ 'mon_equipe.admins_count' | transloco }} &middot; {{ operateurs.length }} {{ 'mon_equipe.operators_count' | transloco }}
         </p>
       </div>
     </div>
@@ -14,7 +14,7 @@
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3">
       <p-button
-        label="Inviter un membre"
+        [label]="'mon_equipe.invite_member' | transloco"
         icon="pi pi-plus"
         (onClick)="openCreate()"
       />
@@ -36,9 +36,9 @@
   @if (utilisateurs.length === 0) {
     <div class="surface-card border-round-xl p-8 text-center">
       <div class="text-6xl mb-4">👥</div>
-      <div class="text-900 font-semibold text-xl mb-2">Aucun membre dans l'équipe</div>
-      <div class="text-500 mb-4">Invitez vos premiers opérateurs ou administrateurs.</div>
-      <p-button label="Inviter un membre" icon="pi pi-user-plus" (onClick)="openCreate()" />
+      <div class="text-900 font-semibold text-xl mb-2">{{ 'mon_equipe.no_members' | transloco }}</div>
+      <div class="text-500 mb-4">{{ 'mon_equipe.invite_operators' | transloco }}</div>
+      <p-button [label]="'mon_equipe.invite_member' | transloco" icon="pi pi-user-plus" (onClick)="openCreate()" />
     </div>
   }
 
@@ -47,7 +47,7 @@
     <div class="mb-5">
       <div class="flex align-items-center gap-2 mb-3">
         <i class="pi pi-shield text-orange-500"></i>
-        <span class="font-semibold text-700 uppercase text-sm">Administrateurs</span>
+        <span class="font-semibold text-700 uppercase text-sm">{{ 'mon_equipe.administrators' | transloco }}</span>
         <span class="text-400 text-sm">({{ admins.length }})</span>
       </div>
       <div class="grid">
@@ -65,7 +65,7 @@
     <div class="mb-5">
       <div class="flex align-items-center gap-2 mb-3">
         <i class="pi pi-wrench text-blue-500"></i>
-        <span class="font-semibold text-700 uppercase text-sm">Opérateurs</span>
+        <span class="font-semibold text-700 uppercase text-sm">{{ 'mon_equipe.operators' | transloco }}</span>
         <span class="text-400 text-sm">({{ operateurs.length }})</span>
       </div>
       <div class="grid">
@@ -82,7 +82,7 @@
   @if (utilisateurs | utilisateursInactifs; as inactifs) {
     @if (inactifs.length > 0) {
       <p-divider align="left">
-        <span class="text-400 text-sm">{{ inactifs.length }} membre(s) désactivé(s)</span>
+        <span class="text-400 text-sm">{{ inactifs.length }} {{ 'mon_equipe.inactive_members' | transloco }}</span>
       </p-divider>
       <div class="grid">
         @for (user of inactifs; track user.id) {
@@ -98,7 +98,7 @@
                 <div class="font-medium text-600 text-sm">{{ user.nom }}</div>
                 <div class="text-400 text-xs truncate">{{ user.email }}</div>
               </div>
-              <p-tag value="Inactif" severity="secondary" styleClass="text-xs" />
+              <p-tag [value]="'mon_equipe.inactive' | transloco" severity="secondary" styleClass="text-xs" />
             </div>
           </div>
         }
@@ -131,12 +131,12 @@
       </div>
       <div class="flex flex-column align-items-end gap-1">
         <p-tag
-          [value]="user.role === 'ADMIN' ? 'Admin' : 'Opérateur'"
+          [value]="user.role === 'ADMIN' ? ('mon_equipe.administrators' | transloco) : ('mon_equipe.operators' | transloco)"
           [severity]="user.role === 'ADMIN' ? 'warn' : 'info'"
           styleClass="text-xs"
         />
         <p-tag
-          [value]="user.actif ? 'Actif' : 'Inactif'"
+          [value]="user.actif ? ('common.active' | transloco) : ('mon_equipe.inactive' | transloco)"
           [severity]="user.actif ? 'success' : 'secondary'"
           styleClass="text-xs"
         />
@@ -146,13 +146,13 @@
     <!-- Date création -->
     <div class="text-400 text-xs flex align-items-center gap-1">
       <i class="pi pi-calendar"></i>
-      Membre depuis le {{ user.createdAt | date:'dd/MM/yyyy' }}
+      {{ 'mon_equipe.member_since' | transloco }} {{ user.createdAt | date:'dd/MM/yyyy' }}
     </div>
 
     <!-- Actions -->
     <div class="flex gap-2 mt-auto pt-2 border-top-1 surface-border">
       <p-button
-        label="Modifier"
+        [label]="'common.edit' | transloco"
         icon="pi pi-pencil"
         severity="secondary"
         [outlined]="true"
@@ -168,7 +168,7 @@
           [text]="true"
           [rounded]="true"
           size="small"
-          pTooltip="Désactiver"
+          [pTooltip]="'common.inactive' | transloco"
           (onClick)="confirmDesactiver(user, $event)"
         />
       }
@@ -178,7 +178,7 @@
 
 <!-- Dialog création / édition -->
 <p-dialog
-  [header]="editingUser ? 'Modifier ' + editingUser.nom : 'Inviter un membre'"
+  [header]="editingUser ? ('mon_equipe.form_title_edit' | transloco) + editingUser.nom : ('mon_equipe.form_title_new' | transloco)"
   [(visible)]="showFormDialog"
   [modal]="true"
   [style]="{ width: '460px' }"
@@ -187,31 +187,31 @@
   <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
 
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="nom">Nom complet <span class="text-red-500">*</span></label>
+      <label class="font-medium text-900" for="nom">{{ 'mon_equipe.full_name' | transloco }} <span class="text-red-500">*</span></label>
       <input
         pInputText id="nom" name="nom"
         [(ngModel)]="formData.nom"
         required maxlength="255"
-        placeholder="Prénom Nom"
+        [placeholder]="'mon_equipe.full_name_placeholder' | transloco"
         [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
       />
     </div>
 
     @if (!editingUser) {
       <div class="flex flex-column gap-2">
-        <label class="font-medium text-900" for="email">Email <span class="text-red-500">*</span></label>
+        <label class="font-medium text-900" for="email">{{ 'mon_equipe.email' | transloco }} <span class="text-red-500">*</span></label>
         <input
           pInputText id="email" name="email"
           [(ngModel)]="formData.email"
           required type="email"
-          placeholder="prenom.nom@exemple.com"
+          [placeholder]="'mon_equipe.email_placeholder' | transloco"
           [class.ng-invalid]="ngForm.submitted && ngForm.controls['email']?.invalid"
         />
       </div>
     }
 
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="role">Rôle <span class="text-red-500">*</span></label>
+      <label class="font-medium text-900" for="role">{{ 'mon_equipe.role' | transloco }} <span class="text-red-500">*</span></label>
       <p-select
         inputId="role" name="role"
         [(ngModel)]="formData.role"
@@ -223,18 +223,18 @@
       />
       <small class="text-500">
         @if (formData.role === 'ADMIN') {
-          L'admin peut gérer les recettes, les matériaux et les utilisateurs.
+          {{ 'mon_equipe.admin_desc' | transloco }}
         } @else {
-          L'opérateur peut consulter et exécuter des runs de production.
+          {{ 'mon_equipe.operator_desc' | transloco }}
         }
       </small>
     </div>
 
     <div class="flex flex-column gap-2">
       <label class="font-medium text-900" for="mdp">
-        Mot de passe
+        {{ 'mon_equipe.password' | transloco }}
         @if (!editingUser) { <span class="text-red-500">*</span> }
-        @if (editingUser) { <span class="text-400 font-normal text-sm">(laisser vide pour ne pas changer)</span> }
+        @if (editingUser) { <span class="text-400 font-normal text-sm">{{ 'mon_equipe.leave_empty' | transloco }}</span> }
       </label>
       <p-password
         inputId="mdp" name="motDePasse"
@@ -242,7 +242,7 @@
         [required]="!editingUser"
         [feedback]="true"
         [toggleMask]="true"
-        placeholder="Mot de passe"
+        [placeholder]="'mon_equipe.password' | transloco"
         styleClass="w-full"
         inputStyleClass="w-full"
       />
@@ -251,9 +251,9 @@
   </form>
 
   <ng-template pTemplate="footer">
-    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="showFormDialog = false" [disabled]="savingForm" />
+    <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true" (onClick)="showFormDialog = false" [disabled]="savingForm" />
     <p-button
-      [label]="editingUser ? 'Enregistrer' : 'Inviter'"
+      [label]="editingUser ? ('common.save_changes' | transloco) : ('mon_equipe.invite' | transloco)"
       [icon]="editingUser ? 'pi pi-check' : 'pi pi-user-plus'"
       [loading]="savingForm"
       (onClick)="submitForm(ngForm)"

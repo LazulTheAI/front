@@ -16,12 +16,13 @@ import { TooltipModule } from 'primeng/tooltip';
 import { CreateUtilisateurRequest, UpdateUtilisateurRequest, UtilisateurMarchandControllerService, UtilisateurResponse } from '@/app/modules/openapi';
 import { ToolbarModule } from 'primeng/toolbar';
 import { UtilisateursInactifsPipe } from './mon-equipe.pipes';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-mon-equipe',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, ToolbarModule, ButtonModule, TagModule, ToastModule, InputTextModule, PasswordModule, SelectModule, DialogModule, TooltipModule, DividerModule, UtilisateursInactifsPipe],
+    imports: [CommonModule, FormsModule, ToolbarModule, ButtonModule, TagModule, ToastModule, InputTextModule, PasswordModule, SelectModule, DialogModule, TooltipModule, DividerModule, UtilisateursInactifsPipe, TranslocoModule],
     providers: [MessageService, ConfirmationService],
     templateUrl: './mon-equipe.component.html'
 })

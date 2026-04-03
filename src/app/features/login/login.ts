@@ -11,6 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-login',
@@ -25,7 +26,8 @@ import { ToastModule } from 'primeng/toast';
         RouterModule,
         RippleModule,
         AppFloatingConfigurator,
-        ToastModule
+        ToastModule,
+        TranslocoModule
     ],
     providers: [MessageService],
     templateUrl: './login.html',

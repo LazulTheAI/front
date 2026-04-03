@@ -31,6 +31,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
+import { TranslocoModule } from '@jsverse/transloco';
 
 interface LieuVm extends EntrepotResponse {
     utilisateursAssignes: UtilisateurResponse[];
@@ -57,7 +58,8 @@ interface LieuVm extends EntrepotResponse {
         TextareaModule,
         DialogModule,
         TooltipModule,
-        DividerModule
+        DividerModule,
+        TranslocoModule
     ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './lieux-production.component.html'

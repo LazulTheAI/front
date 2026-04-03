@@ -1,6 +1,7 @@
 // produits-list.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -75,7 +76,8 @@ interface StockProduitResponse {
         EntreeProduitDialogComponent,
         TransfertProduitDialogComponent,
         HistoriqueProduitDialogComponent,
-        AjustementProduitDialogComponent
+        AjustementProduitDialogComponent,
+        TranslocoModule
     ],
     templateUrl: './produits-list.component.html'
 })

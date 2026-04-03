@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { Button } from 'primeng/button';
@@ -13,7 +14,7 @@ import { RevendeurControllerService, RevendeurResponse } from '@/app/modules/ope
 @Component({
     selector: 'app-revendeur-form-dialog',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, Button, InputNumber, InputText, Textarea],
+    imports: [CommonModule, FormsModule, DialogModule, Button, InputNumber, InputText, Textarea, TranslocoModule],
     templateUrl: 'revendeur-form-dialog.component.html'
 })
 export class RevendeurFormDialogComponent implements OnChanges {

@@ -3,16 +3,16 @@
   <!-- En-tête -->
   <div class="flex justify-content-between align-items-center">
     <div class="flex align-items-center gap-2">
-      <span class="font-medium text-900">Ingrédients</span>
+      <span class="font-medium text-900">{{ 'ingredients_editor.title' | transloco }}</span>
       @if (ingredients.length > 0) {
-        <p-tag [value]="ingredients.length + ' ligne(s)'" severity="secondary" />
+        <p-tag [value]="ingredients.length + ' ' + ('ingredients_editor.lines' | transloco)" severity="secondary" />
       }
       @if (hasDuplicates()) {
-        <p-tag value="Doublons détectés" severity="warn" />
+        <p-tag [value]="'ingredients_editor.duplicates_detected' | transloco" severity="warn" />
       }
     </div>
     <p-button
-      label="Ajouter un ingrédient"
+      [label]="'ingredients_editor.add_ingredient' | transloco"
       icon="pi pi-plus"
       severity="secondary"
       size="small"
@@ -24,7 +24,7 @@
   @if (ingredients.length === 0) {
     <div class="surface-100 border-round p-4 text-center text-400">
       <i class="pi pi-list text-2xl mb-2 block"></i>
-      Aucun ingrédient ajouté. Cliquez sur "Ajouter" pour commencer.
+      {{ 'ingredients_editor.no_ingredients' | transloco }}
     </div>
   }
 
@@ -35,7 +35,7 @@
         <!-- Matériau -->
         <div class="col-12 md:col-5 flex flex-column gap-1">
           @if (i === 0) {
-            <label class="text-xs text-500 font-medium">MATÉRIAU</label>
+            <label class="text-xs text-500 font-medium">{{ 'ingredients_editor.material' | transloco }}</label>
           }
           <p-select
             [name]="'materiau_' + i"
@@ -43,9 +43,9 @@
             [options]="materiauOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="Sélectionner un matériau..."
+            [placeholder]="'ingredients_editor.select_material' | transloco"
             [filter]="true"
-            filterPlaceholder="Rechercher..."
+            [filterPlaceholder]="'ingredients_editor.search_material' | transloco"
             [loading]="loadingMateriaux"
             (onChange)="onMateriauChange(i, $event.value)"
             styleClass="w-full"
@@ -55,7 +55,7 @@
         <!-- Quantité -->
         <div class="col-12 md:col-3 flex flex-column gap-1">
           @if (i === 0) {
-            <label class="text-xs text-500 font-medium">QUANTITÉ</label>
+            <label class="text-xs text-500 font-medium">{{ 'common.quantity' | transloco }}</label>
           }
           <p-inputNumber
             [name]="'quantite_' + i"
@@ -72,14 +72,14 @@
         <!-- Unité -->
         <div class="col-12 md:col-3 flex flex-column gap-1">
           @if (i === 0) {
-            <label class="text-xs text-500 font-medium">UNITÉ</label>
+            <label class="text-xs text-500 font-medium">{{ 'ingredients_editor.unit_placeholder' | transloco }}</label>
           }
           <input
             pInputText
             [name]="'unite_' + i"
             [(ngModel)]="ligne.unite"
             maxlength="20"
-            placeholder="kg, L, g..."
+            [placeholder]="'ingredients_editor.unit_placeholder' | transloco"
             (ngModelChange)="onFieldChange()"
             class="w-full"
           />
@@ -93,7 +93,7 @@
             [text]="true"
             [rounded]="true"
             size="small"
-            pTooltip="Supprimer cette ligne"
+            [pTooltip]="'ingredients_editor.delete' | transloco"
             (onClick)="removeIngredient(i)"
           />
         </div>
@@ -106,7 +106,7 @@
   @if (ingredients.length > 0 && !isValid()) {
     <small class="text-orange-500">
       <i class="pi pi-info-circle mr-1"></i>
-      Tous les ingrédients doivent avoir un matériau, une quantité et une unité.
+      {{ 'ingredients_editor.validation_message' | transloco }}
     </small>
   }
 

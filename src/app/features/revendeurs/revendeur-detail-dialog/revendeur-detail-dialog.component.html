@@ -15,7 +15,7 @@
             <span class="text-xl font-semibold">{{ dialogHeader }}</span>
             <p-button
                 icon="pi pi-pencil"
-                label="Modifier"
+                [label]="'revendeur_detail.edit' | transloco"
                 severity="secondary"
                 size="small"
                 (onClick)="onEdit.emit($event)"
@@ -26,26 +26,26 @@
     <ng-container *ngIf="revendeur">
         <!-- Informations générales -->
         <section class="mb-4">
-            <h3 class="text-base font-semibold text-color-secondary mb-3">Informations générales</h3>
+            <h3 class="text-base font-semibold text-color-secondary mb-3">{{ 'revendeur_detail.contact' | transloco }}</h3>
             <div class="grid">
                 <div class="col-12 md:col-6 flex flex-column gap-1">
                     <span class="text-xs text-color-secondary uppercase font-medium">Nom</span>
                     <span class="font-medium">{{ revendeur.nom ?? '—' }}</span>
                 </div>
                 <div class="col-12 md:col-6 flex flex-column gap-1">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Contact</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'revendeur_detail.contact' | transloco }}</span>
                     <span class="font-medium">{{ revendeur.contact ?? '—' }}</span>
                 </div>
                 <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Email</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'revendeur_detail.email' | transloco }}</span>
                     <span class="font-medium">{{ revendeur.email ?? '—' }}</span>
                 </div>
                 <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Téléphone</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'revendeur_detail.phone' | transloco }}</span>
                     <span class="font-medium">{{ revendeur.telephone ?? '—' }}</span>
                 </div>
                 <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Adresse</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'revendeur_detail.address' | transloco }}</span>
                     <span class="font-medium">
                         {{ revendeur.adresse ?? '—' }}<br *ngIf="revendeur.adresse" />
                         {{ revendeur.codePostal }} {{ revendeur.ville }}<br *ngIf="revendeur.ville" />
@@ -53,24 +53,24 @@
                     </span>
                 </div>
                 <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Remise globale</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'revendeur_detail.discount' | transloco }}</span>
                     <span class="font-medium">
                         {{ revendeur.remiseGlobale != null ? (revendeur.remiseGlobale + ' %') : '—' }}
                     </span>
                 </div>
                 <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Statut</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'common.status' | transloco }}</span>
                     <p-tag
-                        [value]="revendeur.actif ? 'Actif' : 'Inactif'"
+                        [value]="revendeur.actif ? ('revendeurs.active' | transloco) : ('revendeurs.archived' | transloco)"
                         [severity]="revendeur.actif ? 'success' : 'danger'"
                     />
                 </div>
                 <div class="col-12 md:col-6 flex flex-column gap-1 mt-3">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Créé le</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'revendeur_detail.since' | transloco }}</span>
                     <span class="font-medium">{{ revendeur.createdAt | date: 'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="col-12 flex flex-column gap-1 mt-3" *ngIf="revendeur.notes">
-                    <span class="text-xs text-color-secondary uppercase font-medium">Notes</span>
+                    <span class="text-xs text-color-secondary uppercase font-medium">{{ 'common.notes' | transloco }}</span>
                     <span class="font-medium">{{ revendeur.notes }}</span>
                 </div>
             </div>
@@ -80,7 +80,7 @@
 
         <!-- Commandes récentes -->
         <section>
-            <h3 class="text-base font-semibold text-color-secondary mb-3">Commandes récentes</h3>
+            <h3 class="text-base font-semibold text-color-secondary mb-3">{{ 'revendeur_detail.orders_history' | transloco }}</h3>
 
             <p-table
                 [value]="commandes"
@@ -89,15 +89,20 @@
                 [paginator]="false"
                 responsiveLayout="scroll"
                 styleClass="p-datatable-sm"
-                emptyMessage="Aucune commande trouvée"
+              
             >
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="100%">{{ 'revendeur_detail.no_orders' | transloco }}</td>
+                    </tr>
+                </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Numéro</th>
-                        <th>Date</th>
-                        <th>Statut</th>
-                        <th>Montant</th>
-                        <th class="text-center">Actions</th>
+                        <th>{{ 'revendeur_detail.number' | transloco }}</th>
+                        <th>{{ 'common.date' | transloco }}</th>
+                        <th>{{ 'common.status' | transloco }}</th>
+                        <th>{{ 'revendeur_detail.total_ht' | transloco }}</th>
+                        <th class="text-center">{{ 'common.actions' | transloco }}</th>
                     </tr>
                 </ng-template>
 
@@ -118,7 +123,7 @@
                                 severity="secondary"
                                 [text]="true"
                                 size="small"
-                                pTooltip="Télécharger le bon de livraison"
+                                [pTooltip]="'revendeur_detail.see_detail' | transloco"
                                 tooltipPosition="left"
                                 (onClick)="downloadBonLivraison(commande)"
                             />

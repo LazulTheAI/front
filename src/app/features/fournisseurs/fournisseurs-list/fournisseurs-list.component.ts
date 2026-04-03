@@ -16,12 +16,13 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { FournisseurControllerService, FournisseurRequest, FournisseurResponse } from '@/app/modules/openapi';
 import { ToolbarModule } from 'primeng/toolbar';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @Component({
     selector: 'app-fournisseurs-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, ToolbarModule, FormsModule, ButtonModule, TagModule, ToastModule, InputTextModule, TextareaModule, InputNumberModule, DialogModule, TooltipModule, DividerModule, TableModule],
+    imports: [CommonModule, ToolbarModule, FormsModule, ButtonModule, TagModule, ToastModule, InputTextModule, TextareaModule, InputNumberModule, DialogModule, TooltipModule, DividerModule, TableModule, TranslocoModule],
     providers: [MessageService, ConfirmationService],
     templateUrl: './fournisseurs-list.component.html'
 })

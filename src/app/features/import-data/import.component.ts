@@ -17,6 +17,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { environment } from '@/environments/environment';
+import { TranslocoModule } from '@jsverse/transloco';
 
 interface ChampSysteme {
     label: string;
@@ -60,7 +61,7 @@ const CHAMPS_PAR_TYPE: Record<string, ChampSysteme[]> = {
     selector: 'app-import',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, ToolbarModule, ButtonModule, SelectModule, FileUploadModule, TableModule, TagModule, ToastModule, DividerModule, StepperModule, ProgressBarModule, TooltipModule],
+    imports: [CommonModule, FormsModule, ToolbarModule, ButtonModule, SelectModule, FileUploadModule, TableModule, TagModule, ToastModule, DividerModule, StepperModule, ProgressBarModule, TooltipModule, TranslocoModule],
     providers: [MessageService],
     templateUrl: './import.component.html'
 })

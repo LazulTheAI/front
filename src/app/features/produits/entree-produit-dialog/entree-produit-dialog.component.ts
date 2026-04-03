@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { Button } from 'primeng/button';
@@ -22,7 +23,7 @@ interface SelectOption {
     selector: 'app-entree-produit-dialog',
     templateUrl: './entree-produit-dialog.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, Button, DialogModule, Select, InputNumber, InputText, Textarea, DatePicker]
+    imports: [CommonModule, FormsModule, Button, DialogModule, Select, InputNumber, InputText, Textarea, DatePicker, TranslocoModule]
 })
 export class EntreeProduitDialogComponent implements OnInit, OnChanges {
     @Input() visible = false;

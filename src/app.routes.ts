@@ -1,14 +1,16 @@
 import { Routes } from '@angular/router';
+import { AuthCallbackComponent } from './app/auth/auth-callback.component';
+import { BcLoadComponent } from './app/auth/gig-commerce/bc-load/bc-load.component';
 import { authGuard } from './app/auth/guards/guards';
 import { AppLayout } from './app/layout/component/app.layout';
 import { Notfound } from './app/pages/notfound/notfound';
-import { AuthCallbackComponent } from './component/auth-callback.component';
 
 export const appRoutes: Routes = [
     // Routes publiques
     { path: 'auth/callback', component: AuthCallbackComponent },
     { path: 'auth', loadChildren: () => import('./app/features/auth/auth.routes') },
     { path: 'notfound', component: Notfound },
+    { path: 'load', component: BcLoadComponent },
 
     // Routes protégées sous AppLayout
     {

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG
@@ -18,7 +19,7 @@ import { ProduitControllerService, ProduitResponse, RecetteControllerService, Re
 @Component({
     selector: 'app-lier-recette-dialog',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, SelectModule, InputNumberModule, CheckboxModule, DividerModule, ToastModule],
+    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, SelectModule, InputNumberModule, CheckboxModule, DividerModule, ToastModule, TranslocoModule],
     providers: [MessageService],
     templateUrl: './lier-recette-dialog.component.html'
 })

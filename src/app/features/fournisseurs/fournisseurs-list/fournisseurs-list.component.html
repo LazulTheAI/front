@@ -4,15 +4,15 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-truck text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Fournisseurs</h2>
-        <p class="m-0 text-400 text-sm mt-1">Gestion de vos fournisseurs de mati&#232;res premi&#232;res</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'fournisseurs.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'fournisseurs.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3">
       <p-button
-        label="Nouveau fournisseur"
+        [label]="'fournisseurs.new_supplier' | transloco"
         icon="pi pi-plus"
         (onClick)="openCreate()"
       />
@@ -34,9 +34,9 @@
     @if (!loading && fournisseursActifs.length === 0 && fournisseursArchives.length === 0) {
       <div class="surface-card border-round-xl p-8 text-center">
         <div class="text-6xl mb-4">🚚</div>
-        <div class="text-900 font-semibold text-xl mb-2">Aucun fournisseur</div>
-        <div class="text-500 mb-4">Ajoutez vos fournisseurs pour créer des bons de commande.</div>
-        <p-button label="Ajouter un fournisseur" icon="pi pi-plus" (onClick)="openCreate()" />
+        <div class="text-900 font-semibold text-xl mb-2">{{ 'fournisseurs.no_suppliers' | transloco }}</div>
+        <div class="text-500 mb-4">{{ 'fournisseurs.add_suppliers' | transloco }}</div>
+        <p-button [label]="'fournisseurs.add_supplier' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
       </div>
     }
 
@@ -82,7 +82,7 @@
               <div class="flex align-items-center gap-3">
                 @if (f.delaiLivraisonJours) {
                   <div class="text-center">
-                    <div class="text-xs text-400 mb-1">Délai livraison</div>
+                    <div class="text-xs text-400 mb-1">{{ 'fournisseurs.delivery_time' | transloco }}</div>
                     <p-tag
                       [value]="getDelaiLabel(f.delaiLivraisonJours)"
                       severity="info"
@@ -95,14 +95,14 @@
                     icon="pi pi-pencil"
                     severity="secondary"
                     [text]="true" [rounded]="true" size="small"
-                    pTooltip="Modifier"
+                    [pTooltip]="'common.edit_tooltip' | transloco"
                     (onClick)="openEdit(f, $event)"
                   />
                   <p-button
                     icon="pi pi-inbox"
                     severity="danger"
                     [text]="true" [rounded]="true" size="small"
-                    pTooltip="Archiver"
+                    [pTooltip]="'common.archive_tooltip' | transloco"
                     (onClick)="confirmArchiver(f, $event)"
                   />
                 </div>
@@ -117,7 +117,7 @@
     <!-- Fournisseurs archivés -->
     @if (fournisseursArchives.length > 0) {
       <p-divider align="left" styleClass="mt-4">
-        <span class="text-400 text-sm">{{ fournisseursArchives.length }} fournisseur(s) archivé(s)</span>
+        <span class="text-400 text-sm">{{ fournisseursArchives.length }} {{ 'fournisseurs.archived_suppliers' | transloco }}</span>
       </p-divider>
       <div class="flex flex-column gap-2">
         @for (f of fournisseursArchives; track f.id) {
@@ -136,7 +136,7 @@
                 }
               </div>
             </div>
-            <p-tag value="Archivé" severity="secondary" styleClass="text-xs" />
+            <p-tag [value]="'fournisseurs.archived' | transloco" severity="secondary" styleClass="text-xs" />
           </div>
         }
       </div>
@@ -159,7 +159,7 @@
           </div>
           <div>
             <div class="font-bold text-900 text-lg">{{ selectedFournisseur.nom }}</div>
-            <p-tag value="Actif" severity="success" styleClass="text-xs mt-1" />
+            <p-tag [value]="'fournisseurs.active' | transloco" severity="success" styleClass="text-xs mt-1" />
           </div>
         </div>
         <p-button
@@ -181,7 +181,7 @@
               <i class="pi pi-envelope text-primary"></i>
             </div>
             <div>
-              <div class="text-400 text-xs mb-1">Email</div>
+              <div class="text-400 text-xs mb-1">{{ 'fournisseurs.email' | transloco }}</div>
               <a [href]="'mailto:' + selectedFournisseur.email"
                  class="text-900 text-sm font-medium no-underline hover:underline">
                 {{ selectedFournisseur.email }}
@@ -196,7 +196,7 @@
               <i class="pi pi-phone text-primary"></i>
             </div>
             <div>
-              <div class="text-400 text-xs mb-1">Téléphone</div>
+              <div class="text-400 text-xs mb-1">{{ 'fournisseurs.phone' | transloco }}</div>
               <a [href]="'tel:' + selectedFournisseur.telephone"
                  class="text-900 text-sm font-medium no-underline hover:underline">
                 {{ selectedFournisseur.telephone }}
@@ -211,7 +211,7 @@
               <i class="pi pi-clock text-primary"></i>
             </div>
             <div>
-              <div class="text-400 text-xs mb-1">Délai de livraison</div>
+              <div class="text-400 text-xs mb-1">{{ 'fournisseurs.delivery_days' | transloco }}</div>
               <span class="text-900 text-sm font-medium">
                 {{ getDelaiLabel(selectedFournisseur.delaiLivraisonJours) }}
               </span>
@@ -224,7 +224,7 @@
             <i class="pi pi-calendar text-primary"></i>
           </div>
           <div>
-            <div class="text-400 text-xs mb-1">Fournisseur depuis</div>
+            <div class="text-400 text-xs mb-1">{{ 'fournisseurs.supplier_since' | transloco }}</div>
             <span class="text-900 text-sm font-medium">
               {{ selectedFournisseur.createdAt | date:'dd/MM/yyyy' }}
             </span>
@@ -234,7 +234,7 @@
         @if (selectedFournisseur.notes) {
           <p-divider />
           <div>
-            <div class="text-400 text-xs mb-2 font-medium uppercase">Notes</div>
+            <div class="text-400 text-xs mb-2 font-medium uppercase">{{ 'common.notes' | transloco }}</div>
             <div class="text-700 text-sm line-height-3 surface-50 border-round p-3 white-space-pre-line">
               {{ selectedFournisseur.notes }}
             </div>
@@ -248,7 +248,7 @@
       <!-- Actions -->
       <div class="flex gap-2">
         <p-button
-          label="Modifier"
+          [label]="'common.edit' | transloco"
           icon="pi pi-pencil"
           severity="secondary"
           [outlined]="true"
@@ -260,7 +260,7 @@
           icon="pi pi-inbox"
           severity="danger"
           [text]="true" [rounded]="true" size="small"
-          pTooltip="Archiver"
+          [pTooltip]="'common.archive_tooltip' | transloco"
           (onClick)="confirmArchiver(selectedFournisseur, $event)"
         />
       </div>
@@ -272,7 +272,7 @@
 
 <!-- Dialog création / édition -->
 <p-dialog
-  [header]="editingFournisseur ? 'Modifier ' + editingFournisseur.nom : 'Nouveau fournisseur'"
+  [header]="editingFournisseur ? ('fournisseurs.form_title_edit' | transloco) + editingFournisseur.nom : ('fournisseurs.form_title_new' | transloco)"
   [(visible)]="showFormDialog"
   [modal]="true"
   [style]="{ width: '500px' }"
@@ -281,55 +281,55 @@
   <form #ngForm="ngForm" class="flex flex-column gap-4 pt-2">
 
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="nom">Nom <span class="text-red-500">*</span></label>
+      <label class="font-medium text-900" for="nom">{{ 'fournisseurs.name' | transloco }} <span class="text-red-500">*</span></label>
       <input
         pInputText id="nom" name="nom"
         [(ngModel)]="formData.nom"
         required maxlength="255"
-        placeholder="Nom du fournisseur..."
+        [placeholder]="'fournisseurs.name_placeholder' | transloco"
         [class.ng-invalid]="ngForm.submitted && ngForm.controls['nom']?.invalid"
       />
     </div>
 
     <div class="grid">
       <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="email">Email</label>
+        <label class="font-medium text-900" for="email">{{ 'fournisseurs.email' | transloco }}</label>
         <input
           pInputText id="email" name="email"
           [(ngModel)]="formData.email"
           type="email" maxlength="255"
-          placeholder="contact@fournisseur.com"
+          [placeholder]="'fournisseurs.email_placeholder' | transloco"
         />
       </div>
       <div class="col-6 flex flex-column gap-2">
-        <label class="font-medium text-900" for="tel">Téléphone</label>
+        <label class="font-medium text-900" for="tel">{{ 'fournisseurs.phone' | transloco }}</label>
         <input
           pInputText id="tel" name="telephone"
           [(ngModel)]="formData.telephone"
           maxlength="50"
-          placeholder="+33 1 23 45 67 89"
+          [placeholder]="'fournisseurs.phone_placeholder' | transloco"
         />
       </div>
     </div>
 
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="delai">Délai de livraison</label>
+      <label class="font-medium text-900" for="delai">{{ 'fournisseurs.delivery_label' | transloco }}</label>
       <p-inputNumber
         inputId="delai" name="delaiLivraisonJours"
         [(ngModel)]="formData.delaiLivraisonJours"
         [min]="1" suffix=" jour(s)"
-        placeholder="Ex: 5"
+        [placeholder]="'fournisseurs.delivery_placeholder' | transloco"
       />
-      <small class="text-500">Délai moyen en jours ouvrés</small>
+      <small class="text-500">{{ 'fournisseurs.delivery_desc' | transloco }}</small>
     </div>
 
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="notes">Notes</label>
+      <label class="font-medium text-900" for="notes">{{ 'common.notes' | transloco }}</label>
       <textarea
         pTextarea id="notes" name="notes"
         [(ngModel)]="formData.notes"
         [rows]="3" maxlength="2000"
-        placeholder="Conditions particulières, contacts, remarques..."
+        [placeholder]="'fournisseurs.notes_placeholder' | transloco"
         class="w-full"
       ></textarea>
     </div>
@@ -337,9 +337,9 @@
   </form>
 
   <ng-template pTemplate="footer">
-    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="showFormDialog = false" [disabled]="savingForm" />
+    <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true" (onClick)="showFormDialog = false" [disabled]="savingForm" />
     <p-button
-      [label]="editingFournisseur ? 'Enregistrer' : 'Créer'"
+      [label]="editingFournisseur ? ('common.save_changes' | transloco) : ('common.create' | transloco)"
       icon="pi pi-check"
       [loading]="savingForm"
       (onClick)="submitForm(ngForm)"

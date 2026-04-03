@@ -1,6 +1,7 @@
 // production-list.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
@@ -47,7 +48,8 @@ import { RunDetailDialogComponent } from '../run-detail-dialog/run-detail-dialog
         PlanifierRunDialogComponent,
         LancerRunDialogComponent,
         AnnulerRunDialogComponent,
-        RunDetailDialogComponent
+        RunDetailDialogComponent,
+        TranslocoModule
     ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './production-list.component.html'

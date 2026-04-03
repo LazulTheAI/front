@@ -6,8 +6,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-users text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Revendeurs</h2>
-        <p class="m-0 text-400 text-sm mt-1">Gestion des clients B2B</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'revendeurs.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'revendeurs.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -17,10 +17,10 @@
         <p-inputicon styleClass="pi pi-search" />
         <input pInputText [ngModel]="search"
           (ngModelChange)="onSearchInput($event)"
-          placeholder="Rechercher un revendeur..."
+          [placeholder]="'revendeurs.search_reseller' | transloco"
           class="w-16rem" />
       </p-iconfield>
-      <p-button label="Nouveau revendeur" icon="pi pi-plus" (onClick)="openCreate()" />
+      <p-button [label]="'revendeurs.new_reseller' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>
   </ng-template>
 </p-toolbar>
@@ -45,16 +45,16 @@
     <ng-template pTemplate="header">
       <tr>
         <th style="width:48px"></th>
-        <th pSortableColumn="nom">Revendeur <p-sortIcon field="nom" /></th>
-        <th style="width:160px">Ville</th>
-        <th style="width:120px" class="text-right">Remise</th>
-        <th style="width:140px" class="text-right">CA mois en cours</th>
-        <th style="width:140px" class="text-right">CA mois précédent</th>
-        <th style="width:140px" class="text-right">CA année</th>
-        <th style="width:130px" class="text-right">Panier moyen</th>
-        <th style="width:90px" class="text-center">Commandes</th>
-        <th style="width:100px" class="text-center">Statut</th>
-        <th style="width:80px" class="text-center">Actions</th>
+        <th pSortableColumn="nom">{{ 'revendeurs.reseller' | transloco }} <p-sortIcon field="nom" /></th>
+        <th style="width:160px">{{ 'revendeurs.city' | transloco }}</th>
+        <th style="width:120px" class="text-right">{{ 'revendeurs.discount' | transloco }}</th>
+        <th style="width:140px" class="text-right">{{ 'revendeurs.ca_current_month' | transloco }}</th>
+        <th style="width:140px" class="text-right">{{ 'revendeurs.ca_previous_month' | transloco }}</th>
+        <th style="width:140px" class="text-right">{{ 'revendeurs.ca_year' | transloco }}</th>
+        <th style="width:130px" class="text-right">{{ 'revendeurs.average_cart' | transloco }}</th>
+        <th style="width:90px" class="text-center">{{ 'revendeurs.orders' | transloco }}</th>
+        <th style="width:100px" class="text-center">{{ 'common.status' | transloco }}</th>
+        <th style="width:80px" class="text-center">{{ 'common.actions' | transloco }}</th>
       </tr>
     </ng-template>
 
@@ -161,9 +161,9 @@
         <!-- Statut -->
         <td class="text-center">
           @if (r.actif) {
-            <p-tag value="Actif" severity="success" />
+            <p-tag [value]="'revendeurs.active' | transloco" severity="success" />
           } @else {
-            <p-tag value="Archivé" severity="secondary" />
+            <p-tag [value]="'revendeurs.archived' | transloco" severity="secondary" />
           }
         </td>
 
@@ -171,14 +171,14 @@
         <td class="text-center" (click)="$event.stopPropagation()">
           <div class="flex justify-content-center gap-1">
             <p-button icon="pi pi-eye" [text]="true" [rounded]="true"
-              severity="secondary" size="small" pTooltip="Voir le détail"
+              severity="secondary" size="small" [pTooltip]="'common.see_details' | transloco"
               (onClick)="openDetail(r)" />
             <p-button icon="pi pi-pencil" [text]="true" [rounded]="true"
-              severity="info" size="small" pTooltip="Modifier"
+              severity="info" size="small" [pTooltip]="'common.edit_tooltip' | transloco"
               (onClick)="openEdit(r, $event)" />
             @if (r.actif) {
               <p-button icon="pi pi-inbox" [text]="true" [rounded]="true"
-                severity="danger" size="small" pTooltip="Archiver"
+                severity="danger" size="small" [pTooltip]="'common.archive_tooltip' | transloco"
                 (onClick)="confirmArchiver(r, $event)" />
             }
           </div>
@@ -191,7 +191,7 @@
       <tr>
         <td colspan="11" class="text-center py-6 text-400">
           <i class="pi pi-users text-4xl block mb-3 opacity-30"></i>
-          Aucun revendeur trouvé
+          {{ 'revendeurs.no_resellers' | transloco }}
         </td>
       </tr>
     </ng-template>

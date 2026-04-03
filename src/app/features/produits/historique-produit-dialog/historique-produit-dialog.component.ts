@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 
 import { Button } from 'primeng/button';
@@ -32,7 +33,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: string; css: string }> 
     selector: 'app-historique-produit-dialog',
     templateUrl: './historique-produit-dialog.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, Button, DialogModule, Select, TableModule, Skeleton, Paginator]
+    imports: [CommonModule, FormsModule, Button, DialogModule, Select, TableModule, Skeleton, Paginator, TranslocoModule]
 })
 export class HistoriqueProduitDialogComponent implements OnChanges, OnInit {
     @Input() visible = false;

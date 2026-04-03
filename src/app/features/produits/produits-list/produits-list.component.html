@@ -8,8 +8,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-shopping-cart text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Produits BigCommerce</h2>
-        <p class="m-0 text-400 text-sm mt-1">Catalogue synchronis&#233; depuis votre boutique</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'produits.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'produits.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -17,7 +17,7 @@
     <p-iconfield>
       <p-inputicon styleClass="pi pi-search" />
       <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
-        placeholder="Rechercher..." class="w-16rem" />
+        [placeholder]="'produits.search_placeholder' | transloco" class="w-16rem" />
     </p-iconfield>
   </ng-template>
 </p-toolbar>
@@ -42,16 +42,16 @@
     <ng-template pTemplate="header">
       <tr>
         <th style="width:56px"></th>
-        <th pSortableColumn="nom">Produit <p-sortIcon field="nom" /></th>
-        <th style="width:130px" pSortableColumn="sku">SKU <p-sortIcon field="sku" /></th>
+        <th pSortableColumn="nom">{{ 'produits.product' | transloco }} <p-sortIcon field="nom" /></th>
+        <th style="width:130px" pSortableColumn="sku">{{ 'produits.sku' | transloco }} <p-sortIcon field="sku" /></th>
         <th style="width:130px" class="text-right" pSortableColumn="prixCents">
           Prix <p-sortIcon field="prixCents" />
         </th>
-        <th style="width:160px">Stock interne</th>
-        <th style="width:160px">Seuil alerte</th>
-        <th>Recette liée</th>
-        <th style="width:110px">Sync BC</th>
-        <th style="width:80px" class="text-center">Actions</th>
+        <th style="width:160px">{{ 'produits.internal_stock' | transloco }}</th>
+        <th style="width:160px">{{ 'produits.alert_threshold' | transloco }}</th>
+        <th>{{ 'produits.linked_recipe' | transloco }}</th>
+        <th style="width:110px">{{ 'produits.bc_sync' | transloco }}</th>
+        <th style="width:80px" class="text-center">{{ 'common.actions' | transloco }}</th>
       </tr>
     </ng-template>
 
@@ -100,7 +100,7 @@
           <div class="flex align-items-center gap-2">
             @if (isEnAlerteProduit(produit)) {
               <i class="pi pi-exclamation-circle text-red-500 text-sm"
-                pTooltip="Stock sous le seuil d'alerte"></i>
+                [pTooltip]="'produits.under_alert' | transloco"></i>
             }
             <span class="font-mono text-sm font-semibold"
               [class.text-red-500]="isEnAlerteProduit(produit)"
@@ -108,7 +108,7 @@
               {{ getStockTotalProduit(produit) | number:'1.0-2' }}
             </span>
             <p-button icon="pi pi-warehouse" [text]="true" [rounded]="true"
-              severity="secondary" size="small" pTooltip="Détail par entrepôt"
+              severity="secondary" size="small" [pTooltip]="'common.see_details' | transloco"
               (onClick)="openStockDialog(produit, $event)" />
           </div>
         </td>
@@ -124,7 +124,7 @@
               <span class="text-400 text-sm">—</span>
             }
             <p-button icon="pi pi-pencil" [text]="true" [rounded]="true"
-              severity="info" size="small" pTooltip="Modifier le seuil"
+              severity="info" size="small" [pTooltip]="'produits.edit_threshold' | transloco"
               (onClick)="openStockDialog(produit, $event)" />
           </div>
         </td>
@@ -136,12 +136,12 @@
               <span class="text-sm text-900">{{ getPrincipalRecette(produit) }}</span>
               @if (produit.recettes.length > 1) {
                 <p-chip [label]="'+' + (produit.recettes.length - 1)"
-                  styleClass="text-xs" pTooltip="Voir toutes les recettes liées" />
+                  styleClass="text-xs" [pTooltip]="'produits.linked_recipe' | transloco" />
               }
             </div>
           } @else {
             <span class="text-orange-400 text-sm flex align-items-center gap-1">
-              <i class="pi pi-exclamation-circle"></i>Aucune recette
+              <i class="pi pi-exclamation-circle"></i>{{ 'produits.no_recipe' | transloco }}
             </span>
           }
         </td>
@@ -153,29 +153,29 @@
               {{ produit.lastSyncedAt | date:'dd/MM HH:mm' }}
             </span>
           } @else {
-            <span class="text-400 text-xs">Jamais</span>
+            <span class="text-400 text-xs">{{ 'produits.never' | transloco }}</span>
           }
         </td>
 
         <td class="text-center">
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
             <p-button icon="pi pi-history" [rounded]="true" [text]="true"
-              severity="info" size="small" pTooltip="Historique mouvements"
+              severity="info" size="small" [pTooltip]="'produits.history' | transloco"
               (onClick)="openHistoriqueProduit(produit)" />
             <p-button icon="pi pi-arrow-down" [rounded]="true" [text]="true"
-              severity="success" size="small" pTooltip="Entrée de stock"
+              severity="success" size="small" [pTooltip]="'produits.entry' | transloco"
               (onClick)="openEntreeProduit(produit)" />
             <p-button icon="pi pi-sliders-h" [rounded]="true" [text]="true"
-              severity="warn" size="small" pTooltip="Ajustement stock"
+              severity="warn" size="small" [pTooltip]="'produits.adjustment' | transloco"
               (onClick)="openAjustementProduit(produit)" />
             <p-button icon="pi pi-arrow-right-arrow-left" [rounded]="true" [text]="true"
-              severity="secondary" size="small" pTooltip="Transfert inter-entrepôts"
+              severity="secondary" size="small" [pTooltip]="'produits.transfer' | transloco"
               (onClick)="openTransfertProduit(produit)" />
             <p-button icon="pi pi-link" [rounded]="true" [text]="true"
-              severity="primary" size="small" pTooltip="Lier une recette"
+              severity="primary" size="small" [pTooltip]="'produits.link_recipe' | transloco"
               (onClick)="openLierRecette(produit, $event)" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true"
-              severity="secondary" size="small" pTooltip="Voir le détail"
+              severity="secondary" size="small" [pTooltip]="'common.see_details' | transloco"
               (onClick)="openDetail(produit)" />
           </div>
         </td>
@@ -187,7 +187,7 @@
       <tr>
         <td colspan="9" class="text-center py-6 text-400">
           <i class="pi pi-shopping-bag text-4xl block mb-3 opacity-30"></i>
-          Aucun produit trouvé. Synchronisez depuis BigCommerce.
+          {{ 'produits.no_products' | transloco }}
         </td>
       </tr>
     </ng-template>
@@ -218,9 +218,9 @@
   } @else if (stocksProduit.length === 0) {
     <div class="text-center py-6 text-400">
       <i class="pi pi-warehouse text-4xl mb-3 block"></i>
-      <div>Aucun stock enregistré pour ce produit</div>
+      <div>{{ 'produits.no_products' | transloco }}</div>
       <div class="text-sm mt-1">
-        Le stock se crée automatiquement après un run de production
+        {{ 'produits.auto_stock_creation' | transloco }}
       </div>
     </div>
   } @else {
@@ -249,7 +249,7 @@
             <div class="grid text-sm mb-3">
               @if (stock.dlcProchaine) {
                 <div class="col-6">
-                  <div class="text-400 text-xs mb-1">DLC prochaine</div>
+                  <div class="text-400 text-xs mb-1">{{ 'produits.dlc_next' | transloco }}</div>
                   <div class="font-semibold"
                     [class.text-orange-500]="isDlcProche(stock.dlcProchaine)"
                     [class.text-900]="!isDlcProche(stock.dlcProchaine)">
@@ -262,7 +262,7 @@
               }
               @if (stock.derniereProductionAt) {
                 <div class="col-6">
-                  <div class="text-400 text-xs mb-1">Dernière production</div>
+                  <div class="text-400 text-xs mb-1">{{ 'produits.last_production' | transloco }}</div>
                   <div class="font-semibold text-900">
                     {{ stock.derniereProductionAt | date:'dd/MM/yyyy HH:mm' }}
                   </div>
@@ -275,7 +275,7 @@
 
           <!-- Seuil éditable -->
           <div class="flex align-items-center justify-content-between">
-            <span class="text-400 text-sm">Seuil d'alerte</span>
+            <span class="text-400 text-sm">{{ 'produits.alert_threshold' | transloco }}</span>
 
             @if (stockProduitSelectionne?.entrepotId === stock.entrepotId) {
               <div class="flex align-items-center gap-2">
@@ -288,10 +288,10 @@
                   styleClass="w-8rem"
                 />
                 <p-button icon="pi pi-check" severity="success" [text]="true"
-                  [rounded]="true" size="small" pTooltip="Enregistrer"
+                  [rounded]="true" size="small" [pTooltip]="'common.save' | transloco"
                   [loading]="stockDialogSaving" (onClick)="saveSeuil()" />
                 <p-button icon="pi pi-times" severity="secondary" [text]="true"
-                  [rounded]="true" size="small" pTooltip="Annuler"
+                  [rounded]="true" size="small" [pTooltip]="'common.cancel' | transloco"
                   (onClick)="cancelEditSeuil()" />
               </div>
             } @else {
@@ -301,10 +301,10 @@
                     {{ stock.seuilAlerte | number:'1.0-2' }}
                   </span>
                 } @else {
-                  <span class="text-400 text-sm font-italic">Non défini</span>
+                  <span class="text-400 text-sm font-italic">{{ 'produits.undefined_threshold' | transloco }}</span>
                 }
                 <p-button icon="pi pi-pencil" severity="info" [text]="true"
-                  [rounded]="true" size="small" pTooltip="Modifier le seuil"
+                  [rounded]="true" size="small" [pTooltip]="'produits.edit_threshold' | transloco"
                   (onClick)="startEditSeuil(stock)" />
               </div>
             }
@@ -319,23 +319,23 @@
     <div class="flex justify-content-between align-items-center w-full">
       <div class="flex gap-2">
         <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
-          severity="success" size="small" pTooltip="Entrée de stock"
+          severity="success" size="small" [pTooltip]="'produits.entry' | transloco"
           (onClick)="showStockDialog = false; openEntreeProduit(selectedProduit!)" />
         <p-button icon="pi pi-sliders-h" [text]="true" [rounded]="true"
-          severity="warn" size="small" pTooltip="Ajustement stock"
+          severity="warn" size="small" [pTooltip]="'produits.adjustment' | transloco"
           (onClick)="showStockDialog = false; openAjustementProduit(selectedProduit!)" />
         <p-button icon="pi pi-arrow-right-arrow-left" [text]="true" [rounded]="true"
-          severity="secondary" size="small" pTooltip="Transfert inter-entrepôts"
+          severity="secondary" size="small" [pTooltip]="'produits.transfer' | transloco"
           (onClick)="showStockDialog = false; openTransfertProduit(selectedProduit!)" />
         <p-button icon="pi pi-history" [text]="true" [rounded]="true"
-          severity="info" size="small" pTooltip="Historique mouvements"
+          severity="info" size="small" [pTooltip]="'produits.history' | transloco"
           (onClick)="showStockDialog = false; openHistoriqueProduit(selectedProduit!)" />
       </div>
-      <p-button label="Fermer" severity="secondary"
+      <p-button [label]="'common.close' | transloco" severity="secondary"
         (onClick)="showStockDialog = false" />
     </div>
   </ng-template>
- 
+
 </p-dialog>
 
 <!-- Dialog détail -->

@@ -6,25 +6,26 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-upload text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Import de donn&#233;es</h2>
+        <h2 class="m-0 text-900 font-semibold">{{ 'import_data.title' | transloco }}</h2>
         <p class="m-0 text-400 text-sm mt-1">
-          Importez vos mati&#232;res, fournisseurs, stock et recettes depuis CSV ou Excel
+          {{ 'import_data.subtitle' | transloco }}
         </p>
       </div>
     </div>
   </ng-template>
   @if (activeStep > 0) {
     <ng-template pTemplate="end">
-      <p-button label="Recommencer" icon="pi pi-refresh"
+      <p-button [label]="'import_data.restart' | transloco" icon="pi pi-refresh"
         severity="secondary" [outlined]="true" (onClick)="reset()" />
     </ng-template>
   }
 </p-toolbar>
+
 <!-- ═══ GUIDE D'ORDRE ════════════════════════════════════════ -->
 <div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
   <div class="flex align-items-center gap-2 mb-3">
     <i class="pi pi-info-circle text-primary"></i>
-    <span class="font-semibold text-900">Ordre d'import recommand&#233;</span>
+    <span class="font-semibold text-900">{{ 'import_data.order_title' | transloco }}</span>
   </div>
   <div class="flex align-items-center gap-2 flex-wrap">
     @for (step of ordreImport; track step.ordre; let last = $last) {
@@ -46,18 +47,18 @@
   </div>
   <div class="text-400 text-xs mt-3">
     <i class="pi pi-exclamation-circle mr-1"></i>
-    Les mati&#232;res inconnues dans les recettes sont cr&#233;&#233;es automatiquement,
-    mais sans co&#251;t ni seuil — pensez &#224; les compl&#233;ter ensuite.
+    {{ 'import_data.auto_create_note' | transloco }}
   </div>
 </div>
+
 <!-- ═══ STEPPER ═════════════════════════════════════════════ -->
 <div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
   <div class="flex align-items-center">
     @for (step of [
-      { label: 'Fichier', icon: 'pi-file-arrow-up' },
-      { label: 'Mapping', icon: 'pi-sliders-h' },
-      { label: 'Import',  icon: 'pi-check-circle' }
-    ]; track step.label; let i = $index) {
+      { labelKey: 'import_data.step_file', icon: 'pi-file-arrow-up' },
+      { labelKey: 'import_data.step_mapping', icon: 'pi-sliders-h' },
+      { labelKey: 'import_data.step_import',  icon: 'pi-check-circle' }
+    ]; track step.labelKey; let i = $index) {
       <div class="flex align-items-center gap-2 cursor-pointer"
         (click)="i < activeStep ? activeStep = i : null">
         <div class="border-circle flex align-items-center justify-content-center font-bold flex-shrink-0"
@@ -75,7 +76,7 @@
         <span class="font-medium hidden md:block"
           [class.text-primary]="i === activeStep"
           [class.text-400]="i !== activeStep">
-          {{ step.label }}
+          {{ step.labelKey | transloco }}
         </span>
       </div>
       @if (i < 2) {
@@ -94,7 +95,7 @@
 
     <h3 class="text-900 font-semibold m-0 mb-4">
       <i class="pi pi-database text-primary mr-2"></i>
-      Type de donn&#233;es &#224; importer
+      {{ 'import_data.data_type' | transloco }}
     </h3>
 
     <!-- Choix du type -->
@@ -127,21 +128,20 @@
       <!-- Champs attendus -->
       <div class="surface-50 border-round p-4 mb-4">
         <div class="text-400 text-xs font-semibold uppercase mb-3">
-          Champs disponibles pour {{ getTypeLabel(typeSelectionne) }}
+          {{ 'import_data.available_fields' | transloco }} {{ getTypeLabel(typeSelectionne) }}
         </div>
         <div class="flex flex-wrap gap-2">
           @for (champ of champsSysteme; track champ.value) {
             <p-tag
               [value]="champ.label"
               [severity]="champ.requis ? 'danger' : 'secondary'"
-              [pTooltip]="champ.requis ? 'Obligatoire' : 'Optionnel'"
+              [pTooltip]="champ.requis ? ('import_data.required_tooltip' | transloco) : ('import_data.optional_tooltip' | transloco)"
             />
           }
         </div>
         <div class="text-400 text-xs mt-2">
           <i class="pi pi-info-circle mr-1"></i>
-          Les colonnes marqu&#233;es en rouge sont obligatoires.
-          Votre fichier peut avoir des colonnes dans n'importe quel ordre et n'importe quel nom.
+          {{ 'import_data.required_fields_note' | transloco }}
         </div>
       </div>
 
@@ -153,7 +153,7 @@
         [auto]="true"
         [customUpload]="true"
         (uploadHandler)="onFileSelect($event)"
-        chooseLabel="Choisir un fichier"
+        [chooseLabel]="'import_data.choose_file' | transloco"
         [showUploadButton]="false"
         [showCancelButton]="false"
         styleClass="w-full"
@@ -161,8 +161,8 @@
         <ng-template pTemplate="empty">
           <div class="flex flex-column align-items-center py-4 text-400">
             <i class="pi pi-cloud-upload text-4xl mb-3"></i>
-            <span class="text-sm">Glissez votre fichier CSV ou Excel ici</span>
-            <span class="text-xs mt-1">Max 10 MB</span>
+            <span class="text-sm">{{ 'import_data.drag_drop' | transloco }}</span>
+            <span class="text-xs mt-1">{{ 'import_data.max_size' | transloco }}</span>
           </div>
         </ng-template>
       </p-fileUpload>
@@ -170,7 +170,7 @@
       @if (uploading) {
         <div class="mt-3">
           <p-progressBar mode="indeterminate" styleClass="h-1rem" style="height:4px" />
-          <div class="text-400 text-sm text-center mt-2">Analyse du fichier en cours...</div>
+          <div class="text-400 text-sm text-center mt-2">{{ 'import_data.analyzing' | transloco }}</div>
         </div>
       }
     }
@@ -186,11 +186,10 @@
       <div>
         <h3 class="text-900 font-semibold m-0">
           <i class="pi pi-sliders-h text-primary mr-2"></i>
-          Correspondance des colonnes
+          {{ 'import_data.column_mapping' | transloco }}
         </h3>
         <p class="text-400 text-sm m-0 mt-1">
-          Associez les colonnes de votre fichier aux champs du syst&#232;me.
-          Le mapping a &#233;t&#233; pr&#233;-rempli automatiquement.
+          {{ 'import_data.mapping_desc' | transloco }}
         </p>
       </div>
     </div>
@@ -200,7 +199,7 @@
       <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-4">
         <i class="pi pi-exclamation-triangle text-orange-500"></i>
         <span class="text-sm text-orange-800">
-          Champs obligatoires non assign&#233;s :
+          {{ 'import_data.required_fields_missing' | transloco }}
           <strong>{{ champsMappesRequisManquants.join(', ') }}</strong>
         </span>
       </div>
@@ -212,9 +211,9 @@
       <!-- Header -->
       <div style="display:grid; grid-template-columns:1fr 40px 1fr; gap:12px; align-items:center;"
         class="text-400 text-xs font-semibold uppercase px-3">
-        <span>Colonne dans votre fichier</span>
+        <span>{{ 'import_data.file_column' | transloco }}</span>
         <span></span>
-        <span>Champ syst&#232;me</span>
+        <span>{{ 'import_data.system_field' | transloco }}</span>
       </div>
 
       @for (col of colonnes; track col) {
@@ -249,7 +248,7 @@
             [options]="champOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="— Ignorer —"
+            [placeholder]="'import_data.ignore' | transloco"
             appendTo="body"
             [style]="{'width':'100%'}"
           />
@@ -260,7 +259,7 @@
     <!-- Aperçu données -->
     <p-divider align="left">
       <span class="text-400 text-xs font-semibold uppercase">
-        Aper&#231;u ({{ apercu.length }} premi&#232;res lignes)
+        {{ 'import_data.preview' | transloco }} ({{ apercu.length }} {{ 'import_data.first_lines' | transloco }})
       </span>
     </p-divider>
 
@@ -295,10 +294,10 @@
 
     <!-- Footer -->
     <div class="flex justify-content-between align-items-center mt-4">
-      <p-button label="Retour" icon="pi pi-arrow-left" severity="secondary"
+      <p-button [label]="'import_data.back' | transloco" icon="pi pi-arrow-left" severity="secondary"
         [text]="true" (onClick)="activeStep = 0" />
       <p-button
-        label="Lancer l'import"
+        [label]="'import_data.start_import' | transloco"
         icon="pi pi-arrow-right" iconPos="right"
         [disabled]="!mappingComplet"
         (onClick)="saveMapping()"
@@ -315,11 +314,11 @@
     @if (!resultat && !processing) {
       <div class="text-center py-6">
         <i class="pi pi-play-circle text-primary text-5xl mb-4 block"></i>
-        <h3 class="text-900 font-semibold mb-2">Pr&#234;t &#224; importer</h3>
+        <h3 class="text-900 font-semibold mb-2">{{ 'import_data.ready_to_import' | transloco }}</h3>
         <p class="text-400 mb-4">
-          Le mapping est configur&#233;. Cliquez pour lancer le traitement.
+          {{ 'import_data.mapping_configured' | transloco }}
         </p>
-        <p-button label="Lancer l'import" icon="pi pi-play"
+        <p-button [label]="'import_data.start_import' | transloco" icon="pi pi-play"
           size="large" (onClick)="process()" />
       </div>
     }
@@ -327,8 +326,8 @@
     @if (processing) {
       <div class="text-center py-6">
         <i class="pi pi-spinner pi-spin text-primary text-4xl mb-4 block"></i>
-        <h3 class="text-900 font-semibold mb-2">Import en cours...</h3>
-        <p class="text-400 mb-4">Traitement des lignes en cours, veuillez patienter.</p>
+        <h3 class="text-900 font-semibold mb-2">{{ 'import_data.processing' | transloco }}</h3>
+        <p class="text-400 mb-4">{{ 'import_data.processing_desc' | transloco }}</p>
         <p-progressBar mode="indeterminate" style="height:4px" />
       </div>
     }
@@ -343,17 +342,17 @@
             [class.border-red-300]="resultat.statut === 'ERROR'"
             [class.surface-border]="resultat.statut === 'PROCESSING'">
             <p-tag
-              [value]="resultat.statut === 'DONE' ? 'Terminé' : 'Erreur'"
+              [value]="resultat.statut === 'DONE' ? ('import_data.done' | transloco) : ('import_data.error' | transloco)"
               [severity]="resultat.statut === 'DONE' ? 'success' : 'danger'"
               styleClass="mb-2"
             />
-            <div class="text-400 text-xs mt-1">Statut</div>
+            <div class="text-400 text-xs mt-1">{{ 'import_data.status' | transloco }}</div>
           </div>
         </div>
         <div class="col-4">
           <div class="surface-50 border-round-xl border-1 surface-border p-4 text-center">
             <div class="text-3xl font-bold text-green-600">{{ resultat.ok }}</div>
-            <div class="text-400 text-xs mt-1">Lignes import&#233;es</div>
+            <div class="text-400 text-xs mt-1">{{ 'import_data.imported_lines' | transloco }}</div>
           </div>
         </div>
         <div class="col-4">
@@ -363,7 +362,7 @@
               [class.text-400]="resultat.erreurs === 0">
               {{ resultat.erreurs }}
             </div>
-            <div class="text-400 text-xs mt-1">Erreurs</div>
+            <div class="text-400 text-xs mt-1">{{ 'import_data.errors' | transloco }}</div>
           </div>
         </div>
       </div>
@@ -372,16 +371,16 @@
       @if (resultat.details?.length > 0) {
         <p-divider align="left">
           <span class="text-red-500 text-xs font-semibold uppercase">
-            D&#233;tail des erreurs
+            {{ 'import_data.error_details' | transloco }}
           </span>
         </p-divider>
         <p-table [value]="resultat.details" styleClass="p-datatable-sm"
           [showGridlines]="true">
           <ng-template pTemplate="header">
             <tr>
-              <th style="width:80px">Ligne</th>
-              <th style="width:150px">Colonne</th>
-              <th>Message</th>
+              <th style="width:80px">{{ 'import_data.line' | transloco }}</th>
+              <th style="width:150px">{{ 'import_data.column' | transloco }}</th>
+              <th>{{ 'import_data.message' | transloco }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-err>
@@ -395,7 +394,7 @@
       }
 
       <div class="flex justify-content-between mt-4">
-        <p-button label="Nouvel import" icon="pi pi-plus"
+        <p-button [label]="'import_data.new_import' | transloco" icon="pi pi-plus"
           severity="secondary" [outlined]="true" (onClick)="reset()" />
       </div>
     }
@@ -407,7 +406,7 @@
   <div class="flex align-items-center justify-content-between mb-3">
     <div class="flex align-items-center gap-2">
       <i class="pi pi-history text-primary"></i>
-      <span class="font-semibold text-900">Historique des imports</span>
+      <span class="font-semibold text-900">{{ 'import_data.history' | transloco }}</span>
     </div>
     <p-button icon="pi pi-refresh" severity="secondary" [text]="true"
       size="small" (onClick)="loadHistorique()" [loading]="loadingHistorique" />
@@ -416,7 +415,7 @@
   @if (historique.length === 0 && !loadingHistorique) {
     <div class="text-center py-4 text-400 text-sm">
       <i class="pi pi-inbox text-2xl block mb-2"></i>
-      Aucun import effectu&#233;
+      {{ 'import_data.no_history' | transloco }}
     </div>
   }
 
@@ -428,10 +427,10 @@
           <th style="width:80px">#</th>
           <th style="width:160px">Type</th>
           <th>Fichier</th>
-          <th style="width:120px">Statut</th>
+          <th style="width:120px">{{ 'import_data.status' | transloco }}</th>
           <th style="width:80px" class="text-center">OK</th>
-          <th style="width:80px" class="text-center">Erreurs</th>
-          <th style="width:150px">Date</th>
+          <th style="width:80px" class="text-center">{{ 'import_data.errors' | transloco }}</th>
+          <th style="width:150px">{{ 'common.date' | transloco }}</th>
           <th style="width:60px"></th>
         </tr>
       </ng-template>
@@ -459,7 +458,7 @@
                 icon="pi pi-undo"
                 severity="danger"
                 [text]="true" [rounded]="true" size="small"
-                pTooltip="Annuler cet import"
+                [pTooltip]="'import_data.cancel_import' | transloco"
                 (onClick)="undoImport(job)"
               />
             }

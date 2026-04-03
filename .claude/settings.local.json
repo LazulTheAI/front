@@ -9,7 +9,8 @@
       "Bash(find c:/Users/boris/proj/riche-front/src -name app.config* -o -name main.ts)",
       "Bash(npm install:*)",
       "Bash(mkdir -p c:/Users/boris/proj/riche-front/src/assets/i18n)",
-      "Bash(mkdir -p c:/Users/boris/proj/riche-front/src/app/core)"
+      "Bash(mkdir -p c:/Users/boris/proj/riche-front/src/app/core)",
+      "Bash(wc -l c:/Users/boris/proj/riche-front/src/assets/i18n/*.json)"
     ]
   }
 }

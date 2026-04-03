@@ -17,6 +17,7 @@ import { AlerteControllerService, AlerteResponse, ConsommationMateriauResponse, 
 import { environment } from '@/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { ToolbarModule } from 'primeng/toolbar';
+import { TranslocoModule } from '@jsverse/transloco';
 
 interface ValeurStockReportResponse {
     valeurTotale: number;
@@ -41,7 +42,7 @@ interface MouvementExportResponse {
     selector: 'app-rapports',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, ToolbarModule, TooltipModule, ToastModule, SkeletonModule, DatePickerModule, SelectModule, DividerModule],
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, ToolbarModule, TooltipModule, ToastModule, SkeletonModule, DatePickerModule, SelectModule, DividerModule, TranslocoModule],
     providers: [MessageService],
     templateUrl: './rapports.component.html',
     styles: `

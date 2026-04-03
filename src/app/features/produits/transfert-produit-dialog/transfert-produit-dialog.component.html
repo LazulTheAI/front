@@ -9,7 +9,7 @@
   <ng-template pTemplate="header">
     <div class="flex align-items-center gap-2">
       <i class="pi pi-arrow-right-arrow-left text-primary"></i>
-      <span class="font-bold text-900">Transfert — {{ produit?.nom }}</span>
+      <span class="font-bold text-900">{{ 'transfert_produit.title' | transloco }} — {{ produit?.nom }}</span>
     </div>
   </ng-template>
 
@@ -18,7 +18,7 @@
     <!-- Schéma visuel -->
     <div class="flex align-items-center justify-content-between gap-2 p-3 surface-50 border-round-lg border-1 surface-border">
       <div class="flex flex-column align-items-center gap-1 flex-1">
-        <span class="text-400 text-xs">Source</span>
+        <span class="text-400 text-xs">{{ 'transfert_produit.source_warehouse' | transloco }}</span>
         <span class="font-semibold text-900 text-sm">{{ entrepotSourceLabel || '—' }}</span>
         @if (stockSource !== null) {
           <span class="text-xs font-mono" [class.text-500]="stockSource > 0" [class.text-red-500]="stockSource === 0">
@@ -33,14 +33,14 @@
         }
       </div>
       <div class="flex flex-column align-items-center gap-1 flex-1">
-        <span class="text-400 text-xs">Destination</span>
+        <span class="text-400 text-xs">{{ 'transfert_produit.dest_warehouse' | transloco }}</span>
         <span class="font-semibold text-900 text-sm">{{ entrepotDestLabel || '—' }}</span>
       </div>
     </div>
 
     <!-- Entrepôt source -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Entrepôt source <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'transfert_produit.source_warehouse' | transloco }} <span class="text-red-400">*</span></label>
       <p-select
         name="entrepotSourceId"
         [(ngModel)]="form.entrepotSourceId"
@@ -56,7 +56,7 @@
 
     <!-- Entrepôt destination -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Entrepôt destination <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'transfert_produit.dest_warehouse' | transloco }} <span class="text-red-400">*</span></label>
       <p-select
         name="entrepotDestinationId"
         [(ngModel)]="form.entrepotDestinationId"
@@ -71,7 +71,7 @@
 
     <!-- Quantité -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Quantité <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'common.quantity' | transloco }} <span class="text-red-400">*</span></label>
       <p-inputNumber
         name="quantite"
         [(ngModel)]="form.quantite"
@@ -84,14 +84,14 @@
       />
       @if (stockSource !== null && form.quantite && form.quantite > stockSource) {
         <small class="text-red-400">
-          Insuffisant — disponible : {{ stockSource | number:'1.0-2' }}
+          {{ 'transfert_produit.insufficient' | transloco }} : {{ stockSource | number:'1.0-2' }}
         </small>
       }
     </div>
 
     <!-- Notes -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">Notes</label>
+      <label class="text-sm font-medium text-700">{{ 'common.notes' | transloco }}</label>
       <textarea pTextarea name="notes" [(ngModel)]="form.notes"
         rows="2" placeholder="Raison du transfert..." class="w-full"></textarea>
     </div>
@@ -100,10 +100,10 @@
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2">
-      <p-button label="Annuler" severity="secondary" [outlined]="true"
+      <p-button [label]="'common.cancel' | transloco" severity="secondary" [outlined]="true"
         (onClick)="onHide()" [disabled]="saving" />
       <p-button
-        label="Transférer"
+        [label]="'transfert_produit.transfer' | transloco"
         icon="pi pi-arrow-right-arrow-left"
         [loading]="saving"
         [disabled]="!isFormValid()"

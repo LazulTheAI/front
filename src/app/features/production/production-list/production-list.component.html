@@ -4,20 +4,20 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-cog text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">Production</h2>
-        <p class="m-0 text-400 text-sm mt-1">Runs de production et tra&#231;abilit&#233; des lots</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'production.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'production.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3 flex-wrap">
-      
+
       <p-select
         [(ngModel)]="filtreEntrepotId"
         [options]="entrepotOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Tous les entrepôts"
+        [placeholder]="'common.all_warehouses' | transloco"
         [showClear]="true"
         styleClass="w-12rem"
         (onChange)="onFiltreChange()"
@@ -28,7 +28,7 @@
         [options]="statutOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Tous les statuts"
+        [placeholder]="'common.all_statuses' | transloco"
         [showClear]="true"
         styleClass="w-12rem"
         (onChange)="onFiltreChange()"
@@ -38,14 +38,14 @@
         <p-inputicon styleClass="pi pi-search" />
         <input pInputText [ngModel]="search"
           (ngModelChange)="onSearchInput($event)"
-          placeholder="Rechercher une recette..."
+          [placeholder]="'production.search_recipe' | transloco"
           class="w-12rem" />
       </p-iconfield>
 
-      <p-button label="Planifier" icon="pi pi-calendar-plus"
+      <p-button [label]="'production.plan' | transloco" icon="pi pi-calendar-plus"
         severity="secondary" [outlined]="true"
         (onClick)="showPlanifierDialog = true" />
-      <p-button label="Lancer" icon="pi pi-play"
+      <p-button [label]="'production.launch' | transloco" icon="pi pi-play"
         (onClick)="showLancerDialog = true" />
     </div>
   </ng-template>
@@ -54,7 +54,7 @@
 @if (hasFiltresActifs) {
   <div class="flex align-items-center gap-2 surface-100 border-round px-3 py-2 mb-3">
     <i class="pi pi-filter-fill text-primary text-sm"></i>
-    <span class="text-sm text-900">Filtres actifs</span>
+    <span class="text-sm text-900">{{ 'production.active_filters' | transloco }}</span>
     @if (filtreEntrepotId) {
       <p-tag [value]="filtreEntrepotLabel" severity="secondary" />
     }
@@ -64,7 +64,7 @@
     @if (search) {
       <p-tag [value]="search" severity="secondary" />
     }
-    <p-button label="Effacer" severity="secondary" [text]="true"
+    <p-button [label]="'production.clear' | transloco" severity="secondary" [text]="true"
       size="small" (onClick)="resetFiltres()" />
   </div>
 }
@@ -90,20 +90,20 @@
     <ng-template pTemplate="header">
       <tr>
         <th style="width:80px">#</th>
-        <th style="width:120px">N&#176; lot</th>
-        <th style="width:140px">Produit</th>
+        <th style="width:120px">{{ 'production.lot_number' | transloco }}</th>
+        <th style="width:140px">{{ 'production.product' | transloco }}</th>
         <th pSortableColumn="recetteNom" style="min-width:100px">
-          Recette <p-sortIcon field="recetteNom" />
+          {{ 'production.recipe' | transloco }} <p-sortIcon field="recetteNom" />
         </th>
-        <th style="width:130px">DLC produit</th>
-        <th style="width:100px">Entrep&#244;t</th>
-        <th style="width:120px">Statut</th>
-        <th style="width:130px" class="text-right">Unit&#233;s prod.</th>
+        <th style="width:130px">{{ 'production.dlc_product' | transloco }}</th>
+        <th style="width:100px">{{ 'common.warehouse' | transloco }}</th>
+        <th style="width:120px">{{ 'common.status' | transloco }}</th>
+        <th style="width:130px" class="text-right">{{ 'production.units_produced' | transloco }}</th>
         <th pSortableColumn="createdAt" style="width:150px">
-          Cr&#233;&#233; le <p-sortIcon field="createdAt" />
+          {{ 'common.date' | transloco }} <p-sortIcon field="createdAt" />
         </th>
         <th pSortableColumn="completeAt" style="width:150px">
-          Termin&#233; le <p-sortIcon field="completeAt" />
+          {{ 'production.completed' | transloco }} <p-sortIcon field="completeAt" />
         </th>
         <th style="width:130px"></th>
       </tr>
@@ -132,7 +132,7 @@
           <div class="flex align-items-center gap-2">
             @if (run.stockInsuffisant) {
               <i class="pi pi-exclamation-triangle text-orange-500 text-sm"
-                pTooltip="Stock insuffisant lors du run"></i>
+                [pTooltip]="'production.insufficient_stock' | transloco"></i>
             }
             <span class="font-medium text-900">{{ run.recetteNom }}</span>
           </div>
@@ -178,22 +178,22 @@
         <td>
           <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
             <p-button icon="pi pi-eye" severity="secondary" [text]="true" [rounded]="true"
-              size="small" pTooltip="D&#233;tail" (onClick)="openDetail(run)" />
+              size="small" [pTooltip]="'production.detail' | transloco" (onClick)="openDetail(run)" />
             @if (canExecuter(run)) {
               <p-button icon="pi pi-play" severity="success" [text]="true" [rounded]="true"
-                size="small" pTooltip="Ex&#233;cuter ce run"
+                size="small" [pTooltip]="'production.execute' | transloco"
                 [loading]="executingRunId === run.id"
                 (onClick)="executerRun(run, $event)" />
             }
             @if (canExport(run)) {
               <p-button icon="pi pi-download" severity="info" [text]="true" [rounded]="true"
-                size="small" pTooltip="Export CSV tra&#231;abilit&#233;"
+                size="small" [pTooltip]="'production.export_csv' | transloco"
                 [loading]="exportingRunId === run.id"
                 (onClick)="exportCsv(run, $event)" />
             }
             @if (canAnnuler(run)) {
               <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true"
-                size="small" pTooltip="Annuler ce run"
+                size="small" [pTooltip]="'production.cancel_run' | transloco"
                 (onClick)="openAnnuler(run, $event)" />
             }
           </div>
@@ -206,13 +206,13 @@
         <td colspan="11" class="text-center py-6 text-400">
           <i class="pi pi-cog text-4xl mb-3 block"></i>
           @if (hasFiltresActifs) {
-            Aucun run pour ces filtres
+            {{ 'production.no_runs' | transloco }}
             <div class="mt-2">
-              <p-button label="Effacer les filtres" severity="secondary"
+              <p-button [label]="'production.clear' | transloco" severity="secondary"
                 size="small" (onClick)="resetFiltres()" />
             </div>
           } @else {
-            Aucun run de production
+            {{ 'production.no_runs' | transloco }}
           }
         </td>
       </tr>

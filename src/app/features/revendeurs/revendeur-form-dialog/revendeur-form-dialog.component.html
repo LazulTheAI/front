@@ -3,37 +3,36 @@
             <form #f="ngForm" class="flex flex-column gap-4 pt-2">
                 <div class="grid">
                     <div class="col-12 flex flex-column gap-1">
-                        <label class="text-sm font-medium text-700">Nom <span class="text-red-400">*</span></label>
-                        <input pInputText name="nom" [(ngModel)]="form.nom" required placeholder="Ex : Épicerie du Marché" class="w-full" />
+                        <label class="text-sm font-medium text-700">{{ 'revendeur_form.company_name' | transloco }} <span class="text-red-400">*</span></label>
+                        <input pInputText name="nom" [(ngModel)]="form.nom" required [placeholder]="'revendeur_form.company_placeholder' | transloco" class="w-full" />
                     </div>
                 </div>
 
                 <div class="grid">
                     <div class="col-6 flex flex-column gap-1">
-                        <label class="text-sm font-medium text-700">Contact</label>
-                        <input pInputText name="contact" [(ngModel)]="form.contact" placeholder="Prénom Nom" class="w-full" />
+                        <label class="text-sm font-medium text-700">{{ 'revendeur_form.contact_name' | transloco }}</label>
+                        <input pInputText name="contact" [(ngModel)]="form.contact" [placeholder]="'revendeur_form.contact_placeholder' | transloco" class="w-full" />
                     </div>
                     <div class="col-6 flex flex-column gap-1">
-                        <label class="text-sm font-medium text-700">Email</label>
-                        <input pInputText name="email" [(ngModel)]="form.email" placeholder="contact@exemple.com" class="w-full" />
+                        <label class="text-sm font-medium text-700">{{ 'revendeur_form.email' | transloco }}</label>
+                        <input pInputText name="email" [(ngModel)]="form.email" [placeholder]="'revendeur_form.email_placeholder' | transloco" class="w-full" />
                     </div>
                 </div>
 
                 <div class="grid">
                     <div class="col-6 flex flex-column gap-1">
-                        <label class="text-sm font-medium text-700">Téléphone</label>
-                        <input pInputText name="telephone" [(ngModel)]="form.telephone" placeholder="+33 6 00 00 00 00" class="w-full" />
+                        <label class="text-sm font-medium text-700">{{ 'revendeur_form.phone' | transloco }}</label>
+                        <input pInputText name="telephone" [(ngModel)]="form.telephone" [placeholder]="'revendeur_form.phone_placeholder' | transloco" class="w-full" />
                     </div>
                     <div class="col-6 flex flex-column gap-1">
-                        <label class="text-sm font-medium text-700">Remise globale (%)</label>
-                        <p-inputNumber name="remiseGlobale" [(ngModel)]="form.remiseGlobale" [min]="0" [max]="100" [minFractionDigits]="0" [maxFractionDigits]="2" suffix="%" placeholder="0" styleClass="w-full" />
-                        <small class="text-400">Appliquée par défaut sur toutes les commandes</small>
+                        <label class="text-sm font-medium text-700">{{ 'revendeur_form.discount' | transloco }}</label>
+                        <p-inputNumber name="remiseGlobale" [(ngModel)]="form.remiseGlobale" [min]="0" [max]="100" [minFractionDigits]="0" [maxFractionDigits]="2" suffix="%" [placeholder]="'revendeur_form.discount_placeholder' | transloco" styleClass="w-full" />
                     </div>
                 </div>
 
                 <div class="flex flex-column gap-1">
-                    <label class="text-sm font-medium text-700">Adresse</label>
-                    <input pInputText name="adresse" [(ngModel)]="form.adresse" placeholder="12 rue du Commerce" class="w-full" />
+                    <label class="text-sm font-medium text-700">{{ 'revendeur_form.address' | transloco }}</label>
+                    <input pInputText name="adresse" [(ngModel)]="form.adresse" [placeholder]="'revendeur_form.address_placeholder' | transloco" class="w-full" />
                 </div>
 
                 <div class="grid">
@@ -52,15 +51,15 @@
                 </div>
 
                 <div class="flex flex-column gap-1">
-                    <label class="text-sm font-medium text-700">Notes</label>
-                    <textarea pTextarea name="notes" [(ngModel)]="form.notes" rows="2" placeholder="Informations complémentaires..." class="w-full"></textarea>
+                    <label class="text-sm font-medium text-700">{{ 'revendeur_form.notes' | transloco }}</label>
+                    <textarea pTextarea name="notes" [(ngModel)]="form.notes" rows="2" [placeholder]="'revendeur_form.notes_placeholder' | transloco" class="w-full"></textarea>
                 </div>
             </form>
 
             <ng-template pTemplate="footer">
                 <div class="flex justify-content-end gap-2">
-                    <p-button label="Annuler" severity="secondary" [outlined]="true" (onClick)="onHide()" [disabled]="saving" />
-                    <p-button [label]="revendeur ? 'Enregistrer' : 'Créer'" icon="pi pi-check" [loading]="saving" [disabled]="!form.nom" (onClick)="submit(f)" />
+                    <p-button [label]="'common.cancel' | transloco" severity="secondary" [outlined]="true" (onClick)="onHide()" [disabled]="saving" />
+                    <p-button [label]="revendeur ? ('revendeur_form.save' | transloco) : ('revendeur_form.create' | transloco)" icon="pi pi-check" [loading]="saving" [disabled]="!form.nom" (onClick)="submit(f)" />
                 </div>
             </ng-template>
         </p-dialog>

@@ -1,5 +1,5 @@
 <p-dialog
-  header="Planifier un run de production"
+  [header]="'planifier_run.title' | transloco"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -10,7 +10,7 @@
 
     <div class="flex flex-column gap-2">
       <label class="font-medium text-900" for="produit">
-        Produit <span class="text-red-500">*</span>
+        {{ 'planifier_run.product' | transloco }} <span class="text-red-500">*</span>
       </label>
       <p-select
         inputId="produit"
@@ -20,23 +20,23 @@
         [options]="produitOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Sélectionner un produit..."
+        [placeholder]="'planifier_run.select_product' | transloco"
         [filter]="true"
-        filterPlaceholder="Rechercher..."
+        [filterPlaceholder]="'planifier_run.search_product' | transloco"
         (onChange)="onProduitChange($event.value)"
         styleClass="w-full"
       />
       @if (selectedProduit && (!selectedProduit.recettes || selectedProduit.recettes.length === 0)) {
         <small class="text-orange-500">
           <i class="pi pi-exclamation-triangle mr-1"></i>
-          Ce produit n'a pas de recette liée
+          {{ 'planifier_run.no_recipe_linked' | transloco }}
         </small>
       }
     </div>
 
     <div class="flex flex-column gap-2">
       <label class="font-medium text-900" for="recette">
-        Recette <span class="text-red-500">*</span>
+        {{ 'planifier_run.recipe' | transloco }} <span class="text-red-500">*</span>
       </label>
       <p-select
         inputId="recette"
@@ -46,13 +46,13 @@
         [options]="recetteOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Sélectionner une recette..."
+        [placeholder]="'planifier_run.select_recipe' | transloco"
         [disabled]="!form.produitId"
         (onChange)="onRecetteChange($event.value)"
         styleClass="w-full"
       />
       @if (form.produitId && recetteOptions.length === 0) {
-        <small class="text-orange-500">Aucune recette liée à ce produit</small>
+        <small class="text-orange-500">{{ 'planifier_run.no_recipe' | transloco }}</small>
       }
       @if (selectedRecette && form.batches > 0) {
         <small class="text-500">
@@ -60,12 +60,12 @@
         </small>
       }
     </div>
- 
+
     <!-- Batches + Entrepôt -->
     <div class="grid">
       <div class="col-6 flex flex-column gap-2">
         <label class="font-medium text-900" for="batches">
-          Nombre de batches <span class="text-red-500">*</span>
+          {{ 'planifier_run.batches' | transloco }} <span class="text-red-500">*</span>
         </label>
         <p-inputNumber
           inputId="batches"
@@ -85,7 +85,7 @@
       </div>
       <div class="col-6 flex flex-column gap-2">
         <label class="font-medium text-900" for="entrepot">
-          Entrepôt <span class="text-red-500">*</span>
+          {{ 'common.warehouse' | transloco }} <span class="text-red-500">*</span>
         </label>
         <p-select
           inputId="entrepot"
@@ -95,7 +95,7 @@
           [options]="entrepotOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="Sélectionner..."
+          [placeholder]="'planifier_run.select_warehouse' | transloco"
           styleClass="w-full"
         />
       </div>
@@ -106,7 +106,7 @@
       <div class="surface-50 border-round p-3 flex align-items-center gap-3">
         <i class="pi pi-calculator text-primary"></i>
         <div>
-          <span class="text-500 text-sm">Coût théorique estimé : </span>
+          <span class="text-500 text-sm">{{ 'planifier_run.theoretical_cost' | transloco }} : </span>
           <span class="font-semibold text-900">
             {{ (selectedRecette!.coutTheorique! * form.batches) | currency:'EUR':'symbol':'1.2-2' }}
           </span>
@@ -121,19 +121,19 @@
 
     <!-- Référence commande -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="orderId">Référence commande</label>
+      <label class="font-medium text-900" for="orderId">{{ 'planifier_run.order_reference' | transloco }}</label>
       <input
         pInputText
         id="orderId"
         name="orderId"
         [(ngModel)]="form.orderId"
-        placeholder="N° commande associée..."
+        [placeholder]="'planifier_run.reference_placeholder' | transloco"
       />
     </div>
 
     <!-- Notes -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="notes">Notes</label>
+      <label class="font-medium text-900" for="notes">{{ 'common.notes' | transloco }}</label>
       <textarea
         pTextarea
         id="notes"
@@ -141,7 +141,7 @@
         [(ngModel)]="form.notes"
         [rows]="2"
         maxlength="1000"
-        placeholder="Instructions, remarques..."
+        [placeholder]="'planifier_run.notes_placeholder' | transloco"
         class="w-full"
       ></textarea>
     </div>
@@ -149,9 +149,9 @@
   </form>
 
   <ng-template pTemplate="footer">
-    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
     <p-button
-      label="Planifier"
+      [label]="'planifier_run.plan' | transloco"
       icon="pi pi-calendar-plus"
       severity="secondary"
       [outlined]="true"

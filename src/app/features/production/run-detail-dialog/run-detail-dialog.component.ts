@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -29,7 +30,7 @@ interface LotParMateriau {
     selector: 'app-run-detail-dialog',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, TableModule, TagModule, DividerModule, TooltipModule, TabsModule, ToastModule, TimelineModule],
+    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, TableModule, TagModule, DividerModule, TooltipModule, TabsModule, ToastModule, TimelineModule, TranslocoModule],
     providers: [MessageService],
     templateUrl: './run-detail-dialog.component.html'
 })

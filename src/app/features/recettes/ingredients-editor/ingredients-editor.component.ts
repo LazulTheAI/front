@@ -1,6 +1,7 @@
 import { MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 
 // PrimeNG
@@ -22,7 +23,7 @@ export interface IngredientLine {
 @Component({
     selector: 'app-ingredients-editor',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonModule, SelectModule, InputNumberModule, InputTextModule, TooltipModule, TagModule, DividerModule],
+    imports: [CommonModule, FormsModule, ButtonModule, SelectModule, InputNumberModule, InputTextModule, TooltipModule, TagModule, DividerModule, TranslocoModule],
     templateUrl: './ingredients-editor.component.html'
 })
 export class IngredientsEditorComponent implements OnInit {

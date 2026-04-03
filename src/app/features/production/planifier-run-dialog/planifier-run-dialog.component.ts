@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -21,7 +22,7 @@ interface SelectOption {
     selector: 'app-planifier-run-dialog',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule, InputTextModule, SelectModule, TextareaModule, DividerModule],
+    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule, InputTextModule, SelectModule, TextareaModule, DividerModule, TranslocoModule],
     templateUrl: './planifier-run-dialog.component.html'
 })
 export class PlanifierRunDialogComponent implements OnChanges, OnInit {

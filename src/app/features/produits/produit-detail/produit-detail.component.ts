@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 
 // PrimeNG
 import { MessageService } from 'primeng/api';
@@ -20,7 +21,7 @@ import { TabsModule } from 'primeng/tabs';
 @Component({
     selector: 'app-produit-detail',
     standalone: true,
-    imports: [CommonModule, DialogModule, ButtonModule, TabsModule, TagModule, ChipModule, TableModule, DividerModule, TooltipModule, SkeletonModule, AvatarModule, ToastModule],
+    imports: [CommonModule, DialogModule, ButtonModule, TabsModule, TagModule, ChipModule, TableModule, DividerModule, TooltipModule, SkeletonModule, AvatarModule, ToastModule, TranslocoModule],
     providers: [MessageService],
     templateUrl: './produit-detail.component.html'
 })

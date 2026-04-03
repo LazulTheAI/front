@@ -1,5 +1,5 @@
 <p-dialog
-  header="Annuler le run"
+  [header]="'annuler_run.title' | transloco"
   [(visible)]="visible"
   (onHide)="onHide()"
   [modal]="true"
@@ -14,7 +14,7 @@
       <div>
         <div class="font-semibold text-900">Run #{{ run?.id }} — {{ run?.recetteNom }}</div>
         <div class="text-500 text-sm">
-          {{ run?.batchsProduits | number:'1.0-2' }} batch(es) · Statut : {{ run?.statut }}
+          {{ run?.batchsProduits | number:'1.0-2' }} batch(es) · {{ 'annuler_run.status' | transloco }} : {{ run?.statut }}
         </div>
       </div>
     </div>
@@ -23,20 +23,20 @@
     <div class="flex align-items-start gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200">
       <i class="pi pi-exclamation-triangle text-orange-500 mt-1"></i>
       <span class="text-sm text-orange-800">
-        L'annulation est irréversible. Le stock ne sera pas restitué automatiquement.
+        {{ 'annuler_run.warning' | transloco }}
       </span>
     </div>
 
     <!-- Raison -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="raison">Raison de l'annulation</label>
+      <label class="font-medium text-900" for="raison">{{ 'annuler_run.reason' | transloco }}</label>
       <textarea
         pTextarea
         id="raison"
         [(ngModel)]="raison"
         [rows]="3"
         maxlength="500"
-        placeholder="Expliquez pourquoi ce run est annulé..."
+        [placeholder]="'annuler_run.reason_placeholder' | transloco"
         class="w-full"
       ></textarea>
     </div>
@@ -44,9 +44,9 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <p-button label="Retour" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
+    <p-button [label]="'annuler_run.back' | transloco" severity="secondary" [text]="true" (onClick)="onHide()" [disabled]="saving" />
     <p-button
-      label="Confirmer l'annulation"
+      [label]="'annuler_run.confirm_cancel' | transloco"
       icon="pi pi-times"
       severity="danger"
       [loading]="saving"

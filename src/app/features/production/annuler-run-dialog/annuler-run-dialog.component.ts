@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -20,6 +21,7 @@ import {
   imports: [
     CommonModule, FormsModule,
     DialogModule, ButtonModule, InputTextModule, TextareaModule,
+    TranslocoModule,
   ],
   providers: [],
   templateUrl: './annuler-run-dialog.component.html',
