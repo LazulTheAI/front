@@ -5,8 +5,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-file-import text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">{{ 'bons_commande.titre' | transloco }}</h2>
-        <p class="m-0 text-400 text-sm mt-1">{{ 'bons_commande.sous_titre' | transloco }}</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'bons_commande.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'bons_commande.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -15,7 +15,7 @@
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
         <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
-          [placeholder]="'bons_commande.rechercher' | transloco" class="w-14rem" />
+          [placeholder]="'bons_commande.search_supplier' | transloco" class="w-14rem" />
       </p-iconfield>
       <p-select
         [(ngModel)]="filtreStatut"
@@ -27,7 +27,7 @@
         (onChange)="onFiltreChange()"
         styleClass="w-14rem"
       />
-      <p-button [label]="'bons_commande.nouveau_bon' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
+      <p-button [label]="'bons_commande.new_order' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>
   </ng-template>
 </p-toolbar>

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { AuthCallbackComponent } from './app/auth/auth-callback.component';
+import { BcAuthComponent } from './app/auth/gig-commerce/bc-load/bc-auth.component';
 import { BcLoadComponent } from './app/auth/gig-commerce/bc-load/bc-load.component';
+import { BillingPendingComponent } from './app/auth/gig-commerce/bc-load/billing-pending.component';
 import { authGuard } from './app/auth/guards/guards';
 import { AppLayout } from './app/layout/component/app.layout';
 import { Notfound } from './app/pages/notfound/notfound';
@@ -8,9 +10,14 @@ import { Notfound } from './app/pages/notfound/notfound';
 export const appRoutes: Routes = [
     // Routes publiques
     { path: 'auth/callback', component: AuthCallbackComponent },
-    { path: 'auth', loadChildren: () => import('./app/features/auth/auth.routes') },
+    { path: 'authmobile', loadChildren: () => import('./app/features/auth/auth.routes') },
+    { path: 'auth', component: BcAuthComponent },
     { path: 'notfound', component: Notfound },
     { path: 'load', component: BcLoadComponent },
+    {
+        path: 'billing/pending',
+        component: BillingPendingComponent
+    },
 
     // Routes protégées sous AppLayout
     {

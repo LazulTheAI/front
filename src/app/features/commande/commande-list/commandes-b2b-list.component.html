@@ -6,8 +6,8 @@
     <div class="flex align-items-center gap-3">
       <i class="pi pi-shopping-bag text-primary text-2xl"></i>
       <div>
-        <h2 class="m-0 text-900 font-semibold">{{ 'commandes_b2b.titre' | transloco }}</h2>
-        <p class="m-0 text-400 text-sm mt-1">{{ 'commandes_b2b.sous_titre' | transloco }}</p>
+        <h2 class="m-0 text-900 font-semibold">{{ 'commandes_b2b.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'commandes_b2b.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -33,7 +33,7 @@
         (onChange)="onFiltreChange()"
         styleClass="w-12rem"
       />
-      <p-button [label]="'commandes_b2b.nouvelle_commande' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
+      <p-button [label]="'commandes_b2b.new_order' | transloco" icon="pi pi-plus" (onClick)="openCreate()" />
     </div>
   </ng-template>
 </p-toolbar>

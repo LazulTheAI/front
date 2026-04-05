@@ -6,7 +6,7 @@ export const authGuard: CanActivateFn = () => {
     const token = localStorage.getItem('jwt');
     
     if (!token) {
-        router.navigate(['/auth/login']);
+        router.navigate(['/authmobile/login']);
         return false;
     }
     return true;

@@ -27,7 +27,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     if (!token) {
         // Ne pas throw, juste laisser passer — le backend renverra 401
         // et l'utilisateur sera redirigé proprement
-        router.navigate(['/auth/login']);
+        router.navigate(['/authmobile/login']);
         return EMPTY; // ← import { EMPTY } from 'rxjs'
     }
 
@@ -39,7 +39,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((error) => {
             if (error.status === 401) {
                 authService.logout();
-                router.navigate(['/auth/login']);
+                router.navigate(['/authmobile/login']);
                 return EMPTY; // ← au lieu de throwError
             }
             return throwError(() => error);
