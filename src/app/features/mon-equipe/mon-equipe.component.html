@@ -1,3 +1,5 @@
+<ng-container *appRequiresFeature="'multi-users'; else locked">
+
 <p-toast />
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
@@ -260,3 +262,8 @@
     />
   </ng-template>
 </p-dialog>
+
+</ng-container>
+<ng-template #locked>
+  <app-upgrade-banner feature="multi-users" />
+</ng-template>

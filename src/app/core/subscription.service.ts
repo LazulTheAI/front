@@ -11,7 +11,7 @@ import {
   PLAN_HIERARCHY,
   FEATURE_PLAN_REQUIREMENTS,
   BC_CHECKOUT_URLS,
-} from '../config/plan.config';
+} from './plan.config';
 
 export interface SubscriptionInfo {
   planLevel: PlanLevel;

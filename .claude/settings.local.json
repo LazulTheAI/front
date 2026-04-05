@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(*)",
       "Bash(find c:Usersborisprojriche-front -name *manque*response* -type f)",
       "Bash(python3 -c \":*)",
       "Bash(find c:Usersborisprojriche-frontsrcappmodulesopenapi -name *request* -o -name *Request*)",
@@ -10,7 +11,12 @@
       "Bash(npm install:*)",
       "Bash(mkdir -p c:/Users/boris/proj/riche-front/src/assets/i18n)",
       "Bash(mkdir -p c:/Users/boris/proj/riche-front/src/app/core)",
-      "Bash(wc -l c:/Users/boris/proj/riche-front/src/assets/i18n/*.json)"
+      "Bash(wc -l c:/Users/boris/proj/riche-front/src/assets/i18n/*.json)",
+      "Bash(grep -l \"subscription\\\\|upgrade\" /c/Users/boris/proj/riche-front/src/app/modules/openapi/model/*.ts)",
+      "Bash(grep -r \"CheckoutUrlResponse\" /c/Users/boris/proj/riche-front/src/app/modules/openapi/model/*.ts)",
+      "Bash(cd /tmp)",
+      "Bash(printf '\\\\n</ng-container>\\\\n<ng-template #locked>\\\\n  <app-upgrade-banner feature=\"rapport-pl\" />\\\\n</ng-template>')",
+      "Bash(printf '\\\\n</ng-container>\\\\n<ng-template #locked>\\\\n  <app-upgrade-banner feature=\"multi-users\" />\\\\n</ng-template>')"
     ]
   }
 }

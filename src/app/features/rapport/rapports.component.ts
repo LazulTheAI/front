@@ -18,6 +18,8 @@ import { environment } from '@/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TranslocoModule } from '@jsverse/transloco';
+import { UpgradeBannerComponent } from '@/app/shared/plan-gating.components';
+import { RequiresFeatureDirective } from '@/app/shared/requires-plan.directive';
 
 interface ValeurStockReportResponse {
     valeurTotale: number;
@@ -42,7 +44,7 @@ interface MouvementExportResponse {
     selector: 'app-rapports',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, ToolbarModule, TooltipModule, ToastModule, SkeletonModule, DatePickerModule, SelectModule, DividerModule, TranslocoModule],
+    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, ToolbarModule, TooltipModule, ToastModule, SkeletonModule, DatePickerModule, SelectModule, DividerModule, TranslocoModule, RequiresFeatureDirective, UpgradeBannerComponent],
     providers: [MessageService],
     templateUrl: './rapports.component.html',
     styles: `

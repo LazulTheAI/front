@@ -1,5 +1,7 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, LOCALE_ID, isDevMode } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, LOCALE_ID, isDevMode } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { SubscriptionService } from './app/core/subscription.service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import { provideTransloco } from '@jsverse/transloco';
@@ -16,6 +18,13 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
         provideAnimationsAsync(),
         providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
+        {
+            provide: APP_INITIALIZER,
+            useFactory: (sub: SubscriptionService) => () =>
+                firstValueFrom(sub.load(), { defaultValue: null }).catch(() => null),
+            deps: [SubscriptionService],
+            multi: true,
+        },
         {
             provide: LOCALE_ID,
             useFactory: (authService: AuthApiService) => authService.getDefaultLang(),

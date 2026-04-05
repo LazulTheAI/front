@@ -1,4 +1,6 @@
 <!-- rapports.component.html -->
+<ng-container *appRequiresFeature="'rapport-pl'; else locked">
+
 <p-toast />
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
@@ -396,3 +398,9 @@
     </div>
   </div>
 </div>
+
+
+</ng-container>
+<ng-template #locked>
+  <app-upgrade-banner feature="rapport-pl" />
+</ng-template>

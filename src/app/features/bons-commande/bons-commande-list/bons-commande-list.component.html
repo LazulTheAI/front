@@ -1,4 +1,6 @@
 <!-- bons-commande-list.component.html -->
+<ng-container *appRequiresFeature="'commandes-fournisseurs'; else locked">
+
 <p-toast />
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
@@ -198,3 +200,8 @@
   [bonId]="selectedBon?.id ?? null"
   (closed)="onDetailClosed()"
 />
+
+</ng-container>
+<ng-template #locked>
+  <app-upgrade-banner feature="commandes-fournisseurs" />
+</ng-template>

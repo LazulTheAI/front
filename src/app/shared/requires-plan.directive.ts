@@ -1,20 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-//  requires-plan.directive.ts
-//
-//  Directive structurelle qui cache/affiche un bloc selon le plan.
-//
-//  Usage 1 — cacher silencieusement :
-//    <div *appRequiresPlan="'maker'">...</div>
-//
-//  Usage 2 — afficher un banner à la place :
-//    <div *appRequiresPlan="'maker'; else upgradeBanner">...</div>
-//    <ng-template #upgradeBanner>
-//      <app-upgrade-banner feature="commandes-fournisseurs" />
-//    </ng-template>
-//
-//  Usage 3 — désactiver un bouton :
-//    <p-button [disabled]="!subscription.hasFeature('export-comptable')" />
-// ─────────────────────────────────────────────────────────────
 import {
   Directive,
   Input,
@@ -23,8 +6,8 @@ import {
   ViewContainerRef,
   inject,
 } from '@angular/core';
-import { PlanLevel } from '../config/plan.config';
-import { SubscriptionService } from '../services/subscription.service';
+import { PlanLevel } from '../core/plan.config';
+import { SubscriptionService } from '../core/subscription.service';
 
 @Directive({
   selector: '[appRequiresPlan]',
@@ -32,6 +15,7 @@ import { SubscriptionService } from '../services/subscription.service';
 })
 export class RequiresPlanDirective implements OnInit {
   @Input('appRequiresPlan') requiredPlan!: PlanLevel;
+  @Input('appRequiresPlanElse') elseTemplate?: TemplateRef<any>;
 
   private template = inject(TemplateRef<any>);
   private viewContainer = inject(ViewContainerRef);
@@ -42,25 +26,21 @@ export class RequiresPlanDirective implements OnInit {
       this.viewContainer.createEmbeddedView(this.template);
     } else {
       this.viewContainer.clear();
+      if (this.elseTemplate) {
+        this.viewContainer.createEmbeddedView(this.elseTemplate);
+      }
     }
   }
 }
 
 
-// ─────────────────────────────────────────────────────────────
-//  requires-feature.directive.ts  (inline dans le même fichier)
-//
-//  Variante basée sur le nom de feature (recommandée dans les templates).
-//
-//  Usage :
-//    <section *appRequiresFeature="'commandes-fournisseurs'">...</section>
-// ─────────────────────────────────────────────────────────────
 @Directive({
   selector: '[appRequiresFeature]',
   standalone: true,
 })
 export class RequiresFeatureDirective implements OnInit {
   @Input('appRequiresFeature') feature!: string;
+  @Input('appRequiresFeatureElse') elseTemplate?: TemplateRef<any>;
 
   private template = inject(TemplateRef<any>);
   private viewContainer = inject(ViewContainerRef);
@@ -71,6 +51,9 @@ export class RequiresFeatureDirective implements OnInit {
       this.viewContainer.createEmbeddedView(this.template);
     } else {
       this.viewContainer.clear();
+      if (this.elseTemplate) {
+        this.viewContainer.createEmbeddedView(this.elseTemplate);
+      }
     }
   }
 }

@@ -17,12 +17,14 @@ import { CreateUtilisateurRequest, UpdateUtilisateurRequest, UtilisateurMarchand
 import { ToolbarModule } from 'primeng/toolbar';
 import { UtilisateursInactifsPipe } from './mon-equipe.pipes';
 import { TranslocoModule } from '@jsverse/transloco';
+import { UpgradeBannerComponent } from '@/app/shared/plan-gating.components';
+import { RequiresFeatureDirective } from '@/app/shared/requires-plan.directive';
 
 @Component({
     selector: 'app-mon-equipe',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, ToolbarModule, ButtonModule, TagModule, ToastModule, InputTextModule, PasswordModule, SelectModule, DialogModule, TooltipModule, DividerModule, UtilisateursInactifsPipe, TranslocoModule],
+    imports: [CommonModule, FormsModule, ToolbarModule, ButtonModule, TagModule, ToastModule, InputTextModule, PasswordModule, SelectModule, DialogModule, TooltipModule, DividerModule, UtilisateursInactifsPipe, TranslocoModule, RequiresFeatureDirective, UpgradeBannerComponent],
     providers: [MessageService, ConfirmationService],
     templateUrl: './mon-equipe.component.html'
 })

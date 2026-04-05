@@ -42,7 +42,8 @@ export const appRoutes: Routes = [
             { path: 'alertes', loadChildren: () => import('./app/features/alerte/alertes.routes').then((m) => m.Alerte_ROUTES) },
             { path: 'revendeurs', loadChildren: () => import('./app/features/revendeurs/revendeurs.routes').then((m) => m.REVENDEURS_ROUTES) },
             { path: 'import', loadChildren: () => import('./app/features/import-data/import.routes').then((m) => m.IMPORT_ROUTES) },
-            { path: 'commandes-b2b', loadChildren: () => import('./app/features/commande/commandes-b2b.routes').then((m) => m.COMMANDES_B2B_ROUTES) }
+            { path: 'commandes-b2b', loadChildren: () => import('./app/features/commande/commandes-b2b.routes').then((m) => m.COMMANDES_B2B_ROUTES) },
+            { path: 'upgrade', loadComponent: () => import('./app/pages/upgrade/upgrade.component').then((m) => m.UpgradeComponent), title: 'Choisir un plan' }
         ]
     },
 

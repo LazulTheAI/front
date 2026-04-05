@@ -18,6 +18,8 @@ import { BonCommandeControllerService, BonCommandeResponse } from '@/app/modules
 import { TranslocoModule } from '@jsverse/transloco';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
+import { UpgradeBannerComponent } from '@/app/shared/plan-gating.components';
+import { RequiresFeatureDirective } from '@/app/shared/requires-plan.directive';
 import { BonCommandeDetailComponent } from '../bon-commande-detail/bon-commande-detail.component';
 import { BonCommandeFormComponent } from '../bon-commande-form/bon-commande-form.component';
 
@@ -25,7 +27,7 @@ import { BonCommandeFormComponent } from '../bon-commande-form/bon-commande-form
     selector: 'app-bons-commande-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, TranslocoModule, IconField, InputIcon, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, SelectModule, InputTextModule, BonCommandeFormComponent, BonCommandeDetailComponent],
+    imports: [CommonModule, TranslocoModule, IconField, InputIcon, FormsModule, TableModule, ButtonModule, TagModule, TooltipModule, ToastModule, ToolbarModule, SelectModule, InputTextModule, BonCommandeFormComponent, BonCommandeDetailComponent, RequiresFeatureDirective, UpgradeBannerComponent],
     providers: [MessageService, ConfirmationService],
     templateUrl: './bons-commande-list.component.html'
 })
