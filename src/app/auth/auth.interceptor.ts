@@ -15,7 +15,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         '/auth/refresh',
         '/auth/load',
         '/api/bc/', // ← BigCommerce OAuth
-        '/api/mobile/auth/login' // ← login mobile
+        '/api/mobile/auth/login',
+        '/api/subscription' // ← ajoute ça
     ];
 
     if (skipUrls.some((url) => req.url.includes(url))) {

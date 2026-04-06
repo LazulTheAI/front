@@ -1,7 +1,7 @@
 import { AlerteWidgetComponent } from '@/app/features/alerte/alerte-widget.component';
 import { LayoutService } from '@/app/layout/service/layout.service';
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
@@ -43,15 +43,7 @@ import { AppConfigurator } from './app.configurator';
 
         <div class="layout-topbar-actions">
             <div class="layout-config-menu">
-                <p-select
-                    [options]="langs"
-                    [(ngModel)]="activeLang"
-                    (ngModelChange)="setLang($event)"
-                    optionLabel="label"
-                    optionValue="value"
-                    styleClass="border-none text-sm font-semibold"
-                    [style]="{'min-width': '80px'}"
-                />
+                <p-select [options]="langs" [(ngModel)]="activeLang" (ngModelChange)="setLang($event)" optionLabel="label" optionValue="value" styleClass="border-none text-sm font-semibold" [style]="{ 'min-width': '80px' }" />
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>

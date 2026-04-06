@@ -11,6 +11,8 @@ import { authInterceptor } from './app/auth/auth.interceptor';
 import { AuthApiService } from './app/auth/services/api/auth.service';
 import { SubscriptionService } from './app/core/subscription.service';
 import { TranslocoHttpLoader } from './app/core/transloco-loader';
+import { BASE_PATH } from './app/modules/openapi';
+import { environment } from './environments/environment';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -18,10 +20,15 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
         provideAnimationsAsync(),
         providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
+        { provide: BASE_PATH, useValue: environment.baseUrl },
+
         {
             provide: APP_INITIALIZER,
-            useFactory: (sub: SubscriptionService) => () => firstValueFrom(sub.load(), { defaultValue: null }).catch(() => null),
-            deps: [SubscriptionService],
+            useFactory: (sub: SubscriptionService, auth: AuthApiService) => () => {
+                if (!auth.getToken()) return Promise.resolve(null); // ← skip si pas connecté
+                return firstValueFrom(sub.load(), { defaultValue: null }).catch(() => null);
+            },
+            deps: [SubscriptionService, AuthApiService],
             multi: true
         },
         {
