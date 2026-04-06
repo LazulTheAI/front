@@ -62,7 +62,11 @@
                 },
                 "serve": {
                     "options": {
-                        "allowedHosts": ["unbaffled-charlyn-unresolutely.ngrok-free.dev"]
+                        "allowedHosts": ["dev.makerstocks.com", "dev-api.makerstocks.com"],
+                        "headers": {
+                            "X-Frame-Options": "ALLOWALL",
+                            "Content-Security-Policy": "frame-ancestors *"
+                        }
                     },
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-auth-callback',
+    standalone: true,
     template: `<p>Connexion en cours...</p>`
 })
 export class AuthCallbackComponent implements OnInit {
@@ -14,6 +15,8 @@ export class AuthCallbackComponent implements OnInit {
     ngOnInit(): void {
         const token = this.route.snapshot.queryParams['token'];
         const checkout = this.route.snapshot.queryParams['checkout'];
+        console.log('AuthCallback token reçu:', token); // ← ajoute ça
+        console.log('URL complète:', window.location.href);
 
         if (!token) {
             this.router.navigate(['/access-denied']);

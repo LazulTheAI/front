@@ -1,0 +1,40 @@
+# ─────────────────────────────────────────────────────────────
+#  netlify.toml — à la racine du repo frontend Angular
+# ─────────────────────────────────────────────────────────────
+
+[build]
+  command   = "npm run build -- --configuration production"
+  publish   = "dist/maker-stock/browser"   # ← adapte au nom de ton projet Angular
+  # Si ton angular.json a un outputPath différent, ajuste ici.
+  # Vérifie avec : cat angular.json | grep outputPath
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA redirect — toutes les routes Angular → index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# Headers de sécurité
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors https://*.bigcommerce.com https://*.mybigcommerce.com"
+
+# Cache long pour les assets Angular (hashes dans les noms de fichiers)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
