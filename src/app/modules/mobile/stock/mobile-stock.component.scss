@@ -1,0 +1,108 @@
+.mobile-page { padding: 16px; }
+
+.mobile-page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.mobile-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--p-text-color);
+    i { font-size: 20px; color: var(--p-primary-color); }
+}
+
+.search-bar {
+    margin-bottom: 16px;
+}
+
+.search-wrapper {
+    width: 100%;
+    display: block;
+}
+
+.search-input {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 12px 12px 40px;
+    border-radius: 10px;
+}
+
+.card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stock-card {
+    background: var(--p-surface-card);
+    border: 1px solid var(--p-surface-border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    &:active { transform: scale(0.98); }
+}
+
+.stock-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.stock-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--p-text-color);
+}
+
+.stock-card-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.stock-values strong { font-size: 18px; }
+
+.entrepot {
+    color: var(--p-text-muted-color);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    i { font-size: 12px; }
+}
+
+:global(.progress-danger .p-progressbar-value) { background: var(--p-red-500) !important; }
+:global(.progress-warn .p-progressbar-value)   { background: var(--p-yellow-500) !important; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--p-text-muted-color);
+    i { font-size: 48px; display: block; margin-bottom: 12px; }
+    p { font-size: 16px; }
+}
+
+.load-more-btn {
+    width: 100%;
+    padding: 14px;
+    background: none;
+    border: 1px dashed var(--p-surface-border);
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--p-primary-color);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    &:disabled { opacity: 0.5; }
+}

@@ -1,0 +1,79 @@
+<p-dialog
+    [(visible)]="visible"
+    (onHide)="onHide()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '100vw', maxWidth: '480px', margin: '0', borderRadius: '16px 16px 0 0' }"
+    position="bottom"
+    styleClass="mobile-dialog"
+>
+    <ng-template pTemplate="header">
+        <div class="dialog-header">
+            <span class="dialog-title">{{ materiau?.nom }}</span>
+            <p-tag [value]="getStatut(materiau!)" [severity]="getSeverity(materiau!)" *ngIf="materiau" />
+        </div>
+    </ng-template>
+
+    @if (materiau) {
+        <div class="detail-body">
+            <div class="stat-row">
+                <div class="stat-item">
+                    <span class="stat-label">Stock actuel</span>
+                    <span class="stat-value">{{ materiau.stockTotal ?? 0 }} {{ materiau.unite }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Seuil alerte</span>
+                    <span class="stat-value">{{ materiau.seuilAlerte ?? 0 }} {{ materiau.unite }}</span>
+                </div>
+            </div>
+
+            @if (materiau.stocks && materiau.stocks.length > 1) {
+                <div class="entrepot-breakdown">
+                    <p class="section-label">Répartition par entrepôt</p>
+                    @for (s of materiau.stocks; track s.entrepotId) {
+                        <div class="entrepot-row">
+                            <i class="pi pi-map-marker"></i>
+                            <span>{{ s.entrepotNom }}</span>
+                            <strong>{{ s.stockActuel }} {{ materiau.unite }}</strong>
+                        </div>
+                    }
+                </div>
+            }
+
+            <p-divider />
+
+            <div class="action-buttons">
+                <button pButton label="Ajuster le stock" icon="pi pi-sliders-h" class="p-button-outlined action-btn" (click)="goAjustement()"></button>
+                <button pButton label="Enregistrer réception" icon="pi pi-plus-circle" class="action-btn" (click)="goReception()"></button>
+            </div>
+
+            <p-divider />
+
+            <p class="section-label">10 derniers mouvements</p>
+
+            @if (loadingMouvements) {
+                <div class="spinner-center">
+                    <p-progressSpinner [style]="{ width: '32px', height: '32px' }" />
+                </div>
+            } @else if (mouvements.length === 0) {
+                <p class="empty-mouvements">Aucun mouvement enregistré</p>
+            } @else {
+                <div class="mouvements-list">
+                    @for (mv of mouvements; track mv.id) {
+                        <div class="mouvement-row">
+                            <i [class]="'pi ' + getMouvementIcon(mv.typeMouvement) + ' mv-icon'"></i>
+                            <div class="mv-body">
+                                <span class="mv-type">{{ mv.typeMouvement }}</span>
+                                <span class="mv-date">{{ mv.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                            </div>
+                            <span class="mv-qty" [class.positive]="mv.typeMouvement?.includes('ENTREE')" [class.negative]="!mv.typeMouvement?.includes('ENTREE')">
+                                {{ mv.typeMouvement?.includes('ENTREE') ? '+' : '-' }}{{ mv.quantite }}
+                            </span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</p-dialog>

@@ -1,0 +1,119 @@
+<div class="mobile-page">
+    <p-toast />
+    <p-confirmDialog />
+
+    <div class="mobile-page-header">
+        <h2 class="mobile-page-title">
+            <i class="pi pi-sliders-h"></i>
+            Ajustement de stock
+        </h2>
+    </div>
+
+    <form #ajustForm="ngForm" (ngSubmit)="confirmSubmit(ajustForm)" class="ajust-form">
+
+        <div class="form-field">
+            <label class="field-label">Matière <span class="required">*</span></label>
+            <p-autoComplete
+                [(ngModel)]="form.materiau"
+                name="materiau"
+                [suggestions]="filteredMateriaux"
+                (completeMethod)="searchMateriau($event)"
+                field="nom"
+                placeholder="Rechercher une matière..."
+                [required]="true"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%', 'font-size': '16px', padding: '12px' }"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Entrepôt <span class="required">*</span></label>
+            <p-select
+                [(ngModel)]="form.entrepotId"
+                name="entrepotId"
+                [options]="entrepotOptions"
+                placeholder="Sélectionner un entrepôt"
+                [required]="true"
+                [style]="{ width: '100%' }"
+            />
+            @if (currentStock !== null) {
+                <span class="field-hint">Stock actuel dans cet entrepôt : <strong>{{ currentStock }} {{ form.materiau?.unite }}</strong></span>
+            }
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Type d'ajustement <span class="required">*</span></label>
+            <p-selectButton
+                [(ngModel)]="form.direction"
+                name="direction"
+                [options]="directionOptions"
+                optionLabel="label"
+                optionValue="value"
+                [required]="true"
+                styleClass="direction-select"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Quantité <span class="required">*</span></label>
+            <p-inputNumber
+                [(ngModel)]="form.quantite"
+                name="quantite"
+                [required]="true"
+                [min]="0.001"
+                [minFractionDigits]="0"
+                [maxFractionDigits]="4"
+                placeholder="0"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%', 'font-size': '22px', padding: '14px', 'text-align': 'center' }"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Motif <span class="required">*</span></label>
+            <p-select
+                [(ngModel)]="form.motif"
+                name="motif"
+                [options]="motifOptions"
+                placeholder="Sélectionner un motif"
+                [required]="true"
+                [style]="{ width: '100%' }"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Note libre</label>
+            <textarea
+                pTextarea
+                [(ngModel)]="form.note"
+                name="note"
+                placeholder="Détails supplémentaires..."
+                [autoResize]="true"
+                rows="2"
+                class="note-textarea"
+            ></textarea>
+        </div>
+
+        <p-divider />
+
+        @if (form.materiau && form.quantite && form.direction) {
+            <div class="preview-card" [class.preview-pos]="form.direction === 'positif'" [class.preview-neg]="form.direction === 'negatif'">
+                <i [class]="'pi ' + (form.direction === 'positif' ? 'pi-arrow-up' : 'pi-arrow-down')"></i>
+                <span>
+                    {{ form.direction === 'positif' ? '+' : '−' }}{{ form.quantite }} {{ form.materiau.unite }}
+                    sur <strong>{{ form.materiau.nom }}</strong>
+                </span>
+            </div>
+        }
+
+        <button
+            pButton
+            type="submit"
+            label="Valider l'ajustement"
+            icon="pi pi-check"
+            [loading]="saving"
+            [disabled]="ajustForm.invalid || !form.materiau || !form.quantite || !form.entrepotId || !form.motif"
+            class="submit-btn"
+        ></button>
+    </form>
+</div>

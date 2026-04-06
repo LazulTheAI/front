@@ -1,0 +1,62 @@
+.mobile-page { padding: 16px; }
+
+.mobile-page-header {
+    margin-bottom: 24px;
+}
+
+.mobile-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--p-text-color);
+    i { font-size: 20px; color: var(--p-primary-color); }
+}
+
+.reception-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--p-text-color);
+    .required { color: var(--p-red-500); }
+}
+
+.text-input {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 16px;
+}
+
+.submit-btn, .secondary-btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 16px;
+    justify-content: center;
+}

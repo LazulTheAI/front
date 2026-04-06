@@ -1,0 +1,36 @@
+<div class="mobile-page">
+    <div class="mobile-page-header">
+        <h2 class="mobile-page-title">
+            <i class="pi pi-home"></i>
+            Dashboard
+        </h2>
+        <button class="refresh-btn" (click)="loadKpis()" [disabled]="loading">
+            <i class="pi pi-refresh" [class.spin]="loading"></i>
+        </button>
+    </div>
+
+    @if (loading && kpis.length === 0) {
+        <div class="kpi-grid">
+            @for (i of [1, 2, 3, 4]; track i) {
+                <p-skeleton height="120px" borderRadius="12px" />
+            }
+        </div>
+    } @else {
+        <div class="kpi-grid">
+            @for (kpi of kpis; track kpi.label) {
+                <div class="kpi-card" (click)="navigate(kpi.route)" [class]="'kpi-card--' + kpi.severity">
+                    <div class="kpi-icon">
+                        <i [class]="'pi ' + kpi.icon"></i>
+                    </div>
+                    <div class="kpi-body">
+                        <div class="kpi-value">{{ kpi.value }}</div>
+                        <div class="kpi-label">{{ kpi.label }}</div>
+                    </div>
+                    <i class="pi pi-chevron-right kpi-arrow"></i>
+                </div>
+            }
+        </div>
+    }
+
+    <p class="refresh-hint">Rafraîchissement automatique toutes les 60 secondes</p>
+</div>

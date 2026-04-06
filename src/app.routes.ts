@@ -47,5 +47,12 @@ export const appRoutes: Routes = [
         ]
     },
 
+    // Module mobile (shell propre, sans AppLayout desktop)
+    {
+        path: 'mobile',
+        canActivate: [authGuard],
+        loadChildren: () => import('./app/modules/mobile/mobile.routes').then((m) => m.MOBILE_ROUTES)
+    },
+
     { path: '**', component: Notfound }
 ];

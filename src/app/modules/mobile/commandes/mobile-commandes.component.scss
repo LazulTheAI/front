@@ -1,0 +1,111 @@
+.mobile-page { padding: 16px; }
+
+.mobile-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.mobile-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--p-text-color);
+    i { font-size: 20px; color: var(--p-primary-color); }
+}
+
+.refresh-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    color: var(--p-text-muted-color);
+    font-size: 18px;
+    &:hover { background: var(--p-surface-hover); }
+    &:disabled { opacity: 0.5; }
+}
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.commande-card {
+    background: var(--p-surface-card);
+    border: 1px solid var(--p-surface-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cmd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cmd-fournisseur {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--p-text-color);
+    flex: 1;
+}
+
+.cmd-ref {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--p-text-muted-color);
+    span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        i { font-size: 11px; }
+    }
+}
+
+.cmd-livraison {
+    font-size: 13px;
+    color: var(--p-text-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    i { color: var(--p-primary-color); }
+}
+
+.cmd-lignes {
+    font-size: 13px;
+    color: var(--p-text-muted-color);
+    padding: 8px 12px;
+    background: var(--p-surface-ground);
+    border-radius: 8px;
+}
+
+.receive-btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--p-text-muted-color);
+    i { font-size: 48px; display: block; margin-bottom: 12px; color: var(--p-green-400); }
+    p { font-size: 16px; margin: 0; }
+    .empty-hint { font-size: 13px; margin-top: 8px; }
+}

@@ -1,0 +1,83 @@
+<div class="mobile-page">
+    <p-toast />
+
+    <div class="mobile-page-header">
+        <h2 class="mobile-page-title">
+            <i class="pi pi-box"></i>
+            Stock
+        </h2>
+    </div>
+
+    <div class="search-bar">
+        <span class="p-input-icon-left search-wrapper">
+            <i class="pi pi-search"></i>
+            <input
+                pInputText
+                type="text"
+                placeholder="Rechercher une matière..."
+                [ngModel]="searchQuery"
+                (ngModelChange)="onSearchInput($event)"
+                class="search-input"
+            />
+        </span>
+    </div>
+
+    @if (loading && materiaux.length === 0) {
+        <div class="card-list">
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+                <p-skeleton height="110px" borderRadius="12px" />
+            }
+        </div>
+    } @else if (materiaux.length === 0 && !loading) {
+        <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>Aucune matière trouvée</p>
+        </div>
+    } @else {
+        <div class="card-list">
+            @for (m of materiaux; track m.id) {
+                <div class="stock-card" (click)="openDetail(m)">
+                    <div class="stock-card-header">
+                        <div class="stock-card-name">{{ m.nom }}</div>
+                        <p-tag
+                            [value]="getStatut(m)"
+                            [severity]="getSeverity(m)"
+                            class="stock-badge"
+                        />
+                    </div>
+
+                    <div class="stock-card-info">
+                        <span class="stock-values">
+                            <strong>{{ m.stockTotal ?? 0 }}</strong> / {{ m.seuilAlerte ?? 0 }} {{ m.unite }}
+                        </span>
+                        @if (m.stocks && m.stocks.length > 0) {
+                            <span class="entrepot">
+                                <i class="pi pi-map-marker"></i>
+                                {{ m.stocks[0].entrepotNom }}
+                            </span>
+                        }
+                    </div>
+
+                    <p-progressBar
+                        [value]="getStockPercent(m)"
+                        [showValue]="false"
+                        [style]="{'height': '6px'}"
+                        [styleClass]="getSeverity(m) === 'danger' ? 'progress-danger' : getSeverity(m) === 'warn' ? 'progress-warn' : ''"
+                    />
+                </div>
+            }
+
+            @if (hasMore) {
+                <button class="load-more-btn" (click)="loadMore()" [disabled]="loading">
+                    <i class="pi pi-chevron-down"></i>
+                    Charger plus
+                </button>
+            }
+        </div>
+    }
+</div>
+
+<app-mobile-stock-detail-dialog
+    [(visible)]="showDetail"
+    [materiau]="selectedMateriau"
+/>

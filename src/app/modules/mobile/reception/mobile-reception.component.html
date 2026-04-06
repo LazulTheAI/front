@@ -1,0 +1,128 @@
+<div class="mobile-page">
+    <p-toast />
+
+    <div class="mobile-page-header">
+        <h2 class="mobile-page-title">
+            <i class="pi pi-plus-circle"></i>
+            Réception matière
+        </h2>
+    </div>
+
+    <form #receptionForm="ngForm" (ngSubmit)="submit(receptionForm)" class="reception-form">
+
+        <div class="form-field">
+            <label class="field-label">Matière <span class="required">*</span></label>
+            <p-autoComplete
+                [(ngModel)]="form.materiau"
+                name="materiau"
+                [suggestions]="filteredMateriaux"
+                (completeMethod)="searchMateriau($event)"
+                field="nom"
+                placeholder="Rechercher une matière..."
+                [required]="true"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%', 'font-size': '16px', padding: '12px' }"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Fournisseur</label>
+            <p-select
+                [(ngModel)]="form.fournisseurId"
+                name="fournisseurId"
+                [options]="fournisseurOptions"
+                placeholder="Sélectionner un fournisseur"
+                [style]="{ width: '100%' }"
+                [showClear]="true"
+            />
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="field-label">Quantité reçue <span class="required">*</span></label>
+                <p-inputNumber
+                    [(ngModel)]="form.quantite"
+                    name="quantite"
+                    [required]="true"
+                    [min]="0.001"
+                    [minFractionDigits]="0"
+                    [maxFractionDigits]="4"
+                    placeholder="0"
+                    [style]="{ width: '100%' }"
+                    [inputStyle]="{ width: '100%', 'font-size': '18px', padding: '12px' }"
+                />
+            </div>
+            <div class="form-field">
+                <label class="field-label">Prix unitaire</label>
+                <p-inputNumber
+                    [(ngModel)]="form.coutUnitaire"
+                    name="coutUnitaire"
+                    [minFractionDigits]="2"
+                    [maxFractionDigits]="4"
+                    placeholder="0.00"
+                    [style]="{ width: '100%' }"
+                    [inputStyle]="{ width: '100%', 'font-size': '18px', padding: '12px' }"
+                />
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Entrepôt de destination <span class="required">*</span></label>
+            <p-select
+                [(ngModel)]="form.entrepotId"
+                name="entrepotId"
+                [options]="entrepotOptions"
+                placeholder="Sélectionner un entrepôt"
+                [required]="true"
+                [style]="{ width: '100%' }"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Numéro de lot fournisseur</label>
+            <input
+                pInputText
+                type="text"
+                [(ngModel)]="form.numeroLot"
+                name="numeroLot"
+                placeholder="Ex: LOT-2024-001"
+                class="text-input"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">DLC</label>
+            <p-datePicker
+                [(ngModel)]="form.dlc"
+                name="dlc"
+                [minDate]="today"
+                placeholder="JJ/MM/AAAA"
+                dateFormat="dd/mm/yy"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%', 'font-size': '16px', padding: '12px' }"
+            />
+        </div>
+
+        <p-divider />
+
+        <div class="form-actions">
+            <button
+                pButton
+                type="submit"
+                label="Enregistrer la réception"
+                icon="pi pi-check"
+                [loading]="saving"
+                [disabled]="receptionForm.invalid || !form.materiau || !form.entrepotId || !form.quantite"
+                class="submit-btn"
+            ></button>
+            <button
+                pButton
+                type="button"
+                label="Scanner une autre matière"
+                icon="pi pi-qrcode"
+                class="p-button-outlined secondary-btn"
+                (click)="scanAnother()"
+            ></button>
+        </div>
+    </form>
+</div>

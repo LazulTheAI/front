@@ -1,0 +1,28 @@
+<div class="mobile-shell">
+    <main class="mobile-content">
+        <router-outlet></router-outlet>
+    </main>
+
+    <nav class="mobile-bottom-nav">
+        <a routerLink="dashboard" routerLinkActive="active" class="nav-item">
+            <i class="pi pi-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a routerLink="stock" routerLinkActive="active" class="nav-item">
+            <i class="pi pi-box"></i>
+            <span>Stock</span>
+        </a>
+        <a routerLink="scanner" routerLinkActive="active" class="nav-item nav-item--scanner">
+            <i class="pi pi-qrcode"></i>
+            <span>Scanner</span>
+        </a>
+        <a routerLink="fabrication" routerLinkActive="active" class="nav-item">
+            <i class="pi pi-cog"></i>
+            <span>Fabrication</span>
+        </a>
+        <a routerLink="commandes" routerLinkActive="active" class="nav-item">
+            <i class="pi pi-shopping-cart"></i>
+            <span>Commandes</span>
+        </a>
+    </nav>
+</div>
