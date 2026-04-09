@@ -124,7 +124,9 @@
     "cost_description": "Cost per unit of measure (used for COGS calculation)",
     "alert_threshold": "Stock alert threshold",
     "threshold_placeholder": "E.g.: 10",
-    "threshold_description": "An alert is triggered if total stock falls below this threshold"
+    "threshold_description": "An alert is triggered if total stock falls below this threshold",
+    "dlc_required": "Expiry date required",
+    "dlc_required_description": "Requires an expiry date on every stock entry"
   },
   "entree_stock": {
     "title": "Stock entry",
@@ -140,7 +142,8 @@
     "lot_placeholder": "Supplier lot...",
     "expiration_date": "Expiration date",
     "expiration_placeholder": "MM/DD/YYYY",
-    "save_entry": "Save entry"
+    "save_entry": "Save entry",
+    "dlc_required_hint": "This material requires an expiry date on every stock entry"
   },
   "ajustement": {
     "title": "Stock adjustment",
@@ -326,6 +329,7 @@
   },
   "produits": {
     "title": "BigCommerce Products",
+    "sku_placeholder": "Filter by SKU",
     "subtitle": "Catalogue synchronized from your store",
     "search_placeholder": "Search...",
     "product": "Product",

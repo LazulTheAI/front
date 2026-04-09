@@ -81,6 +81,20 @@
       <small class="text-500">{{ 'materiaux_form.threshold_description' | transloco }}</small>
     </div>
 
+    <p-divider />
+
+    <!-- DLC obligatoire -->
+    <div class="flex align-items-center justify-content-between gap-3">
+      <div class="flex flex-column gap-1">
+        <span class="font-medium text-900">{{ 'materiaux_form.dlc_required' | transloco }}</span>
+        <small class="text-500">{{ 'materiaux_form.dlc_required_description' | transloco }}</small>
+      </div>
+      <p-toggleswitch
+        name="dlcObligatoire"
+        [(ngModel)]="form.dlcObligatoire"
+      />
+    </div>
+
   </form>
 
   <ng-template pTemplate="footer">

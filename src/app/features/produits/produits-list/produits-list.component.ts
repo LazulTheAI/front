@@ -1,8 +1,8 @@
 // produits-list.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
-import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
@@ -91,6 +91,9 @@ export class ProduitsListComponent implements OnInit {
     sortBy = 'nom';
     sortDir = 'asc';
 
+    skuFilter = '';
+    private skuSubject = new Subject<string>();
+
     search = '';
     private search$ = new Subject<string>();
 
@@ -125,6 +128,22 @@ export class ProduitsListComponent implements OnInit {
             this.page = 0;
             this.loadProduits();
         });
+        this.loadProduits();
+        this.skuSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe((sku) => {
+            this.skuFilter = sku;
+            this.page = 0;
+            this.loadProduits();
+        });
+    }
+
+    onSkuInput(value: string): void {
+        this.skuSubject.next(value);
+    }
+
+    resetFiltres(): void {
+        this.search = '';
+        this.skuFilter = '';
+        this.page = 0;
         this.loadProduits();
     }
 
@@ -172,7 +191,7 @@ export class ProduitsListComponent implements OnInit {
     }
     loadProduits(): void {
         this.loading = true;
-        this.produitService.listerProduit(this.page, this.size, this.sortBy, this.sortDir, this.search || undefined).subscribe({
+        this.produitService.listerProduit(this.page, this.size, this.sortBy, this.sortDir, this.search, this.skuFilter || undefined).subscribe({
             next: (data: any) => {
                 this.produits = data.content;
                 this.totalRecords = data.totalElements;

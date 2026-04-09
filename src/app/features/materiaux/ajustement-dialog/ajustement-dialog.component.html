@@ -28,6 +28,7 @@
       <p-selectButton
         name="direction"
         [(ngModel)]="form.direction"
+        (ngModelChange)="onDirectionChange()"
         required
         [options]="directionOptions"
         optionLabel="label"
@@ -58,7 +59,8 @@
     <!-- Quantité -->
     <div class="flex flex-column gap-2">
       <label class="font-medium text-900" for="quantite">
-        {{ 'common.quantity' | transloco }} {{ form.direction === 'positif' ? ('ajustement.add' | transloco) : ('ajustement.remove' | transloco) }}
+        {{ 'common.quantity' | transloco }}
+        {{ form.direction === 'positif' ? ('ajustement.add' | transloco) : ('ajustement.remove' | transloco) }}
         <span class="text-red-500">*</span>
       </label>
       <p-inputNumber
@@ -73,6 +75,31 @@
         [class.ng-invalid]="ngForm.submitted && ngForm.controls['quantite']?.invalid"
       />
     </div>
+
+    <!-- DLC — ajustement positif uniquement, si dlcObligatoire -->
+    @if (form.direction === 'positif' && materiau?.dlcObligatoire) {
+      <div class="flex flex-column gap-2">
+        <label class="font-medium text-900" for="expiresAt">
+          {{ 'entree_stock.expiration_date' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <p-datepicker
+          inputId="expiresAt"
+          name="expiresAt"
+          [(ngModel)]="form.expiresAt"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [minDate]="today"
+          required
+          [placeholder]="'entree_stock.expiration_placeholder' | transloco"
+          [class.ng-invalid]="ngForm.submitted && ngForm.controls['expiresAt']?.invalid"
+        />
+        <small class="text-orange-500">
+          <i class="pi pi-info-circle mr-1"></i>
+          {{ 'entree_stock.dlc_required_hint' | transloco }}
+        </small>
+      </div>
+    }
 
     <!-- Raison -->
     <div class="flex flex-column gap-2">

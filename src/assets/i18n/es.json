@@ -124,7 +124,9 @@
     "cost_description": "Coste por unidad de medida (usado para el cálculo de COGS)",
     "alert_threshold": "Umbral de alerta de stock",
     "threshold_placeholder": "Ej: 10",
-    "threshold_description": "Se activa una alerta si el stock total cae por debajo de este umbral"
+    "threshold_description": "Se activa una alerta si el stock total cae por debajo de este umbral",
+    "dlc_required": "Fecha de caducidad obligatoria",
+    "dlc_required_description": "Requiere una fecha de caducidad en cada entrada de stock"
   },
   "entree_stock": {
     "title": "Entrada de stock",
@@ -140,6 +142,7 @@
     "lot_placeholder": "Lote proveedor...",
     "expiration_date": "Fecha de caducidad",
     "expiration_placeholder": "DD/MM/AAAA",
+    "dlc_required_hint": "Este material requiere una fecha de caducidad en cada entrada de stock",
     "save_entry": "Guardar entrada"
   },
   "ajustement": {
@@ -327,6 +330,7 @@
   "produits": {
     "title": "Productos BigCommerce",
     "subtitle": "Catálogo sincronizado desde su tienda",
+    "sku_placeholder": "Filtrar por SKU",
     "search_placeholder": "Buscar...",
     "product": "Producto",
     "sku": "SKU",

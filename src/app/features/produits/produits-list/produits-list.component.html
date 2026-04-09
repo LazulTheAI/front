@@ -14,11 +14,25 @@
     </div>
   </ng-template>
   <ng-template pTemplate="end">
-    <p-iconfield>
-      <p-inputicon styleClass="pi pi-search" />
-      <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
-        [placeholder]="'produits.search_placeholder' | transloco" class="w-16rem" />
-    </p-iconfield>
+    <div class="flex align-items-center gap-2">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
+          [placeholder]="'produits.search_placeholder' | transloco" class="w-14rem" />
+      </p-iconfield>
+
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-barcode" />
+        <input pInputText [ngModel]="skuFilter" (ngModelChange)="onSkuInput($event)"
+          [placeholder]="'produits.sku_placeholder' | transloco" class="w-10rem" />
+      </p-iconfield>
+
+      @if (search || skuFilter) {
+        <p-button icon="pi pi-times" severity="secondary" [text]="true" [rounded]="true"
+          size="small" [pTooltip]="'common.clear_filters' | transloco"
+          (onClick)="resetFiltres()" />
+      }
+    </div>
   </ng-template>
 </p-toolbar>
 

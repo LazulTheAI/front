@@ -5,6 +5,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { AjustementStockRequest, EntrepotControllerService, EntrepotResponse, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -15,14 +16,14 @@ import { StockTotalPipe } from '../materiau.pipes';
 @Component({
     selector: 'app-ajustement-dialog',
     standalone: true,
-    imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule, SelectModule, InputTextModule, TranslocoModule, SelectButtonModule, StockTotalPipe],
+    imports: [CommonModule, FormsModule, DatePickerModule, DialogModule, ButtonModule, InputNumberModule, SelectModule, InputTextModule, TranslocoModule, SelectButtonModule, StockTotalPipe],
     providers: [],
     templateUrl: './ajustement-dialog.component.html'
 })
 export class AjustementDialogComponent implements OnChanges, OnInit {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
-
+    today = new Date();
     @Input() materiau: MateriauResponse | null = null;
     @Output() saved = new EventEmitter<{ success: boolean; message: string }>();
 
@@ -38,7 +39,8 @@ export class AjustementDialogComponent implements OnChanges, OnInit {
         quantite: null as number | null,
         direction: 'positif' as 'positif' | 'negatif',
         raison: '',
-        entrepotId: null as number | null
+        entrepotId: null as number | null,
+        expiresAt: null as Date | null
     };
 
     constructor(
@@ -57,7 +59,13 @@ export class AjustementDialogComponent implements OnChanges, OnInit {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['visible'] && this.visible) {
-            this.form = { quantite: null, direction: 'positif', raison: '', entrepotId: null };
+            this.form = { quantite: null, direction: 'positif', raison: '', entrepotId: null, expiresAt: null };
+        }
+    }
+
+    onDirectionChange(): void {
+        if (this.form.direction === 'negatif') {
+            this.form.expiresAt = null;
         }
     }
 

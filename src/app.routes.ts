@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { AuthCallbackComponent } from './app/auth/auth-callback.component';
-import { BcAuthComponent } from './app/auth/gig-commerce/bc-load/bc-auth.component';
-import { BcLoadComponent } from './app/auth/gig-commerce/bc-load/bc-load.component';
-import { BillingPendingComponent } from './app/auth/gig-commerce/bc-load/billing-pending.component';
+import { BcAuthComponent } from './app/auth/big-commerce/bc-load/bc-auth.component';
+import { BcLoadComponent } from './app/auth/big-commerce/bc-load/bc-load.component';
+import { BillingPendingComponent } from './app/auth/big-commerce/bc-load/billing-pending.component';
 import { authGuard } from './app/auth/guards/guards';
 import { AppLayout } from './app/layout/component/app.layout';
 import { Notfound } from './app/pages/notfound/notfound';

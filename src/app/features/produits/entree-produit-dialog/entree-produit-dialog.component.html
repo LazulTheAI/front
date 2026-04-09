@@ -76,6 +76,7 @@
     <div class="flex flex-column gap-1">
       <label class="text-sm font-medium text-700">{{ 'entree_produit.dlc' | transloco }}</label>
       <p-datepicker
+        appendTo="body"
         name="dlc"
         [(ngModel)]="form.dlc"
         [showIcon]="true"

@@ -96,9 +96,14 @@
       </div>
     </div>
 
-    <!-- Date expiration -->
+   <!-- Date expiration -->
     <div class="flex flex-column gap-2">
-      <label class="font-medium text-900" for="expiration">{{ 'entree_stock.expiration_date' | transloco }}</label>
+      <label class="font-medium text-900" for="expiration">
+        {{ 'entree_stock.expiration_date' | transloco }}
+        @if (materiau?.dlcObligatoire) {
+          <span class="text-red-500">*</span>
+        }
+      </label>
       <p-datepicker
         inputId="expiration"
         name="expiresAt"
@@ -106,8 +111,17 @@
         dateFormat="dd/mm/yy"
         [showIcon]="true"
         [minDate]="today"
+        appendTo="body"
+        [required]="!!materiau?.dlcObligatoire"
         [placeholder]="'entree_stock.expiration_placeholder' | transloco"
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['expiresAt']?.invalid"
       />
+      @if (materiau?.dlcObligatoire) {
+        <small class="text-orange-500">
+          <i class="pi pi-info-circle mr-1"></i>
+          {{ 'entree_stock.dlc_required_hint' | transloco }}
+        </small>
+      }
     </div>
 
     <!-- Notes -->
