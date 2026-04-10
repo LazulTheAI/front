@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, startWith, switchMap, takeUntil } from 'rxjs/operators';
 
@@ -26,11 +26,9 @@ import { EntrepotControllerService, EntrepotResponse, MateriauControllerService,
 
 // Dialogs
 import { TranslocoModule } from '@jsverse/transloco';
-import { AjustementDialogComponent } from '../ajustement-dialog/ajustement-dialog.component';
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
 import { HistoriqueDialogComponent } from '../historique-dialog/historique-dialog.component';
 import { MateriauFormComponent } from '../materiau-form/materiau-form.component';
-import { TransfertMatiereDialogComponent } from '../transfert-matiere-dialog/transfert-matiere-dialog.component';
 
 /**
  * LigneStockMateriau — une ligne = un MateriauResponse × un entrepôt.
@@ -96,17 +94,15 @@ interface SelectOption {
         ConfirmDialog,
         // Dialogs
         EntreeStockDialogComponent,
-        AjustementDialogComponent,
         HistoriqueDialogComponent,
-        MateriauFormComponent,
-        TransfertMatiereDialogComponent
+        MateriauFormComponent
     ],
     providers: [MessageService, ConfirmationService]
 })
 export class StockMateriauxComponent implements OnInit, OnDestroy {
     private materiauxBruts: MateriauResponse[] = [];
     showTransfertDialog = false;
-
+    sku: string | null;
     lignes: LigneStockMateriau[] = [];
     lignesFiltrees: LigneStockMateriau[] = [];
     entrepots: EntrepotResponse[] = [];
@@ -141,7 +137,8 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
         private entrepotService: EntrepotControllerService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        public router: Router
     ) {
         this.filters = this.fb.group({
             search: [''],
@@ -200,6 +197,11 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
+    openLots(l: LigneStockMateriau): void {
+        this.router.navigate(['/materiaux', l.materiauId, 'lots'], {
+            queryParams: { nom: l.nom }
+        });
+    }
     openTransfert(l: LigneStockMateriau): void {
         this.selectedMateriau = this.findMateriau(l.materiauId);
         this.showTransfertDialog = true;
@@ -222,6 +224,7 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
             const enAlerte = m.enAlerte === true;
 
             return {
+                sku: m.sku ?? null,
                 trackId: `${m.id}`,
                 materiauId: m.id!,
                 nom: m.nom!,

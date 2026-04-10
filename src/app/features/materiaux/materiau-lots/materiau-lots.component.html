@@ -1,0 +1,218 @@
+<p-toast />
+
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <p-button icon="pi pi-arrow-left" severity="secondary" [text]="true"
+        [rounded]="true" (onClick)="retour()" />
+      <i class="pi pi-box text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">
+          {{ 'lots.title' | transloco }} — {{ materiau?.nom ?? '...' }}
+        </h2>
+        <p class="m-0 text-400 text-sm mt-1">
+          @if (materiau?.sku) {
+            <span class="font-mono text-600 mr-2">{{ materiau?.sku }}</span>·
+          }
+          {{ materiau?.unite }}
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-3">
+
+      <!-- Filtre entrepôt -->
+      <p-select
+        [(ngModel)]="filtreEntrepotId"
+        [options]="entrepotOptions"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="false"
+        styleClass="w-13rem"
+        (onChange)="onFiltreEntrepot()"
+      />
+
+
+      <!-- Nouvelle entrée -->
+      <p-button
+        label="{{ 'lots.new_entry' | transloco }}"
+        icon="pi pi-plus"
+        severity="success"
+        (onClick)="openEntree()"
+      />
+      
+      <!-- Stock total -->
+      <div class="surface-100 border-round px-3 py-2 text-center">
+        <div class="text-400 text-xs">{{ 'lots.total_stock' | transloco }}</div>
+        <div class="font-bold text-900 text-lg">
+          {{ getTotalStock() | number:'1.0-2' }} {{ materiau?.unite }}
+        </div>
+      </div>
+
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<!-- Banner lots expirés -->
+@if (nbLotsExpires > 0) {
+  <div class="flex align-items-center gap-2 p-3 bg-red-50 border-round border-1 border-red-200 mb-3">
+    <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
+    <span class="text-red-800 font-medium">
+      {{ nbLotsExpires }} {{ 'lots.expired_count' | transloco }}
+    </span>
+  </div>
+}
+
+<div class="card">
+  <p-table
+    [value]="lotsFiltres"
+    [loading]="loading"
+    [showGridlines]="true"
+    [rowHover]="true"
+    dataKey="id"
+    [sortField]="'expiresAt'"
+    [sortOrder]="1"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:140px" pSortableColumn="numeroLot">
+          {{ 'lots.lot_number' | transloco }} <p-sortIcon field="numeroLot" />
+        </th>
+        <th style="width:130px">{{ 'common.warehouse' | transloco }}</th>
+        <th style="width:150px" pSortableColumn="expiresAt">
+          {{ 'lots.dlc' | transloco }} <p-sortIcon field="expiresAt" />
+        </th>
+        <th style="width:160px" class="text-right" pSortableColumn="quantiteRestante">
+          {{ 'lots.remaining' | transloco }} <p-sortIcon field="quantiteRestante" />
+        </th>
+        <th style="width:140px" class="text-right" pSortableColumn="quantiteInitiale">
+          {{ 'lots.initial' | transloco }} <p-sortIcon field="quantiteInitiale" />
+        </th>
+        <th style="width:130px" class="text-right">
+          {{ 'lots.unit_cost' | transloco }}
+        </th>
+        <th style="width:150px" pSortableColumn="createdAt">
+          {{ 'lots.entry_date' | transloco }} <p-sortIcon field="createdAt" />
+        </th>
+        <th style="width:100px" class="text-center">{{ 'common.actions' | transloco }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-lot>
+      <tr [class.opacity-60]="lot.estExpire">
+
+        <td>
+          @if (lot.numeroLot) {
+            <span class="font-mono text-sm bg-gray-100 px-2 py-1 border-round text-700">
+              {{ lot.numeroLot }}
+            </span>
+          } @else {
+            <span class="text-400 text-sm font-italic">{{ 'lots.no_lot_number' | transloco }}</span>
+          }
+        </td>
+
+        <td>
+          <span class="text-sm text-900">{{ lot.entrepotNom }}</span>
+        </td>
+
+        <td>
+          @if (lot.expiresAt) {
+            <div class="flex align-items-center gap-2">
+              <p-tag
+                [value]="lot.expiresAt | date:'dd/MM/yyyy'"
+                [severity]="getDlcSeverity(lot)"
+              />
+              @if (lot.estExpire) {
+                <i class="pi pi-exclamation-circle text-red-500 text-sm"
+                  [pTooltip]="'lots.expired' | transloco"></i>
+              } @else if (lot.dlcProche) {
+                <i class="pi pi-exclamation-triangle text-orange-500 text-sm"
+                  [pTooltip]="'lots.dlc_soon' | transloco"></i>
+              }
+            </div>
+          } @else {
+            <span class="text-400 text-sm">{{ 'lots.no_dlc' | transloco }}</span>
+          }
+        </td>
+
+        <td class="text-right">
+          <div class="flex align-items-center justify-content-end gap-2">
+            <span class="font-mono font-semibold text-900 text-sm">
+              {{ lot.quantiteRestante | number:'1.0-4' }}
+            </span>
+            <span class="text-400 text-xs">{{ materiau?.unite }}</span>
+          </div>
+          <div class="mt-1 bg-gray-200 border-round" style="height:4px">
+            <div class="border-round"
+              [style.width.%]="lot.quantiteInitiale > 0
+                ? (lot.quantiteRestante / lot.quantiteInitiale * 100) : 0"
+              [style.background]="lot.estExpire ? '#ef4444'
+                : lot.dlcProche ? '#f97316' : '#22c55e'"
+              style="height:4px; transition:width 0.3s">
+            </div>
+          </div>
+        </td>
+
+        <td class="text-right">
+          <span class="font-mono text-sm text-500">
+            {{ lot.quantiteInitiale | number:'1.0-4' }} {{ materiau?.unite }}
+          </span>
+        </td>
+
+        <td class="text-right">
+          @if (lot.coutUnitaire != null) {
+            <span class="font-mono text-sm text-900">
+              {{ lot.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }}
+            </span>
+          } @else {
+            <span class="text-400">—</span>
+          }
+        </td>
+
+        <td>
+          <span class="text-sm text-500">
+            {{ lot.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </td>
+
+        <td class="text-center">
+          <p-button
+            label="{{ 'lots.degrever' | transloco }}"
+            icon="pi pi-minus-circle"
+            severity="warn"
+            [text]="true"
+            size="small"
+            [pTooltip]="'lots.degrever_tooltip' | transloco"
+            [disabled]="lot.estExpire || lot.quantiteRestante <= 0"
+            (onClick)="openDegrever(lot)"
+          />
+        </td>
+
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center py-6 text-400">
+          <i class="pi pi-box text-4xl block mb-3 opacity-30"></i>
+          {{ 'lots.no_lots' | transloco }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<app-degrever-lot-dialog
+  [(visible)]="showDegreverDialog"
+  [lot]="selectedLot"
+  [materiau]="materiau"
+  (saved)="onDegreverSaved()"
+/>
+
+<app-entree-stock-dialog
+  [(visible)]="showEntreeDialog"
+  [materiau]="materiau"
+  (saved)="onEntreeSaved()"
+/>

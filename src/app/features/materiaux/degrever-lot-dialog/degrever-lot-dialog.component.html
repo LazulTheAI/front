@@ -1,0 +1,112 @@
+<p-toast />
+
+<p-dialog
+  [header]="('lots.degrever_title' | transloco)"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" (ngSubmit)="submit(ngForm)" class="flex flex-column gap-4 pt-2">
+
+    <!-- Infos lot -->
+    <div class="surface-100 border-round p-3 flex flex-column gap-2">
+      <div class="flex align-items-center justify-content-between">
+        <span class="font-semibold text-900">{{ materiau?.nom }}</span>
+        @if (lot?.numeroLot) {
+          <span class="font-mono text-sm bg-white px-2 py-1 border-round border-1 surface-border text-700">
+            {{ lot?.numeroLot }}
+          </span>
+        }
+      </div>
+      <div class="flex align-items-center gap-3 text-sm">
+        <div class="flex flex-column gap-1">
+          <span class="text-400 text-xs">{{ 'lots.remaining' | transloco }}</span>
+          <span class="font-bold text-900">
+            {{ lot?.quantiteRestante | number:'1.0-4' }} {{ materiau?.unite }}
+          </span>
+        </div>
+        <p-divider layout="vertical" />
+        <div class="flex flex-column gap-1">
+          <span class="text-400 text-xs">{{ 'lots.dlc' | transloco }}</span>
+          @if (lot?.expiresAt) {
+            <p-tag
+              [value]="lot?.expiresAt | date:'dd/MM/yyyy'"
+              [severity]="dlcSeverity"
+            />
+          } @else {
+            <span class="text-400">{{ 'lots.no_dlc' | transloco }}</span>
+          }
+        </div>
+        <p-divider layout="vertical" />
+        <div class="flex flex-column gap-1">
+          <span class="text-400 text-xs">{{ 'common.warehouse' | transloco }}</span>
+          <span class="text-900">{{ lot?.entrepotNom }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantité à dégrever -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="quantite">
+        {{ 'lots.quantity_to_write_off' | transloco }}
+        <span class="text-red-500">*</span>
+      </label>
+      <p-inputNumber
+        inputId="quantite"
+        name="quantite"
+        [(ngModel)]="form.quantite"
+        required
+        [min]="0.0001"
+        [max]="maxQuantite"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="4"
+        [suffix]="' ' + (materiau?.unite ?? '')"
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['quantite']?.invalid"
+      />
+      <small class="text-500">
+        {{ 'lots.max' | transloco }} : {{ maxQuantite | number:'1.0-4' }} {{ materiau?.unite }}
+      </small>
+    </div>
+
+    <!-- Raison -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="raison">
+        {{ 'lots.reason' | transloco }}
+      </label>
+      <input
+        pInputText
+        id="raison"
+        name="raison"
+        [(ngModel)]="form.raison"
+        maxlength="500"
+        [placeholder]="'lots.reason_placeholder' | transloco"
+      />
+    </div>
+
+    <!-- Avertissement -->
+    <div class="flex align-items-start gap-2 surface-50 border-round p-3 border-1 border-orange-200">
+      <i class="pi pi-exclamation-triangle text-orange-500 mt-1"></i>
+      <span class="text-sm text-700">{{ 'lots.degrever_warning' | transloco }}</span>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'common.cancel' | transloco"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onHide()"
+      [disabled]="saving"
+    />
+    <p-button
+      [label]="'lots.confirm_degrever' | transloco"
+      icon="pi pi-minus-circle"
+      severity="warn"
+      [loading]="saving"
+      (onClick)="submit(ngForm)"
+    />
+  </ng-template>
+</p-dialog>

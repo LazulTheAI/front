@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
-import { CreerMateriauRequest, MateriauControllerService, MateriauResponse, ModifierMateriauRequest } from '@/app/modules/openapi';
+import { MateriauControllerService, MateriauResponse, ModifierMateriauRequest } from '@/app/modules/openapi';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -43,6 +43,7 @@ export class MateriauFormComponent implements OnChanges {
     form = {
         nom: '',
         unite: '',
+        sku: '',
         coutUnitaire: null as number | null,
         seuilAlerte: null as number | null,
         dlcObligatoire: false // ← nouveau
@@ -74,12 +75,13 @@ export class MateriauFormComponent implements OnChanges {
             this.form = {
                 nom: this.materiau.nom ?? '',
                 unite: this.materiau.unite ?? '',
+                sku: this.materiau.sku ?? '',
                 coutUnitaire: this.materiau.coutUnitaire ?? null,
                 seuilAlerte: this.materiau.seuilAlerte ?? null,
                 dlcObligatoire: this.materiau.dlcObligatoire ?? false // ← nouveau
             };
         } else {
-            this.form = { nom: '', unite: '', coutUnitaire: null, seuilAlerte: null, dlcObligatoire: false };
+            this.form = { nom: '', unite: '', sku: '', coutUnitaire: null, seuilAlerte: null, dlcObligatoire: false };
         }
     }
 
@@ -105,12 +107,13 @@ export class MateriauFormComponent implements OnChanges {
                 error: () => this.handleError()
             });
         } else {
-            const req: CreerMateriauRequest = {
+            const req: ModifierMateriauRequest = {
                 nom: this.form.nom,
                 unite: this.form.unite,
+                sku: this.form.sku || undefined,
                 coutUnitaire: this.form.coutUnitaire ?? undefined,
                 seuilAlerte: this.form.seuilAlerte ?? undefined,
-                dlcObligatoire: this.form.dlcObligatoire // ← nouveau
+                dlcObligatoire: this.form.dlcObligatoire
             };
             this.materiauService.creerMateriau(req).subscribe({
                 next: () => this.handleSuccess('Matériau créé avec succès'),

@@ -111,8 +111,10 @@
     "transfer_tooltip": "Transfert inter-entrepôts",
     "edit_tooltip": "Modifier",
     "archive_tooltip": "Archiver",
-    "in_alert": "en alerte de stock"
+    "in_alert": "en alerte de stock",
+    "lots_tooltip": "Voir les lots — ajustements, pertes et traçabilité DLC"
   },
+  
   "materiaux_form": {
     "name": "Nom",
     "name_placeholder": "Ex: Farine de blé T55",
@@ -128,6 +130,34 @@
     "threshold_description": "Une alerte est déclenchée si le stock total descend sous ce seuil",
     "dlc_required": "DLC obligatoire",
     "dlc_required_description": "Exige une date d'expiration à chaque entrée en stock"
+  },
+  "lots": {
+    "new_entry": "Nouvelle entrée", 
+    "degrever_tooltip": "Dégrever ce lot (perte, casse...)",
+    "title": "Lots en stock",
+    "subtitle": "Lots disponibles par entrepôt",
+    "total_stock": "Stock total",
+    "lot_number": "N° lot",
+    "dlc": "DLC",
+    "remaining": "Restant",
+    "initial": "Initial",
+    "unit_cost": "Coût unitaire",
+    "entry_date": "Date entrée",
+    "no_lot_number": "Sans numéro",
+    "no_dlc": "Sans DLC",
+    "expired": "Lot expiré",
+    "dlc_soon": "DLC dans moins de 30 jours",
+    "degrever": "Dégrever ce lot",
+    "no_lots": "Aucun lot disponible",
+    "lots_count": "lot(s)",
+    "expired_count": "lot(s) expiré(s)",
+    "degrever_title": "Dégrever un lot",
+    "quantity_to_write_off": "Quantité à dégrever",
+    "max": "Maximum",
+    "reason": "Raison",
+    "reason_placeholder": "Ex : casse, perte, contrôle qualité...",
+    "degrever_warning": "Cette action est irréversible. La quantité sera déduite de ce lot précisément.",
+    "confirm_degrever": "Confirmer le dégrèvement"
   },
   "entree_stock": {
     "title": "Entrée de stock",
