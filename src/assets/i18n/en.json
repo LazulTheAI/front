@@ -156,7 +156,10 @@
     "threshold_placeholder": "E.g.: 10",
     "threshold_description": "An alert is triggered if total stock falls below this threshold",
     "dlc_required": "Expiry date required",
-    "dlc_required_description": "Requires an expiry date on every stock entry"
+    "dlc_required_description": "Requires an expiry date on every stock entry",
+    "sku": "SKU / Reference",
+    "sku_placeholder": "E.g.: MAT-001, REF-FLOUR...",
+    "sku_description": "Optional unique identifier for this material"
   },
   "entree_stock": {
     "title": "Stock entry",
@@ -355,7 +358,30 @@
     "modified": "Modified on",
     "active": "Active",
     "archived": "Archived",
-    "save_ingredients": "Save ingredients"
+    "save_ingredients": "Save ingredients",
+    "title": "Recipe detail",
+    "duree": "DURATION",
+    "de_fabrication": "of manufacturing",
+    "cout_theorique": "THEORETICAL COST",
+    "reference_s": "referenced",
+    "onglet_ingredients": "Ingredients",
+    "ingredient_s": "ingredient(s)",
+    "modifier_ingredients": "Edit ingredients",
+    "col_materiau": "Material",
+    "col_quantite": "Quantity",
+    "col_stock": "Stock (by warehouse)",
+    "col_cout_ligne": "Line cost",
+    "col_pct_cout": "% cost",
+    "tooltip_stock_insuffisant": "Insufficient stock for this recipe",
+    "total_cout_theorique": "Total theoretical cost",
+    "enregistrer_ingredients": "Save ingredients",
+    "onglet_notes": "Notes",
+    "aucune_note": "No notes for this recipe",
+    "onglet_informations": "Information",
+    "creee_le": "Created on",
+    "modifiee_le": "Modified on",
+    "id": "ID",
+    "statut": "Status"
   },
   "ingredients_editor": {
     "title": "Ingredients",

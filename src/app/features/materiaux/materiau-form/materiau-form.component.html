@@ -46,6 +46,20 @@
       }
     </div>
 
+    <!-- SKU -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900" for="sku">{{ 'materiaux_form.sku' | transloco }}</label>
+      <input
+        pInputText
+        id="sku"
+        name="sku"
+        [(ngModel)]="form.sku"
+        maxlength="100"
+        [placeholder]="'materiaux_form.sku_placeholder' | transloco"
+      />
+      <small class="text-500">{{ 'materiaux_form.sku_description' | transloco }}</small>
+    </div>
+
     <p-divider />
 
     <!-- Coût unitaire -->

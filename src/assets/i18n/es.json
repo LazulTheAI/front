@@ -156,7 +156,10 @@
     "threshold_placeholder": "Ej: 10",
     "threshold_description": "Se activa una alerta si el stock total cae por debajo de este umbral",
     "dlc_required": "Fecha de caducidad obligatoria",
-    "dlc_required_description": "Requiere una fecha de caducidad en cada entrada de stock"
+    "dlc_required_description": "Requiere una fecha de caducidad en cada entrada de stock",
+    "sku": "SKU / Referencia",
+    "sku_placeholder": "Ej: MAT-001, REF-HARINA...",
+    "sku_description": "Identificador único opcional para este material"
   },
   "entree_stock": {
     "title": "Entrada de stock",
@@ -355,7 +358,30 @@
     "modified": "Modificada el",
     "active": "Activa",
     "archived": "Archivada",
-    "save_ingredients": "Guardar ingredientes"
+    "save_ingredients": "Guardar ingredientes",
+    "title": "Detalle de receta",
+    "duree": "DURACIÓN",
+    "de_fabrication": "de fabricación",
+    "cout_theorique": "COSTE TEÓRICO",
+    "reference_s": "referenciado(s)",
+    "onglet_ingredients": "Ingredientes",
+    "ingredient_s": "ingrediente(s)",
+    "modifier_ingredients": "Editar ingredientes",
+    "col_materiau": "Material",
+    "col_quantite": "Cantidad",
+    "col_stock": "Stock (por almacén)",
+    "col_cout_ligne": "Coste línea",
+    "col_pct_cout": "% coste",
+    "tooltip_stock_insuffisant": "Stock insuficiente para esta receta",
+    "total_cout_theorique": "Coste teórico total",
+    "enregistrer_ingredients": "Guardar ingredientes",
+    "onglet_notes": "Notas",
+    "aucune_note": "Sin notas para esta receta",
+    "onglet_informations": "Información",
+    "creee_le": "Creada el",
+    "modifiee_le": "Modificada el",
+    "id": "ID",
+    "statut": "Estado"
   },
   "ingredients_editor": {
     "title": "Ingredientes",

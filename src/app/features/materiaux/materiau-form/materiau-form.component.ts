@@ -98,6 +98,7 @@ export class MateriauFormComponent implements OnChanges {
             const req: ModifierMateriauRequest = {
                 nom: this.form.nom,
                 unite: this.form.unite,
+                sku: this.form.sku || undefined,
                 coutUnitaire: this.form.coutUnitaire ?? undefined,
                 seuilAlerte: this.form.seuilAlerte ?? undefined,
                 dlcObligatoire: this.form.dlcObligatoire // ← nouveau

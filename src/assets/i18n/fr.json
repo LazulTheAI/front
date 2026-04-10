@@ -129,7 +129,10 @@
     "threshold_placeholder": "Ex: 10",
     "threshold_description": "Une alerte est déclenchée si le stock total descend sous ce seuil",
     "dlc_required": "DLC obligatoire",
-    "dlc_required_description": "Exige une date d'expiration à chaque entrée en stock"
+    "dlc_required_description": "Exige une date d'expiration à chaque entrée en stock",
+    "sku": "SKU / Référence",
+    "sku_placeholder": "Ex: MAT-001, REF-FARINE...",
+    "sku_description": "Identifiant unique optionnel pour ce matériau"
   },
   "lots": {
     "new_entry": "Nouvelle entrée", 
@@ -356,7 +359,30 @@
     "modified": "Modifiée le",
     "active": "Active",
     "archived": "Archivée",
-    "save_ingredients": "Enregistrer les ingrédients"
+    "save_ingredients": "Enregistrer les ingrédients",
+    "title": "Détail recette",
+    "duree": "DURÉE",
+    "de_fabrication": "de fabrication",
+    "cout_theorique": "COÛT THÉORIQUE",
+    "reference_s": "référencé(s)",
+    "onglet_ingredients": "Ingrédients",
+    "ingredient_s": "ingrédient(s)",
+    "modifier_ingredients": "Modifier les ingrédients",
+    "col_materiau": "Matériau",
+    "col_quantite": "Quantité",
+    "col_stock": "Stock (par entrepôt)",
+    "col_cout_ligne": "Coût ligne",
+    "col_pct_cout": "% coût",
+    "tooltip_stock_insuffisant": "Stock insuffisant pour cette recette",
+    "total_cout_theorique": "Total coût théorique",
+    "enregistrer_ingredients": "Enregistrer les ingrédients",
+    "onglet_notes": "Notes",
+    "aucune_note": "Aucune note pour cette recette",
+    "onglet_informations": "Informations",
+    "creee_le": "Créée le",
+    "modifiee_le": "Modifiée le",
+    "id": "Identifiant",
+    "statut": "Statut"
   },
   "ingredients_editor": {
     "title": "Ingrédients",
