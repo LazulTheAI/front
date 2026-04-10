@@ -14,7 +14,7 @@ import { Tooltip } from 'primeng/tooltip';
 
 import { CommandeB2BControllerService, CommandeB2BResponse, PdfControllerService, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
 import { HttpClient as NgHttpClient } from '@angular/common/http';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { environment } from '../../../../environments/environment';
 import { CommandeB2BDetailDialogComponent } from '../commande-detail-dialog/commande-b2b-detail-dialog.component';
 import { CommandeB2BFormDialogComponent } from '../commande-form-dialog/commande-b2b-form-dialog.component';
@@ -47,14 +47,7 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
     revendeurs: RevendeurResponse[] = [];
     revendeurOptions: SelectOption[] = [];
 
-    readonly statutOptions: SelectOption[] = [
-        { label: 'Tous les statuts', value: null },
-        { label: 'Brouillon', value: 'BROUILLON' },
-        { label: 'Confirmée', value: 'CONFIRMEE' },
-        { label: 'Expédiée', value: 'EXPEDIEE' },
-        { label: 'Livrée', value: 'LIVREE' },
-        { label: 'Annulée', value: 'ANNULEE' }
-    ];
+    statutOptions: SelectOption[] = [];
 
     showFormDialog = false;
     showDetailDialog = false;
@@ -69,14 +62,23 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
         private revendeurService: RevendeurControllerService,
         private http: NgHttpClient,
         private messageService: MessageService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private transloco: TranslocoService
     ) {}
 
     ngOnInit(): void {
+        this.statutOptions = [
+            { label: this.transloco.translate('commandes_b2b.tous_statuts'), value: null },
+            { label: this.transloco.translate('commandes_b2b.statut_brouillon'), value: 'BROUILLON' },
+            { label: this.transloco.translate('commandes_b2b.statut_confirmee'), value: 'CONFIRMEE' },
+            { label: this.transloco.translate('commandes_b2b.statut_expediee'), value: 'EXPEDIEE' },
+            { label: this.transloco.translate('commandes_b2b.statut_livree'), value: 'LIVREE' },
+            { label: this.transloco.translate('commandes_b2b.statut_annulee'), value: 'ANNULEE' }
+        ];
         this.revendeurService.listerRevendeurActifs().subscribe({
             next: (list) => {
                 this.revendeurs = list;
-                this.revendeurOptions = [{ label: 'Tous les revendeurs', value: null }, ...list.map((r) => ({ label: r.nom!, value: r.id! }))];
+                this.revendeurOptions = [{ label: this.transloco.translate('commandes_b2b.filtre_revendeur'), value: null }, ...list.map((r) => ({ label: r.nom!, value: r.id! }))];
                 this.cdr.markForCheck();
             }
         });
@@ -98,7 +100,7 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
                 this.cdr.markForCheck();
             },
             error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les commandes' });
+                this.messageService.add({ severity: 'error', summary: this.transloco.translate('common.error'), detail: this.transloco.translate('commandes_b2b.erreur_charger_commandes') });
                 this.loading = false;
                 this.cdr.markForCheck();
             }
@@ -130,11 +132,11 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
         event.stopPropagation();
         this.commandeService.changerStatutCommandeB2B(c.id!, { statut }).subscribe({
             next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Statut mis à jour', detail: `Commande ${c.numero} → ${statut}` });
+                this.messageService.add({ severity: 'success', summary: this.transloco.translate('commandes_b2b.statut_mis_a_jour'), detail: this.transloco.translate('commandes_b2b.commande_numero_statut', { numero: c.numero, statut }) });
                 this.loadCommandes();
             },
             error: (err: any) => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: err?.error?.message ?? 'Transition invalide' });
+                this.messageService.add({ severity: 'error', summary: this.transloco.translate('common.error'), detail: err?.error?.message ?? this.transloco.translate('commandes_b2b.transition_invalide') });
             }
         });
     }
@@ -157,7 +159,7 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
                     URL.revokeObjectURL(url);
                 },
                 error: () => {
-                    this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de générer le PDF' });
+                    this.messageService.add({ severity: 'error', summary: this.transloco.translate('common.error'), detail: this.transloco.translate('commandes_b2b.erreur_pdf') });
                 }
             });
     }
@@ -190,7 +192,7 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
                     URL.revokeObjectURL(url);
                 },
                 error: () => {
-                    this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de générer le PDF' });
+                    this.messageService.add({ severity: 'error', summary: this.transloco.translate('common.error'), detail: this.transloco.translate('commandes_b2b.erreur_pdf') });
                 }
             });
     }
@@ -200,7 +202,7 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
     onFormSaved(): void {
         this.showFormDialog = false;
         this.loadCommandes();
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Commande enregistrée.' });
+        this.messageService.add({ severity: 'success', summary: this.transloco.translate('common.success'), detail: this.transloco.translate('commandes_b2b.commande_saved') });
         this.cdr.markForCheck();
     }
 
@@ -217,13 +219,13 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
 
     getStatutLabel(statut: string): string {
         const map: Record<string, string> = {
-            BROUILLON: 'Brouillon',
-            CONFIRMEE: 'Confirmée',
-            EXPEDIEE: 'Expédiée',
-            LIVREE: 'Livrée',
-            ANNULEE: 'Annulée'
+            BROUILLON: 'commandes_b2b.statut_brouillon',
+            CONFIRMEE: 'commandes_b2b.statut_confirmee',
+            EXPEDIEE: 'commandes_b2b.statut_expediee',
+            LIVREE: 'commandes_b2b.statut_livree',
+            ANNULEE: 'commandes_b2b.statut_annulee'
         };
-        return map[statut] ?? statut;
+        return map[statut] ? this.transloco.translate(map[statut]) : statut;
     }
 
     getNextStatut(statut: string): string | null {
@@ -237,10 +239,10 @@ export class CommandesB2BListComponent implements OnInit, OnDestroy {
 
     getNextStatutLabel(statut: string): string {
         const map: Record<string, string> = {
-            BROUILLON: 'Confirmer',
-            CONFIRMEE: 'Marquer expédiée',
-            EXPEDIEE: 'Marquer livrée'
+            BROUILLON: 'commandes_b2b.action_confirmer',
+            CONFIRMEE: 'commandes_b2b.action_expedier',
+            EXPEDIEE: 'commandes_b2b.action_livrer'
         };
-        return map[statut] ?? '';
+        return map[statut] ? this.transloco.translate(map[statut]) : '';
     }
 }

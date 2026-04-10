@@ -14,7 +14,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { LierProduitRecetteDialogComponent } from '../lier-produit-recette-dialog/lier-produit-recette-dialog.component';
 import { RecetteDetailComponent } from '../recette-detail/recette-detail.component';
@@ -62,7 +62,8 @@ export class RecettesListComponent implements OnInit {
         private recetteService: RecetteControllerService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private transloco: TranslocoService
     ) {}
 
     ngOnInit(): void {
@@ -78,7 +79,7 @@ export class RecettesListComponent implements OnInit {
     onLierProduitSaved(result: { success: boolean; message: string }): void {
         this.messageService.add({
             severity: result.success ? 'success' : 'error',
-            summary: result.success ? 'Succès' : 'Erreur',
+            summary: this.transloco.translate(result.success ? 'common.success' : 'common.error'),
             detail: result.message
         });
         if (result.success) {
@@ -119,8 +120,8 @@ export class RecettesListComponent implements OnInit {
     confirmArchive(recette: RecetteResponse, event: Event): void {
         event.stopPropagation();
         this.confirmationService.confirm({
-            message: `Archiver la recette "${recette.nom}" ?`,
-            header: "Confirmer l'archivage",
+            message: this.transloco.translate('recettes.archiver_recette_confirm', { nom: recette.nom }),
+            header: this.transloco.translate('recettes.confirmer_archivage'),
             icon: 'pi pi-exclamation-triangle',
             accept: () => this.archiveRecette(recette.id!)
         });
@@ -129,11 +130,11 @@ export class RecettesListComponent implements OnInit {
     private archiveRecette(id: number): void {
         this.recetteService.archiverRecette(id).subscribe({
             next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Archivée', detail: 'Recette archivée avec succès' });
+                this.messageService.add({ severity: 'success', summary: this.transloco.translate('common.success'), detail: this.transloco.translate('recettes.archivee_succes') });
                 this.loadRecettes();
             },
             error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Archivage impossible' });
+                this.messageService.add({ severity: 'error', summary: this.transloco.translate('common.error'), detail: this.transloco.translate('recettes.archivage_impossible') });
             }
         });
     }
