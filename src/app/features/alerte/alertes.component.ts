@@ -28,7 +28,8 @@ import { AlerteService } from './alerte.service';
 export class AlertesComponent implements OnInit, OnDestroy {
     alertes$: Observable<AlerteResponse[]>;
     alertesFiltrees$: Observable<AlerteResponse[]>;
-    nbStockBas$: Observable<number>;
+    nbUrgentes$: Observable<number>;
+    nbPrevisionnelles$: Observable<number>;
     nbAutres$: Observable<number>;
 
     filtreType: string | null = null;
@@ -37,6 +38,7 @@ export class AlertesComponent implements OnInit, OnDestroy {
         { label: 'Tous les types', value: null },
         { label: 'Stock bas matériau', value: 'stock_bas' },
         { label: 'Stock bas produit', value: 'stock_bas_produit' },
+        { label: 'Stock prévisionnel', value: 'stock_previsionnel' },
         { label: 'Annulation commande', value: 'annulation_commande' },
         { label: 'Rupture produit', value: 'stock_produit_insuffisant' }
     ];
@@ -52,9 +54,11 @@ export class AlertesComponent implements OnInit, OnDestroy {
     ) {
         this.alertes$ = this.alerteService.alertes$;
 
-        this.nbStockBas$ = this.alertes$.pipe(map((a) => a.filter((x) => x.typeAlerte === 'stock_bas' || x.typeAlerte === 'stock_bas_produit').length));
+        this.nbUrgentes$ = this.alertes$.pipe(map((a) => a.filter((x) => x.typeAlerte === 'stock_bas' || x.typeAlerte === 'stock_bas_produit').length));
 
-        this.nbAutres$ = this.alertes$.pipe(map((a) => a.filter((x) => x.typeAlerte !== 'stock_bas' && x.typeAlerte !== 'stock_bas_produit').length));
+        this.nbPrevisionnelles$ = this.alertes$.pipe(map((a) => a.filter((x) => x.typeAlerte === 'stock_previsionnel').length));
+
+        this.nbAutres$ = this.alertes$.pipe(map((a) => a.filter((x) => x.typeAlerte !== 'stock_bas' && x.typeAlerte !== 'stock_bas_produit' && x.typeAlerte !== 'stock_previsionnel').length));
 
         this.alertesFiltrees$ = this.buildFiltrees();
     }
@@ -121,6 +125,7 @@ export class AlertesComponent implements OnInit, OnDestroy {
         const labels: Record<string, string> = {
             stock_bas: 'Stock bas',
             stock_bas_produit: 'Stock produit',
+            stock_previsionnel: 'Prévisionnel',
             annulation_commande: 'Annulation',
             stock_produit_insuffisant: 'Rupture produit'
         };
@@ -132,12 +137,29 @@ export class AlertesComponent implements OnInit, OnDestroy {
             case 'stock_bas':
             case 'stock_bas_produit':
                 return 'danger';
+            case 'stock_previsionnel':
             case 'annulation_commande':
                 return 'warn';
             case 'stock_produit_insuffisant':
                 return 'info';
             default:
                 return 'secondary';
+        }
+    }
+
+    getTypeIcon(type: string | undefined): string {
+        switch (type) {
+            case 'stock_bas':
+            case 'stock_bas_produit':
+                return 'pi pi-exclamation-circle';
+            case 'stock_previsionnel':
+                return 'pi pi-calendar-times';
+            case 'annulation_commande':
+                return 'pi pi-times-circle';
+            case 'stock_produit_insuffisant':
+                return 'pi pi-box';
+            default:
+                return 'pi pi-bell';
         }
     }
 }

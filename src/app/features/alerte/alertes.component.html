@@ -34,32 +34,64 @@
   </ng-template>
 </p-toolbar>
 
+<!-- ═══ Banners ══════════════════════════════════════════════ -->
+@if ((nbUrgentes$ | async) ?? 0 > 0) {
+  <div class="flex align-items-center gap-2 p-3 bg-red-50 border-round border-1 border-red-200 mb-2">
+    <i class="pi pi-exclamation-circle text-red-500 text-xl"></i>
+    <span class="text-red-800 font-medium">
+      {{ nbUrgentes$ | async }} {{ 'alerte.urgent_banner' | transloco }}
+    </span>
+  </div>
+}
+
+@if ((nbPrevisionnelles$ | async) ?? 0 > 0) {
+  <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-2">
+    <i class="pi pi-calendar-times text-orange-500 text-xl"></i>
+    <span class="text-orange-800 font-medium">
+      {{ nbPrevisionnelles$ | async }} {{ 'alerte.previsionnel_banner' | transloco }}
+    </span>
+  </div>
+}
+
 <!-- ═══ KPIs ════════════════════════════════════════════════ -->
 <div class="grid mb-4">
-  <div class="col-12 md:col-4">
+
+  <div class="col-12 md:col-3">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
       <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'alerte.active_alerts' | transloco }}</div>
-      <div class="text-3xl font-bold text-red-500">
+      <div class="text-3xl font-bold text-900">
         {{ (alertes$ | async)?.length ?? 0 }}
       </div>
     </div>
   </div>
-  <div class="col-12 md:col-4">
+
+  <div class="col-12 md:col-3">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
       <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'alerte.low_stock' | transloco }}</div>
-      <div class="text-3xl font-bold text-orange-500">
-        {{ (nbStockBas$ | async) ?? 0 }}
+      <div class="text-3xl font-bold text-red-500">
+        {{ (nbUrgentes$ | async) ?? 0 }}
       </div>
     </div>
   </div>
-  <div class="col-12 md:col-4">
+
+  <div class="col-12 md:col-3">
+    <div class="surface-card border-round-xl border-1 surface-border p-4">
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'alerte.previsionnel' | transloco }}</div>
+      <div class="text-3xl font-bold text-orange-500">
+        {{ (nbPrevisionnelles$ | async) ?? 0 }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 md:col-3">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
       <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'alerte.other_alerts' | transloco }}</div>
-      <div class="text-3xl font-bold text-red-700">
+      <div class="text-3xl font-bold text-700">
         {{ (nbAutres$ | async) ?? 0 }}
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- ═══ TABLE ════════════════════════════════════════════════ -->
@@ -76,7 +108,7 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width:150px">{{ 'alerte.type' | transloco }}</th>
+        <th style="width:160px">{{ 'alerte.type' | transloco }}</th>
         <th>{{ 'alerte.message' | transloco }}</th>
         <th style="width:130px">{{ 'alerte.warehouse' | transloco }}</th>
         <th pSortableColumn="createdAt" style="width:140px">
@@ -98,7 +130,12 @@
 
         <td>
           <div class="flex align-items-center gap-2">
-            <i class="pi pi-exclamation-circle text-red-500 text-sm flex-shrink-0"></i>
+            <i
+              [class]="getTypeIcon(a.typeAlerte) + ' text-sm flex-shrink-0'"
+              [class.text-red-500]="getTypeSeverity(a.typeAlerte) === 'danger'"
+              [class.text-orange-500]="getTypeSeverity(a.typeAlerte) === 'warn'"
+              [class.text-blue-500]="getTypeSeverity(a.typeAlerte) === 'info'"
+            ></i>
             <span class="text-900 text-sm">{{ a.message }}</span>
           </div>
         </td>

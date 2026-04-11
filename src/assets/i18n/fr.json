@@ -70,6 +70,9 @@
     "sign_in_button": "Se connecter"
   },
   "alerte": {
+    "urgent_banner": "alerte(s) de stock bas — action immédiate requise",
+    "previsionnel_banner": "alerte(s) prévisionnelle(s) — runs planifiés à risque",
+    "previsionnel": "Prévisionnelles",
     "title": "Alertes stock",
     "subtitle": "Actualisé toutes les 30 secondes",
     "refresh": "Actualiser",

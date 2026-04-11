@@ -70,6 +70,9 @@
     "sign_in_button": "Iniciar sesión"
   },
   "alerte": {
+    "urgent_banner": "alerta(s) de stock bajo — acción inmediata requerida",
+    "previsionnel_banner": "alerta(s) previsional(es) — producciones planificadas en riesgo",
+    "previsionnel": "Previsionales",
     "title": "Alertas de stock",
     "subtitle": "Actualizado cada 30 segundos",
     "refresh": "Actualizar",
