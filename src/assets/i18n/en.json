@@ -69,6 +69,13 @@
     "forgot_password": "Forgot password?",
     "sign_in_button": "Sign in"
   },
+  "run": {
+    "launch_failed": "Run could not be launched",
+    "plan_instead": "Would you like to schedule this run?",
+    "plan_instead_description": "The run will be queued and can be executed once stock is sufficient.",
+    "yes_plan": "Yes, schedule",
+    "no_cancel": "No, cancel"
+  },
   "alerte": {
     "title": "Stock alerts",
     "subtitle": "Refreshed every 30 seconds",
@@ -407,6 +414,20 @@
     "main_recipe": "Main recipe",
     "main_recipe_tooltip": "The main recipe is used for cost calculation and automatic deduction",
     "link_product": "Link to product"
+  },
+  "produit_lots": {
+    "title": "Lots",
+    "subtitle": "Stock lots by warehouse",
+    "new_entry": "New entry",
+    "total_stock": "Total stock",
+    "no_lots": "No lots available for this product",
+    "lots_tooltip": "View lots & perform actions",
+    "transfer_tooltip": "Transfer this lot to another warehouse",
+    "transfer_title": "Transfer a lot",
+    "transfer_destination": "Destination warehouse",
+    "transfer_select_destination": "Select a warehouse...",
+    "transfer_notes_placeholder": "Optional notes...",
+    "confirm_transfer": "Confirm transfer"
   },
   "produits": {
     "title": "BigCommerce Products",

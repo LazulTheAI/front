@@ -21,6 +21,7 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { Router } from '@angular/router';
 import { ProduitControllerService, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { IconField } from 'primeng/iconfield';
@@ -119,7 +120,8 @@ export class ProduitsListComponent implements OnInit {
         @Inject(StockProduitControllerService)
         private stockProduitService: StockProduitControllerService,
         private messageService: MessageService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
@@ -149,6 +151,10 @@ export class ProduitsListComponent implements OnInit {
 
     onSearchInput(value: string): void {
         this.search$.next(value);
+    }
+
+    openLots(produit: ProduitResponse): void {
+        this.router.navigate(['/produits', produit.id, 'lots']);
     }
 
     openEntreeProduit(produit: ProduitResponse): void {

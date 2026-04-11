@@ -113,6 +113,13 @@
     "archive_tooltip": "Archivar",
     "in_alert": "en alerta de stock"
   },
+  "run": {
+    "launch_failed": "No se pudo lanzar la producción",
+    "plan_instead": "¿Desea planificar esta producción?",
+    "plan_instead_description": "La producción quedará en espera y podrá ejecutarse cuando haya stock suficiente.",
+    "yes_plan": "Sí, planificar",
+    "no_cancel": "No, cancelar"
+  },
   "lots": {
     "new_entry": "Nueva entrada", 
     "degrever_tooltip": "Dar de baja este lote (pérdida, rotura...)",
@@ -407,6 +414,20 @@
     "main_recipe": "Receta principal",
     "main_recipe_tooltip": "La receta principal se usa para el cálculo de costes y la deducción automática",
     "link_product": "Vincular al producto"
+  },
+  "produit_lots": {
+    "title": "Lotes",
+    "subtitle": "Lotes en stock por almacén",
+    "new_entry": "Nueva entrada",
+    "total_stock": "Stock total",
+    "no_lots": "No hay lotes disponibles para este producto",
+    "lots_tooltip": "Ver lotes y realizar acciones",
+    "transfer_tooltip": "Transferir este lote a otro almacén",
+    "transfer_title": "Transferir un lote",
+    "transfer_destination": "Almacén destino",
+    "transfer_select_destination": "Seleccionar un almacén...",
+    "transfer_notes_placeholder": "Notas opcionales...",
+    "confirm_transfer": "Confirmar transferencia"
   },
   "produits": {
     "title": "Productos BigCommerce",

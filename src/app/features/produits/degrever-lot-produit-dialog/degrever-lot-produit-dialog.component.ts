@@ -12,21 +12,21 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 
-import { LotResponse, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
+import { LotResponse, ProduitControllerService, ProduitResponse } from '@/app/modules/openapi';
 
 @Component({
-    selector: 'app-degrever-lot-dialog',
+    selector: 'app-degrever-lot-produit-dialog',
     standalone: true,
     imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputNumberModule, InputTextModule, ToastModule, DividerModule, TranslocoModule, TagModule],
     providers: [MessageService],
-    templateUrl: './degrever-lot-dialog.component.html'
+    templateUrl: './degrever-lot-produit-dialog.component.html'
 })
-export class DegreverLotDialogComponent implements OnChanges {
+export class DegreverLotProduitDialogComponent implements OnChanges {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
 
     @Input() lot: LotResponse | null = null;
-    @Input() materiau: MateriauResponse | null = null;
+    @Input() produit: ProduitResponse | null = null;
     @Output() saved = new EventEmitter<void>();
 
     saving = false;
@@ -37,7 +37,7 @@ export class DegreverLotDialogComponent implements OnChanges {
     };
 
     constructor(
-        private materiauService: MateriauControllerService,
+        private produitService: ProduitControllerService,
         private messageService: MessageService
     ) {}
 
@@ -63,32 +63,37 @@ export class DegreverLotDialogComponent implements OnChanges {
     }
 
     submit(ngForm: NgForm): void {
-        if (ngForm.invalid || !this.lot || !this.materiau) return;
+        if (ngForm.invalid || !this.lot || !this.produit) return;
         if (!this.form.quantite || this.form.quantite <= 0) return;
         if (this.form.quantite > this.maxQuantite) {
             this.messageService.add({
                 severity: 'error',
                 summary: 'Erreur',
-                detail: `Quantité max : ${this.maxQuantite} ${this.materiau.unite}`
+                detail: `Quantité max : ${this.maxQuantite}`
             });
             return;
         }
 
         this.saving = true;
-        this.materiauService.degreverLotMateriau(this.materiau.id!, this.lot.id!, { quantite: this.form.quantite, raison: this.form.raison || undefined }).subscribe({
-            next: () => {
-                this.saving = false;
-                this.visibleChange.emit(false);
-                this.saved.emit();
-            },
-            error: (err) => {
-                this.saving = false;
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erreur',
-                    detail: err?.error?.message ?? 'Une erreur est survenue'
-                });
-            }
-        });
+        this.produitService
+            .degreverLotProduit(this.produit.id!, this.lot.id!, {
+                quantite: this.form.quantite,
+                raison: this.form.raison || undefined
+            })
+            .subscribe({
+                next: () => {
+                    this.saving = false;
+                    this.visibleChange.emit(false);
+                    this.saved.emit();
+                },
+                error: (err) => {
+                    this.saving = false;
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Erreur',
+                        detail: err?.error?.message ?? 'Une erreur est survenue'
+                    });
+                }
+            });
     }
 }

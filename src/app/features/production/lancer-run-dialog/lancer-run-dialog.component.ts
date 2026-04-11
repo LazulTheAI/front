@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -31,6 +31,11 @@ export class LancerRunDialogComponent implements OnChanges, OnInit {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
     @Output() saved = new EventEmitter<{ success: boolean; message: string }>();
+
+    erreurRun: string | null = null;
+    showConfirmPlanifier = false;
+    private lastReq: LancerRunRequest | null = null;
+    planification = false;
 
     saving = false;
     resultat: ResultatProductionResponse | null = null;
@@ -140,8 +145,9 @@ export class LancerRunDialogComponent implements OnChanges, OnInit {
     submit(): void {
         if (!this.form.recetteId || !this.form.entrepotId || !this.form.batches) return;
         this.saving = true;
+        this.erreurRun = null;
 
-        const req: LancerRunRequest = {
+        this.lastReq = {
             recetteId: this.form.recetteId!,
             batches: this.form.batches,
             entrepotId: this.form.entrepotId!,
@@ -149,21 +155,59 @@ export class LancerRunDialogComponent implements OnChanges, OnInit {
             orderId: this.form.orderId || undefined
         };
 
-        this.productionService.lancerRunProduction(req, 'response', false, { transferCache: false }).subscribe({
+        this.productionService.lancerRunProduction(this.lastReq, 'response', false, { transferCache: false }).subscribe({
             next: (event: any) => {
                 if (event.type === HttpEventType.Response) {
                     this.saving = false;
                     this.resultat = event.body ?? ({} as any);
                     this.runTermine = true;
+                    this.saved.emit({ success: true, message: '' });
                     setTimeout(() => this.cdr.detectChanges(), 0);
                 }
             },
             error: (err) => {
                 this.saving = false;
-                const detail = err?.error?.message ?? 'Impossible de lancer le run';
-                this.saved.emit({ success: false, message: detail });
+                this.erreurRun = err?.error?.message ?? 'Stock insuffisant pour lancer le run';
+                this.showConfirmPlanifier = true;
+                this.cdr.detectChanges();
             }
         });
+    }
+
+    confirmerPlanifier(): void {
+        if (!this.lastReq) return;
+        this.planification = true;
+
+        // Appel planifier — adapte selon ta méthode exacte
+        this.productionService
+            .planifierRunProduction({
+                recetteId: this.lastReq.recetteId,
+                batches: this.lastReq.batches,
+                entrepotId: this.lastReq.entrepotId,
+                notes: this.lastReq.notes,
+                orderId: this.lastReq.orderId
+            })
+            .subscribe({
+                next: () => {
+                    this.planification = false;
+                    this.showConfirmPlanifier = false;
+                    this.saved.emit({ success: true, message: 'Run planifié avec succès' });
+                    this.visibleChange.emit(false);
+                    this.cdr.detectChanges();
+                },
+                error: () => {
+                    this.planification = false;
+                    this.saved.emit({ success: false, message: 'Impossible de planifier le run' });
+                    this.cdr.detectChanges();
+                }
+            });
+    }
+
+    refuserPlanifier(): void {
+        this.showConfirmPlanifier = false;
+        this.erreurRun = null;
+        this.saved.emit({ success: false, message: '' });
+        this.cdr.detectChanges();
     }
 
     fermer(): void {

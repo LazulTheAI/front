@@ -134,6 +134,13 @@
     "sku_placeholder": "Ex: MAT-001, REF-FARINE...",
     "sku_description": "Identifiant unique optionnel pour ce matériau"
   },
+  "run": {
+    "launch_failed": "Run impossible à lancer",
+    "plan_instead": "Voulez-vous planifier ce run ?",
+    "plan_instead_description": "Le run sera mis en attente et pourra être exécuté dès que le stock sera suffisant.",
+    "yes_plan": "Oui, planifier",
+    "no_cancel": "Non, annuler"
+  },
   "lots": {
     "new_entry": "Nouvelle entrée", 
     "degrever_tooltip": "Dégrever ce lot (perte, casse...)",
@@ -408,6 +415,20 @@
     "main_recipe": "Recette principale",
     "main_recipe_tooltip": "La recette principale est utilisée pour le calcul du coût et la déduction automatique",
     "link_product": "Lier au produit"
+  },
+  "produit_lots": {
+    "title": "Lots",
+    "subtitle": "Lots en stock par entrepôt",
+    "new_entry": "Nouvelle entrée",
+    "total_stock": "Stock total",
+    "no_lots": "Aucun lot disponible pour ce produit",
+    "lots_tooltip": "Voir les lots & effectuer des actions",
+    "transfer_tooltip": "Transférer ce lot vers un autre entrepôt",
+    "transfer_title": "Transférer un lot",
+    "transfer_destination": "Entrepôt destination",
+    "transfer_select_destination": "Sélectionner un entrepôt...",
+    "transfer_notes_placeholder": "Notes optionnelles...",
+    "confirm_transfer": "Confirmer le transfert"
   },
   "produits": {
     "title": "Produits BigCommerce",

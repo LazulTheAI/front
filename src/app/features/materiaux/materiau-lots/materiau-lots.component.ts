@@ -101,7 +101,7 @@ export class MateriauLotsComponent implements OnInit, OnDestroy {
     loadLots(): void {
         this.loading = true;
         this.materiauService
-            .listerLots(this.materiauId)
+            .listerLotsMateriau(this.materiauId)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (lots) => {

@@ -173,18 +173,9 @@
 
         <td class="text-center">
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
-            <p-button icon="pi pi-history" [rounded]="true" [text]="true"
-              severity="info" size="small" [pTooltip]="'produits.history' | transloco"
-              (onClick)="openHistoriqueProduit(produit)" />
-            <p-button icon="pi pi-arrow-down" [rounded]="true" [text]="true"
-              severity="success" size="small" [pTooltip]="'produits.entry' | transloco"
-              (onClick)="openEntreeProduit(produit)" />
-            <p-button icon="pi pi-sliders-h" [rounded]="true" [text]="true"
-              severity="warn" size="small" [pTooltip]="'produits.adjustment' | transloco"
-              (onClick)="openAjustementProduit(produit)" />
-            <p-button icon="pi pi-arrow-right-arrow-left" [rounded]="true" [text]="true"
-              severity="secondary" size="small" [pTooltip]="'produits.transfer' | transloco"
-              (onClick)="openTransfertProduit(produit)" />
+            <p-button icon="pi pi-box" [rounded]="true" [text]="true"
+              severity="success" size="small" [pTooltip]="'produit_lots.lots_tooltip' | transloco"
+              (onClick)="openLots(produit)" />
             <p-button icon="pi pi-link" [rounded]="true" [text]="true"
               severity="primary" size="small" [pTooltip]="'produits.link_recipe' | transloco"
               (onClick)="openLierRecette(produit, $event)" />
