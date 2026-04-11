@@ -115,6 +115,7 @@
     "days_30": "Last 30 days"
   },
   "materiaux": {
+    "lots_button": "Lots",
     "title": "Stock & materials",
     "subtitle": "Unified view — stock by warehouse",
     "search_placeholder": "Search a material...",
@@ -169,7 +170,13 @@
     "reason": "Reason",
     "reason_placeholder": "E.g. breakage, loss, quality control...",
     "degrever_warning": "This action is irreversible. The quantity will be deducted from this specific lot.",
-    "confirm_degrever": "Confirm write-off"
+    "confirm_degrever": "Confirm write-off",
+    "transfer_tooltip": "Transfer this lot to another warehouse",
+    "transfer_title": "Transfer a lot",
+    "transfer_destination": "Destination warehouse",
+    "transfer_select_destination": "Select a warehouse...",
+    "transfer_notes_placeholder": "Optional notes...",
+    "confirm_transfer": "Confirm transfer"
   },
   "materiaux_form": {
     "name": "Name",

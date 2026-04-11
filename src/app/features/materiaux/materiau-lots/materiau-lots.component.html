@@ -12,9 +12,8 @@
         </h2>
         <p class="m-0 text-400 text-sm mt-1">
           @if (materiau?.sku) {
-            <span class="font-mono text-600 mr-2">{{ materiau?.sku }}</span>·
+            <span class="font-mono text-600 mr-2">{{ materiau?.sku }}</span>
           }
-          {{ materiau?.unite }}
         </p>
       </div>
     </div>
@@ -101,7 +100,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-lot>
-      <tr [class.opacity-60]="lot.estExpire">
+      <tr >
 
         <td>
           @if (lot.numeroLot) {
@@ -178,16 +177,26 @@
         </td>
 
         <td class="text-center">
-          <p-button
-            label="{{ 'lots.degrever' | transloco }}"
-            icon="pi pi-minus-circle"
-            severity="warn"
-            [text]="true"
-            size="small"
-            [pTooltip]="'lots.degrever_tooltip' | transloco"
-            [disabled]="lot.estExpire || lot.quantiteRestante <= 0"
-            (onClick)="openDegrever(lot)"
-          />
+          <div class="flex align-items-center justify-content-center gap-1">
+            <p-button
+              icon="pi pi-arrow-right-arrow-left"
+              severity="info"
+              [text]="true"
+              size="small"
+              [pTooltip]="'lots.transfer_tooltip' | transloco"
+              [disabled]="lot.quantiteRestante <= 0"
+              (onClick)="openTransferer(lot)"
+            />
+            <p-button
+              icon="pi pi-minus-circle"
+              severity="warn"
+              [text]="true"
+              size="small"
+              [pTooltip]="'lots.degrever_tooltip' | transloco"
+              [disabled]="lot.quantiteRestante <= 0"
+              (onClick)="openDegrever(lot)"
+            />
+          </div>
         </td>
 
       </tr>
@@ -215,4 +224,11 @@
   [(visible)]="showEntreeDialog"
   [materiau]="materiau"
   (saved)="onEntreeSaved()"
+/>
+
+<app-transferer-lot-dialog
+  [(visible)]="showTransfererDialog"
+  [lot]="selectedLot"
+  [materiau]="materiau"
+  (saved)="onTransfererSaved()"
 />

@@ -109,6 +109,7 @@
     "days_30": "Últimos 30 días"
   },
   "materiaux": {
+     "lots_button": "Lotes",
     "title": "Stock y materiales",
     "subtitle": "Vista unificada — stock por almacén",
     "search_placeholder": "Buscar un material...",
@@ -170,7 +171,13 @@
     "reason_placeholder": "Ej: rotura, pérdida, control de calidad...",
     "degrever_warning": "Esta acción es irreversible. La cantidad se deducirá de este lote específico.",
     "confirm_degrever": "Confirmar baja",
-    "lots_tooltip": "Ver lotes — ajustes, pérdidas y trazabilidad de caducidad"
+    "lots_tooltip": "Ver lotes — ajustes, pérdidas y trazabilidad de caducidad",
+    "transfer_tooltip": "Transferir este lote a otro almacén",
+    "transfer_title": "Transferir un lote",
+    "transfer_destination": "Almacén de destino",
+    "transfer_select_destination": "Seleccionar un almacén...",
+    "transfer_notes_placeholder": "Notas opcionales...",
+    "confirm_transfer": "Confirmar transferencia"
   },
   "materiaux_form": {
     "name": "Nombre",

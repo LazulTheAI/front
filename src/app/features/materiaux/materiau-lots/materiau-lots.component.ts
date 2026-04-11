@@ -18,6 +18,7 @@ import { Tooltip } from 'primeng/tooltip';
 import { EntrepotControllerService, EntrepotResponse, LotResponse, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
 import { DegreverLotDialogComponent } from '../degrever-lot-dialog/degrever-lot-dialog.component';
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
+import { TransfererLotDialogComponent } from '../transferer-lot-dialog/transferer-lot-dialog.component';
 
 interface SelectOption {
     label: string;
@@ -29,7 +30,7 @@ interface SelectOption {
     templateUrl: './materiau-lots.component.html',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, RouterModule, TranslocoModule, Toast, Button, Tag, Select, TableModule, Tooltip, Toolbar, DegreverLotDialogComponent, EntreeStockDialogComponent],
+    imports: [CommonModule, FormsModule, RouterModule, TranslocoModule, Toast, Button, Tag, Select, TableModule, Tooltip, Toolbar, DegreverLotDialogComponent, EntreeStockDialogComponent, TransfererLotDialogComponent],
     providers: [MessageService]
 })
 export class MateriauLotsComponent implements OnInit, OnDestroy {
@@ -47,6 +48,7 @@ export class MateriauLotsComponent implements OnInit, OnDestroy {
     // Dialogs
     showDegreverDialog = false;
     showEntreeDialog = false;
+    showTransfererDialog = false;
     selectedLot: LotResponse | null = null;
 
     private destroy$ = new Subject<void>();
@@ -140,6 +142,11 @@ export class MateriauLotsComponent implements OnInit, OnDestroy {
         this.showDegreverDialog = true;
     }
 
+    openTransferer(lot: LotResponse): void {
+        this.selectedLot = lot;
+        this.showTransfererDialog = true;
+    }
+
     openEntree(): void {
         this.showEntreeDialog = true;
     }
@@ -151,6 +158,16 @@ export class MateriauLotsComponent implements OnInit, OnDestroy {
             detail: 'Lot dégrevé avec succès.'
         });
         this.loadLots();
+    }
+
+    onTransfererSaved(): void {
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Lot transféré avec succès.'
+        });
+        this.loadLots();
+        this.loadMateriau();
     }
 
     onEntreeSaved(): void {

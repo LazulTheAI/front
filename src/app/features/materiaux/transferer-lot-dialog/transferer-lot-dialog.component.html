@@ -1,0 +1,95 @@
+<p-toast />
+
+<p-dialog
+  [header]="'lots.transfer_title' | transloco"
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+>
+  <form #ngForm="ngForm" (ngSubmit)="submit(ngForm)" class="flex flex-column gap-4 pt-2">
+
+    <!-- Infos lot -->
+    <div class="surface-100 border-round p-3 flex flex-column gap-2">
+      <div class="flex align-items-center justify-content-between">
+        <span class="font-semibold text-900">{{ materiau?.nom }}</span>
+        @if (lot?.numeroLot) {
+          <span class="font-mono text-sm bg-white px-2 py-1 border-round border-1 surface-border text-700">
+            {{ lot?.numeroLot }}
+          </span>
+        }
+      </div>
+      <div class="flex align-items-center gap-3 text-sm">
+        <div class="flex flex-column gap-1">
+          <span class="text-400 text-xs">{{ 'lots.remaining' | transloco }}</span>
+          <span class="font-bold text-900">{{ lot?.quantiteRestante | number:'1.0-4' }} {{ materiau?.unite }}</span>
+        </div>
+        <p-divider layout="vertical" />
+        <div class="flex flex-column gap-1">
+          <span class="text-400 text-xs">{{ 'common.warehouse' | transloco }}</span>
+          <span class="text-900">{{ lot?.entrepotNom }}</span>
+        </div>
+        <p-divider layout="vertical" />
+        <div class="flex flex-column gap-1">
+          <span class="text-400 text-xs">{{ 'lots.dlc' | transloco }}</span>
+          @if (lot?.expiresAt) {
+            <p-tag [value]="lot?.expiresAt | date:'dd/MM/yyyy'" [severity]="dlcSeverity" />
+          } @else {
+            <span class="text-400">{{ 'lots.no_dlc' | transloco }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Entrepôt destination -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">
+        {{ 'lots.transfer_destination' | transloco }} <span class="text-red-500">*</span>
+      </label>
+      <p-select
+        name="entrepotDestinationId"
+        [(ngModel)]="form.entrepotDestinationId"
+        [options]="entrepotOptions"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'lots.transfer_select_destination' | transloco"
+        required
+        class="w-full"
+      />
+    </div>
+
+    <!-- Quantité -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">
+        {{ 'common.quantity' | transloco }} <span class="text-red-500">*</span>
+      </label>
+      <p-inputNumber
+        name="quantite"
+        [(ngModel)]="form.quantite"
+        required
+        [min]="0.0001"
+        [max]="maxQuantite"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="4"
+        [class.ng-invalid]="ngForm.submitted && ngForm.controls['quantite']?.invalid"
+      />
+      <small class="text-500">{{ 'lots.max' | transloco }} : {{ maxQuantite | number:'1.0-4' }} {{ materiau?.unite }}</small>
+    </div>
+
+    <!-- Notes -->
+    <div class="flex flex-column gap-2">
+      <label class="font-medium text-900">{{ 'common.notes' | transloco }}</label>
+      <textarea pTextarea name="notes" [(ngModel)]="form.notes"
+        rows="2" [placeholder]="'lots.transfer_notes_placeholder' | transloco" class="w-full"></textarea>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button [label]="'common.cancel' | transloco" severity="secondary" [text]="true"
+      (onClick)="onHide()" [disabled]="saving" />
+    <p-button [label]="'lots.confirm_transfer' | transloco" icon="pi pi-arrow-right-arrow-left"
+      severity="info" [loading]="saving" (onClick)="submit(ngForm)" />
+  </ng-template>
+</p-dialog>

@@ -262,15 +262,12 @@
                 (onClick)="confirmArchive(m)" />
 
               <p-button
-                label="Lots"
-                icon="pi pi-list"
-                severity="info"
-                [text]="true"
+                [label]="('materiaux.lots_button' | transloco) + ' →'"
+                severity="primary"
                 size="small"
-                [pTooltip]="'materiaux.lots_tooltip' | transloco"
+                styleClass="white-space-nowrap"
                 (onClick)="openLots(m)"
               />
-
             </div>
           }
         </td>

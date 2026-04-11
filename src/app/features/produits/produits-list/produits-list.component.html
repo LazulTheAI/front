@@ -173,15 +173,19 @@
 
         <td class="text-center">
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
-            <p-button icon="pi pi-box" [rounded]="true" [text]="true"
-              severity="success" size="small" [pTooltip]="'produit_lots.lots_tooltip' | transloco"
-              (onClick)="openLots(produit)" />
             <p-button icon="pi pi-link" [rounded]="true" [text]="true"
               severity="primary" size="small" [pTooltip]="'produits.link_recipe' | transloco"
               (onClick)="openLierRecette(produit, $event)" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true"
               severity="secondary" size="small" [pTooltip]="'common.see_details' | transloco"
               (onClick)="openDetail(produit)" />
+            <p-button
+              [label]="('materiaux.lots_button' | transloco) + ' →'"
+              severity="primary"
+              size="small"
+              styleClass="white-space-nowrap"
+              (onClick)="openLots(produit)"
+            />
           </div>
         </td>
 

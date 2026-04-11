@@ -108,6 +108,7 @@
     "days_30": "30 derniers jours"
   },
   "materiaux": {
+    "lots_button": "Lots",
     "title": "Stock & matériaux",
     "subtitle": "Vue unifiée — stock par entrepôt",
     "search_placeholder": "Rechercher un matériau...",
@@ -189,7 +190,13 @@
     "reason": "Raison",
     "reason_placeholder": "Ex : casse, perte, contrôle qualité...",
     "degrever_warning": "Cette action est irréversible. La quantité sera déduite de ce lot précisément.",
-    "confirm_degrever": "Confirmer le dégrèvement"
+    "confirm_degrever": "Confirmer le dégrèvement",
+    "transfer_tooltip": "Transférer ce lot vers un autre entrepôt",
+    "transfer_title": "Transférer un lot",
+    "transfer_destination": "Entrepôt destination",
+    "transfer_select_destination": "Sélectionner un entrepôt...",
+    "transfer_notes_placeholder": "Notes optionnelles...",
+    "confirm_transfer": "Confirmer le transfert"
   },
   "entree_stock": {
     "title": "Entrée de stock",
