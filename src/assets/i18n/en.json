@@ -1,4 +1,23 @@
-{
+{"menu": {
+    "supply": "Supply",
+    "materials": "Raw materials",
+    "suppliers": "Suppliers",
+    "orders": "Purchase orders",
+    "production": "Production",
+    "runs": "Production runs",
+    "recipes": "Recipes",
+    "sales": "Sales & B2B",
+    "products": "Products & stock",
+    "resellers": "Resellers",
+    "b2b_orders": "B2B orders",
+    "piloting": "Monitoring",
+    "alerts": "Alerts",
+    "reports": "Reports",
+    "settings": "Settings",
+    "workshops": "Workshops",
+    "import": "Data import",
+    "users": "Users"
+  },
   "common": {
     "cancel": "Cancel",
     "save": "Save",
@@ -617,21 +636,21 @@
     "create_order": "Create order"
   },
   "bons_commande": {
-    "title": "Purchase orders",
-    "subtitle": "Supplier orders and delivery tracking",
+    "title": "Replenishments",
+    "subtitle": "Supplier replenishments and delivery tracking",
     "search_supplier": "Search a supplier...",
-    "new_order": "New order",
+    "new_order": "New replenishment",
     "supplier": "Supplier",
     "expected_delivery": "Expected delivery",
     "amount": "Amount",
-    "no_orders": "No purchase orders",
+    "no_orders": "No replenishments",
     "mark_sent": "Mark as sent",
     "receive": "Receive",
     "cancel": "Cancel",
     "delete_draft": "Delete draft"
   },
   "bon_detail": {
-    "title": "Purchase order #",
+    "title": "Replenishment #",
     "total": "TOTAL",
     "ordered": "Ordered on",
     "material": "Material",
@@ -652,15 +671,15 @@
     "save_reception": "Save receipt"
   },
   "bon_form": {
-    "title": "New purchase order",
+    "title": "New replenishment",
     "supplier": "Supplier",
     "select_supplier": "Select a supplier...",
     "reference_number": "Reference number",
-    "reference_placeholder": "PO-2024-001...",
-    "order_date": "Order date",
+    "reference_placeholder": "REP-2024-001...",
+    "order_date": "Replenishment date",
     "expected_delivery": "Expected delivery",
     "optional": "Optional...",
-    "order_lines": "Order lines",
+    "order_lines": "Replenishment lines",
     "no_lines": "No lines. Click \"Add\" to get started.",
     "material": "MATERIAL",
     "unit_price": "UNIT PRICE",
@@ -668,7 +687,7 @@
     "add_line": "Add a line",
     "estimated_total": "Estimated total:",
     "notes_placeholder": "Delivery instructions, remarks...",
-    "create_order": "Create order"
+    "create_order": "Create replenishment"
   },
   "production": {
     "title": "Production",
@@ -841,7 +860,7 @@
     "subtitle": "Management of your raw material suppliers",
     "new_supplier": "New supplier",
     "no_suppliers": "No suppliers",
-    "add_suppliers": "Add your suppliers to create purchase orders.",
+    "add_suppliers": "Add your suppliers to create replenishments.",
     "add_supplier": "Add a supplier",
     "delivery_time": "Delivery time",
     "archived_suppliers": "archived supplier(s)",

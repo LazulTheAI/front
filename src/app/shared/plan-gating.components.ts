@@ -23,7 +23,7 @@ const FEATURE_LABELS: Record<string, string> = {
     'multi-users': 'Gestion multi-utilisateurs',
     'cogs-complet': 'COGS complet (MO + charges)',
     'prix-recommande': 'Prix de vente recommandé',
-    'commandes-fournisseurs': 'Commandes fournisseurs',
+    'commandes-fournisseurs': 'Approvisionnements',
     'tracabilite-lots': 'Traçabilité des lots',
     'export-comptable': 'Export comptable',
     'allergenes-inci': 'Fiche allergènes & INCI',

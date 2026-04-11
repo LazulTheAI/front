@@ -1,4 +1,23 @@
-{
+{"menu": {
+    "supply": "Approvisionnement",
+    "materials": "Stock matières",
+    "suppliers": "Fournisseurs",
+    "orders": "Approvisionnements",
+    "production": "Production",
+    "runs": "Runs de production",
+    "recipes": "Recettes",
+    "sales": "Ventes & B2B",
+    "products": "Produits & stock",
+    "resellers": "Revendeurs",
+    "b2b_orders": "Commandes B2B",
+    "piloting": "Pilotage",
+    "alerts": "Alertes",
+    "reports": "Rapports",
+    "settings": "Configuration",
+    "workshops": "Ateliers",
+    "import": "Import données",
+    "users": "Utilisateurs"
+  },
   "common": {
     "cancel": "Annuler",
     "save": "Enregistrer",
@@ -618,21 +637,21 @@
     "create_order": "Créer la commande"
   },
   "bons_commande": {
-    "title": "Bons de commande",
-    "subtitle": "Commandes fournisseurs et suivi des livraisons",
+    "title": "Approvisionnements",
+    "subtitle": "Approvisionnements fournisseurs et suivi des livraisons",
     "search_supplier": "Rechercher un fournisseur...",
-    "new_order": "Nouveau bon",
+    "new_order": "Nouvel approvisionnement",
     "supplier": "Fournisseur",
     "expected_delivery": "Livraison prévue",
     "amount": "Montant",
-    "no_orders": "Aucun bon de commande",
+    "no_orders": "Aucun approvisionnement",
     "mark_sent": "Marquer comme envoyé",
     "receive": "Réceptionner",
     "cancel": "Annuler",
     "delete_draft": "Supprimer le brouillon"
   },
   "bon_detail": {
-    "title": "Bon de commande #",
+    "title": "Approvisionnement #",
     "total": "TOTAL",
     "ordered": "Commandé le",
     "material": "Matériau",
@@ -653,15 +672,15 @@
     "save_reception": "Enregistrer la réception"
   },
   "bon_form": {
-    "title": "Nouveau bon de commande",
+    "title": "Nouvel approvisionnement",
     "supplier": "Fournisseur",
     "select_supplier": "Sélectionner un fournisseur...",
     "reference_number": "Numéro de référence",
-    "reference_placeholder": "BC-2024-001...",
-    "order_date": "Date de commande",
+    "reference_placeholder": "AP-2024-001...",
+    "order_date": "Date d'approvisionnement",
     "expected_delivery": "Livraison prévue",
     "optional": "Optionnel...",
-    "order_lines": "Lignes de commande",
+    "order_lines": "Lignes d'approvisionnement",
     "no_lines": "Aucune ligne. Cliquez sur \"Ajouter\" pour commencer.",
     "material": "MATÉRIAU",
     "unit_price": "PRIX UNITAIRE",
@@ -669,7 +688,7 @@
     "add_line": "Ajouter une ligne",
     "estimated_total": "Total estimé :",
     "notes_placeholder": "Instructions de livraison, remarques...",
-    "create_order": "Créer le bon"
+    "create_order": "Créer l'approvisionnement"
   },
   "production": {
     "title": "Production",
@@ -842,7 +861,7 @@
     "subtitle": "Gestion de vos fournisseurs de matières premières",
     "new_supplier": "Nouveau fournisseur",
     "no_suppliers": "Aucun fournisseur",
-    "add_suppliers": "Ajoutez vos fournisseurs pour créer des bons de commande.",
+    "add_suppliers": "Ajoutez vos fournisseurs pour créer des approvisionnements.",
     "add_supplier": "Ajouter un fournisseur",
     "delivery_time": "Délai livraison",
     "archived_suppliers": "fournisseur(s) archivé(s)",
