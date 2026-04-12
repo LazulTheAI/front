@@ -21,8 +21,8 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { Router } from '@angular/router';
 import { ProduitControllerService, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
+import { Router } from '@angular/router';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -32,7 +32,6 @@ import { EntreeProduitDialogComponent } from '../entree-produit-dialog/entree-pr
 import { HistoriqueProduitDialogComponent } from '../historique-produit-dialog/historique-produit-dialog.component';
 import { LierRecetteDialogComponent } from '../lier-recette-dialog/lier-recette-dialog.component';
 import { ProduitDetailComponent } from '../produit-detail/produit-detail.component';
-import { TransfertProduitDialogComponent } from '../transfert-produit-dialog/transfert-produit-dialog.component';
 
 interface StockProduitResponse {
     produitId: number;
@@ -75,7 +74,6 @@ interface StockProduitResponse {
         ProduitDetailComponent,
         LierRecetteDialogComponent,
         EntreeProduitDialogComponent,
-        TransfertProduitDialogComponent,
         HistoriqueProduitDialogComponent,
         AjustementProduitDialogComponent,
         TranslocoModule

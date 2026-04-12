@@ -10,7 +10,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 
-import { CommandeB2BControllerService, ProduitControllerService, ProduitResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
+import { CommandeControllerService, ProduitControllerService, ProduitResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
 import { TranslocoModule } from '@jsverse/transloco';
 
 interface LigneForm {
@@ -27,12 +27,12 @@ interface SelectOption {
 }
 
 @Component({
-    selector: 'app-commande-b2b-form-dialog',
+    selector: 'app-commande-form-dialog',
     standalone: true,
     imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, Button, Select, InputNumber, InputText, DatePicker, Divider],
-    templateUrl: './commande-b2b-form-dialog.component.html'
+    templateUrl: './commande-form-dialog.component.html'
 })
-export class CommandeB2BFormDialogComponent implements OnInit, OnChanges {
+export class CommandeFormDialogComponent implements OnInit, OnChanges {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
     @Output() saved = new EventEmitter<void>();
@@ -79,7 +79,7 @@ export class CommandeB2BFormDialogComponent implements OnInit, OnChanges {
     }
 
     constructor(
-        private commandeService: CommandeB2BControllerService,
+        private commandeService: CommandeControllerService,
         @Inject(RevendeurControllerService)
         private revendeurService: RevendeurControllerService,
         private produitService: ProduitControllerService
@@ -156,7 +156,7 @@ export class CommandeB2BFormDialogComponent implements OnInit, OnChanges {
             }))
         };
 
-        this.commandeService.creerCommandeB2B(req as any).subscribe({
+        this.commandeService.creerCommande(req as any).subscribe({
             next: () => {
                 this.saving = false;
                 this.saved.emit();

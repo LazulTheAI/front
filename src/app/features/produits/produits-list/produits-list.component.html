@@ -55,7 +55,6 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width:56px"></th>
         <th pSortableColumn="nom">{{ 'produits.product' | transloco }} <p-sortIcon field="nom" /></th>
         <th style="width:130px" pSortableColumn="sku">{{ 'produits.sku' | transloco }} <p-sortIcon field="sku" /></th>
         <th style="width:130px" class="text-right" pSortableColumn="prixCents">
@@ -71,17 +70,6 @@
 
     <ng-template pTemplate="body" let-produit>
       <tr class="cursor-pointer">
-
-        <td>
-          @if (hasProduitImage(produit)) {
-            <img [src]="produit.imageUrl" [alt]="produit.nom"
-              class="border-round" style="width:40px;height:40px;object-fit:cover;" />
-          } @else {
-            <p-avatar [label]="getInitials(produit.nom)" shape="square" size="normal"
-              styleClass="bg-primary-100 text-primary font-bold" />
-          }
-        </td>
-
         <td>
           <div class="font-semibold text-900">{{ produit.nom }}</div>
           @if (produit.platformProductId) {
@@ -173,6 +161,12 @@
 
         <td class="text-center">
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
+            <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
+              severity="success" size="small" [pTooltip]="'produits.entry' | transloco"
+              (onClick)="showStockDialog = false; openEntreeProduit(selectedProduit!)" />
+            <p-button icon="pi pi-history" [text]="true" [rounded]="true"
+              severity="info" size="small" [pTooltip]="'produits.history' | transloco"
+              (onClick)="showStockDialog = false; openHistoriqueProduit(selectedProduit!)" />
             <p-button icon="pi pi-link" [rounded]="true" [text]="true"
               severity="primary" size="small" [pTooltip]="'produits.link_recipe' | transloco"
               (onClick)="openLierRecette(produit, $event)" />
@@ -326,20 +320,6 @@
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-between align-items-center w-full">
-      <div class="flex gap-2">
-        <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
-          severity="success" size="small" [pTooltip]="'produits.entry' | transloco"
-          (onClick)="showStockDialog = false; openEntreeProduit(selectedProduit!)" />
-        <p-button icon="pi pi-sliders-h" [text]="true" [rounded]="true"
-          severity="warn" size="small" [pTooltip]="'produits.adjustment' | transloco"
-          (onClick)="showStockDialog = false; openAjustementProduit(selectedProduit!)" />
-        <p-button icon="pi pi-arrow-right-arrow-left" [text]="true" [rounded]="true"
-          severity="secondary" size="small" [pTooltip]="'produits.transfer' | transloco"
-          (onClick)="showStockDialog = false; openTransfertProduit(selectedProduit!)" />
-        <p-button icon="pi pi-history" [text]="true" [rounded]="true"
-          severity="info" size="small" [pTooltip]="'produits.history' | transloco"
-          (onClick)="showStockDialog = false; openHistoriqueProduit(selectedProduit!)" />
-      </div>
       <p-button [label]="'common.close' | transloco" severity="secondary"
         (onClick)="showStockDialog = false" />
     </div>
@@ -366,12 +346,7 @@
   [produit]="selectedProduit"
   (saved)="onStockUpdated($event)"
 />
-<app-transfert-produit-dialog
-  [(visible)]="showTransfertProduitDialog"
-  [produit]="selectedProduit"
-  [stocksProduit]="stocksProduit"
-  (saved)="onStockUpdated($event)"
-/>
+
 <app-historique-produit-dialog
   [(visible)]="showHistoriqueProduitDialog"
   [produit]="selectedProduit"

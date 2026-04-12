@@ -1,0 +1,268 @@
+<p-toast />
+<p-confirmDialog />
+
+<p-toolbar styleClass="mb-4">
+  <ng-template pTemplate="start">
+    <div class="flex align-items-center gap-3">
+      <i class="pi pi-shopping-bag text-primary text-2xl"></i>
+      <div>
+        <h2 class="m-0 text-900 font-semibold">{{ 'commandes.title' | transloco }}</h2>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'commandes.subtitle' | transloco }}</p>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <div class="flex align-items-center gap-2 flex-wrap">
+
+      <!-- Source -->
+      <p-select
+        [(ngModel)]="filtreSource"
+        [options]="sourceOptions"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="false"
+        styleClass="w-10rem"
+        (onChange)="onFiltreChange()"
+      />
+
+      <!-- Statut -->
+      <p-select
+        [(ngModel)]="filtreStatut"
+        [options]="statutOptions"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        styleClass="w-10rem"
+        (onChange)="onFiltreChange()"
+      />
+
+      <!-- Revendeur (B2B seulement) -->
+      @if (filtreSource === 'B2B_MANUEL' || filtreSource === null) {
+        <p-select
+          [(ngModel)]="filtreRevendeurId"
+          [options]="revendeurOptions"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          styleClass="w-11rem"
+          (onChange)="onFiltreChange()"
+        />
+      }
+
+      <!-- Produit -->
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-box" />
+        <input pInputText
+          [(ngModel)]="filtreProduitNom"
+          (ngModelChange)="onSearchInput()"
+          [placeholder]="'commandes.filtre_produit' | transloco"
+          class="w-10rem" />
+      </p-iconfield>
+
+      <!-- Numéro de lot -->
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-list" />
+        <input pInputText
+          [(ngModel)]="filtreNumeroLot"
+          (ngModelChange)="onSearchInput()"
+          [placeholder]="'commandes.filtre_lot' | transloco"
+          class="w-10rem" />
+      </p-iconfield>
+
+      @if (hasFiltresActifs) {
+        <p-button icon="pi pi-times" severity="secondary" [text]="true"
+          [rounded]="true" size="small"
+          [pTooltip]="'commandes.reset_filtres' | transloco"
+          (onClick)="resetFiltres()" />
+      }
+
+      <p-button
+        [label]="'commandes.nouvelle_commande' | transloco"
+        icon="pi pi-plus"
+        (onClick)="openCreate()"
+      />
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<div class="card">
+  <p-table
+    [value]="commandes"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="size"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [showCurrentPageReport]="true"
+    [showGridlines]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords} commandes"
+    dataKey="id"
+    [rowHover]="true"
+    (onRowClick)="openDetail($event['data'])"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:130px">{{ 'commandes.col_numero' | transloco }}</th>
+        <th style="width:110px">{{ 'commandes.col_source' | transloco }}</th>
+        <th>{{ 'commandes.col_client' | transloco }}</th>
+        <th style="width:160px">{{ 'commandes.col_produits' | transloco }}</th>
+        <th style="width:110px">{{ 'commandes.col_lots' | transloco }}</th>
+        <th style="width:100px">{{ 'commandes.col_entrepot' | transloco }}</th>
+        <th style="width:110px" class="text-right">{{ 'commandes.col_total' | transloco }}</th>
+        <th style="width:110px">{{ 'commandes.col_statut' | transloco }}</th>
+        <th style="width:130px">{{ 'commandes.col_date' | transloco }}</th>
+        <th style="width:100px"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-c>
+      <tr class="cursor-pointer">
+
+        <!-- Numéro -->
+        <td>
+          <div class="font-mono text-sm font-semibold text-900">{{ c.numero ?? '—' }}</div>
+          @if (c.platformOrderId) {
+            <div class="text-400 text-xs mt-1">BC #{{ c.platformOrderId }}</div>
+          }
+        </td>
+
+        <!-- Source -->
+        <td>
+          <p-tag
+            [value]="getSourceLabel(c.source)"
+            [severity]="getSourceSeverity(c.source)"
+          />
+        </td>
+
+        <!-- Client -->
+        <td>
+          <div class="text-sm text-900 font-medium">
+            {{ c.revendeurNom ?? c.clientNom ?? '—' }}
+          </div>
+          @if (c.revendeurNom && c.clientNom) {
+            <div class="text-400 text-xs mt-1">{{ c.clientNom }}</div>
+          }
+        </td>
+
+        <!-- Produits -->
+        <td>
+          @if (c.lignes && c.lignes.length > 0) {
+            <div class="flex flex-column gap-1">
+              @for (l of c.lignes.slice(0, 2); track l.id) {
+                <div class="text-xs text-700">
+                  {{ l.quantite | number:'1.0-2' }} × {{ l.produitNom }}
+                </div>
+              }
+              @if (c.lignes.length > 2) {
+                <div class="text-400 text-xs">+{{ c.lignes.length - 2 }} autre(s)</div>
+              }
+            </div>
+          } @else {
+            <span class="text-400 text-sm">—</span>
+          }
+        </td>
+
+        <!-- Lots -->
+        <td>
+          @if (c.lots && c.lots.length > 0) {
+            <div class="flex flex-column gap-1">
+              @for (lot of c.lots.slice(0, 2); track lot.id) {
+                <div class="flex align-items-center gap-1">
+                  <span class="font-mono text-xs bg-gray-100 px-1 border-round text-700">
+                    {{ lot.numeroDeLot ?? '—' }}
+                  </span>
+                  @if (lot.dlcProduitFini) {
+                    <span class="text-400 text-xs">
+                      {{ lot.dlcProduitFini | date:'dd/MM/yy' }}
+                    </span>
+                  }
+                </div>
+              }
+              @if (c.lots.length > 2) {
+                <div class="text-400 text-xs">+{{ c.lots.length - 2 }}</div>
+              }
+            </div>
+          } @else {
+            <span class="text-400 text-sm">—</span>
+          }
+        </td>
+
+        <!-- Entrepôt -->
+        <td>
+          @if (c.lots && c.lots.length > 0 && c.lots[0].entrepotNom) {
+            <span class="text-sm text-500">{{ c.lots[0].entrepotNom }}</span>
+          } @else {
+            <span class="text-400 text-sm">—</span>
+          }
+        </td>
+
+        <!-- Total -->
+        <td class="text-right">
+          @if (c.totalHT != null) {
+            <span class="font-mono font-semibold text-sm text-900">
+              {{ c.totalHT | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
+          } @else {
+            <span class="text-400 text-sm">—</span>
+          }
+        </td>
+
+        <!-- Statut -->
+        <td>
+          <p-tag
+            [value]="getStatutLabel(c.statut!)"
+            [severity]="getStatutSeverity(c.statut!)"
+          />
+        </td>
+
+        <!-- Date -->
+        <td>
+          <span class="text-sm text-500">
+            {{ c.dateCommande | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </td>
+
+        <!-- Actions -->
+        <td (click)="$event.stopPropagation()">
+          <div class="flex gap-1 justify-content-end">
+            <p-button icon="pi pi-eye" severity="secondary" [text]="true"
+              [rounded]="true" size="small"
+              [pTooltip]="'commandes.voir_detail' | transloco"
+              (onClick)="openDetail(c)" />
+            @if (getNextStatut(c.statut!) && c.source === 'B2B_MANUEL') {
+              <p-button icon="pi pi-arrow-right" severity="info" [text]="true"
+                [rounded]="true" size="small"
+                [pTooltip]="'commandes.avancer_statut' | transloco"
+                (onClick)="changerStatut(c, getNextStatut(c.statut!)!, $event)" />
+            }
+          </div>
+        </td>
+
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="10" class="text-center py-6 text-400">
+          <i class="pi pi-shopping-bag text-4xl block mb-3 opacity-30"></i>
+          {{ 'commandes.aucune_commande' | transloco }}
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</div>
+
+<app-commande-form-dialog
+  [(visible)]="showFormDialog"
+  (saved)="onFormSaved()"
+/>
+
+<app-commande-detail-dialog
+  [(visible)]="showDetailDialog"
+  [commande]="selectedCommande"
+  (closed)="onDetailClosed()"
+/>

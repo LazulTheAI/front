@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnChanges, Output } from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
 
-import { CommandeB2BControllerService, CommandeB2BResponse, RevendeurResponse } from '@/app/modules/openapi';
+import { CommandeControllerService, CommandeResponse, RevendeurResponse } from '@/app/modules/openapi';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -17,17 +17,17 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-revendeur-detail-dialog',
     standalone: true,
-    imports: [CommonModule, DialogModule, TranslocoModule, Button, Tag, Divider, TableModule, Tooltip, Toast, TranslocoModule],
+    imports: [CommonModule, DialogModule, TranslocoModule, Button, Tag, Divider, TableModule, Tooltip, Toast],
     providers: [MessageService],
     templateUrl: './revendeur-detail-dialog.component.html'
 })
-export class RevendeurDetailDialogComponent {
+export class RevendeurDetailDialogComponent implements OnChanges {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
     @Input() revendeur: RevendeurResponse | null = null;
     @Output() onEdit = new EventEmitter<Event>();
 
-    commandes: CommandeB2BResponse[] = [];
+    commandes: CommandeResponse[] = [];
     loadingCommandes = false;
 
     get dialogHeader(): string {
@@ -35,7 +35,8 @@ export class RevendeurDetailDialogComponent {
     }
 
     constructor(
-        private commandeService: CommandeB2BControllerService,
+        @Inject(CommandeControllerService)
+        private commandeService: CommandeControllerService,
         private http: HttpClient,
         private messageService: MessageService
     ) {}
@@ -49,18 +50,28 @@ export class RevendeurDetailDialogComponent {
     loadCommandes(): void {
         if (!this.revendeur?.id) return;
         this.loadingCommandes = true;
-        this.commandeService.listerCommandeB2B(this.revendeur.id, undefined, 0, 10).subscribe({
-            next: (data: any) => {
-                this.commandes = data.content ?? [];
-                this.loadingCommandes = false;
-            },
-            error: () => {
-                this.loadingCommandes = false;
-            }
-        });
+        this.commandeService
+            .listerCommande(
+                this.revendeur.id, // revendeurId
+                undefined, // statut
+                undefined, // source
+                undefined, // numeroLot
+                undefined, // produitNom
+                0, // page
+                10 // size
+            )
+            .subscribe({
+                next: (data: any) => {
+                    this.commandes = data.content ?? [];
+                    this.loadingCommandes = false;
+                },
+                error: () => {
+                    this.loadingCommandes = false;
+                }
+            });
     }
 
-    downloadBonLivraison(c: CommandeB2BResponse): void {
+    downloadBonLivraison(c: CommandeResponse): void {
         const lang = navigator.language?.split('-')[0] ?? 'fr';
         this.http
             .get(`${environment.baseUrl}/api/pdf/commandes-b2b/${c.id}/bon-livraison?lang=${lang}`, {
@@ -76,7 +87,11 @@ export class RevendeurDetailDialogComponent {
                     URL.revokeObjectURL(url);
                 },
                 error: () => {
-                    this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de générer le PDF' });
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Erreur',
+                        detail: 'Impossible de générer le PDF'
+                    });
                 }
             });
     }
@@ -85,9 +100,11 @@ export class RevendeurDetailDialogComponent {
         const map: Record<string, any> = {
             BROUILLON: 'secondary',
             CONFIRMEE: 'info',
+            EN_COURS: 'info',
             EXPEDIEE: 'warn',
             LIVREE: 'success',
-            ANNULEE: 'danger'
+            ANNULEE: 'danger',
+            ERREUR: 'danger'
         };
         return map[statut] ?? 'secondary';
     }
@@ -96,9 +113,11 @@ export class RevendeurDetailDialogComponent {
         const map: Record<string, string> = {
             BROUILLON: 'Brouillon',
             CONFIRMEE: 'Confirmée',
+            EN_COURS: 'En cours',
             EXPEDIEE: 'Expédiée',
             LIVREE: 'Livrée',
-            ANNULEE: 'Annulée'
+            ANNULEE: 'Annulée',
+            ERREUR: 'Erreur'
         };
         return map[statut] ?? statut;
     }

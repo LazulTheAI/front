@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Button } from 'primeng/button';
@@ -8,23 +8,23 @@ import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
-import { CommandeB2BControllerService, CommandeB2BResponse } from '@/app/modules/openapi';
+import { CommandeControllerService, CommandeResponse } from '@/app/modules/openapi';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { environment } from '../../../../environments/environment';
 
 @Component({
-    selector: 'app-commande-b2b-detail-dialog',
+    selector: 'app-commande-detail-dialog',
     standalone: true,
     imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, Button, Tag, TableModule, Toast],
     providers: [MessageService],
-    templateUrl: './commande-b2b-detail-dialog.component.html'
+    templateUrl: './commande-detail-dialog.component.html'
 })
-export class CommandeB2BDetailDialogComponent implements OnChanges {
+export class CommandeDetailDialogComponent implements OnChanges {
     @Input() visible = false;
     @Output() visibleChange = new EventEmitter<boolean>();
-    @Input() commande: CommandeB2BResponse | null = null;
+    @Input() commande: CommandeResponse | null = null;
     @Output() onStatutChange = new EventEmitter<void>();
 
     saving = false;
@@ -34,7 +34,8 @@ export class CommandeB2BDetailDialogComponent implements OnChanges {
     }
 
     constructor(
-        private commandeService: CommandeB2BControllerService,
+        @Inject(CommandeControllerService)
+        private commandeService: CommandeControllerService,
         private http: HttpClient,
         private messageService: MessageService
     ) {}
@@ -44,7 +45,7 @@ export class CommandeB2BDetailDialogComponent implements OnChanges {
     changerStatut(statut: string): void {
         if (!this.commande?.id) return;
         this.saving = true;
-        this.commandeService.changerStatutCommandeB2B(this.commande.id, { statut }).subscribe({
+        this.commandeService.changerStatutCommande(this.commande.id, { statut }).subscribe({
             next: (updated) => {
                 this.commande = updated;
                 this.saving = false;

@@ -17,17 +17,30 @@ interface LayoutState {
     activePath: string | null;
 }
 
-@Injectable({
-    providedIn: 'root'
-})
-export class LayoutService {
-    layoutConfig = signal<LayoutConfig>({
+const LAYOUT_CONFIG_KEY = 'layoutConfig';
+
+function loadLayoutConfig(): LayoutConfig {
+    const defaults: LayoutConfig = {
         preset: 'Aura',
         primary: 'emerald',
         surface: null,
         darkTheme: false,
         menuMode: 'static'
-    });
+    };
+    try {
+        const stored = localStorage.getItem(LAYOUT_CONFIG_KEY);
+        if (stored) {
+            return { ...defaults, ...JSON.parse(stored) };
+        }
+    } catch {}
+    return defaults;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class LayoutService {
+    layoutConfig = signal<LayoutConfig>(loadLayoutConfig());
 
     layoutState = signal<LayoutState>({
         staticMenuDesktopInactive: false,
@@ -55,10 +68,21 @@ export class LayoutService {
     private initialized = false;
 
     constructor() {
+        // Apply dark mode immediately from stored config before first render
+        this.toggleDarkMode();
+
         effect(() => {
             const config = this.layoutConfig();
 
-            if (!this.initialized || !config) {
+            if (!config) {
+                return;
+            }
+
+            try {
+                localStorage.setItem(LAYOUT_CONFIG_KEY, JSON.stringify(config));
+            } catch {}
+
+            if (!this.initialized) {
                 this.initialized = true;
                 return;
             }
