@@ -12,6 +12,7 @@ import { Select } from 'primeng/select';
 
 import { CommandeControllerService, ProduitControllerService, ProduitResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
 import { TranslocoModule } from '@jsverse/transloco';
+import { MessageService } from 'primeng/api';
 
 interface LigneForm {
     produitId: number | null;
@@ -82,7 +83,8 @@ export class CommandeFormDialogComponent implements OnInit, OnChanges {
         private commandeService: CommandeControllerService,
         @Inject(RevendeurControllerService)
         private revendeurService: RevendeurControllerService,
-        private produitService: ProduitControllerService
+        private produitService: ProduitControllerService,
+        private messageService: MessageService
     ) {}
 
     ngOnInit(): void {
@@ -162,8 +164,13 @@ export class CommandeFormDialogComponent implements OnInit, OnChanges {
                 this.saved.emit();
                 this.onHide();
             },
-            error: () => {
+            error: (err: any) => {
                 this.saving = false;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: err?.error?.message ?? err?.error?.error ?? err?.error?.detail ?? 'Une erreur est survenue'
+                });
             }
         });
     }

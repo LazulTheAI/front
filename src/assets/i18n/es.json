@@ -71,7 +71,10 @@
     "select_warehouse": "Seleccionar un almacén...",
     "yes": "Sí",
     "no": "No",
-    "voir_detail": "Ver detalle"
+    "voir_detail": "Ver detalle",
+    "fermer": "Cerrar",
+    "annuler": "Cancelar",
+    "selectionner": "Seleccionar..."
   },
   "lang": {
     "fr": "Français",
@@ -597,7 +600,8 @@
     "transition_invalide": "Transición inválida",
     "erreur_charger": "Error al cargar pedidos",
     "commande_saved": "Pedido guardado",
-    "aucune_commande": "No hay pedidos"
+    "aucune_commande": "No hay pedidos",
+    "page_report": "{first}-{last} de {totalRecords} pedidos"
   },
   "commande_detail": {
     "title": "Albarán de entrega",
@@ -613,7 +617,30 @@
     "price_unit_ht": "Precio unit. sin IVA",
     "discount": "Descuento",
     "total_ht": "Total sin IVA",
-    "global_discount": "Descuento global"
+    "global_discount": "Descuento global",
+    "bon_livraison": "Albarán de entrega",
+    "facture": "Factura",
+    "revendeur": "Revendedor",
+    "livraison": "Entrega",
+    "souhaitee": "Deseada",
+    "expediee": "Enviada",
+    "livree": "Entregada",
+    "non_renseignee": "No especificada",
+    "col_produit": "Producto",
+    "col_quantite": "Cant.",
+    "col_prix_unit": "Precio unit. s/IVA",
+    "col_remise": "Descuento",
+    "col_total_ht": "Total s/IVA",
+    "remise_globale": "Descuento global",
+    "annuler": "Cancelar",
+    "header": "Pedido {{numero}} — {{revendeur}}",
+    "header_empty": "Detalle pedido",
+    "statut_mis_a_jour": "Estado actualizado",
+    "transition_invalide": "Transición inválida",
+    "erreur_pdf": "Error al generar el PDF",
+    "action_confirmer": "Confirmar",
+    "action_expediee": "Marcar enviado",
+    "action_livree": "Marcar entregado"
   },
   "commande_form": {
     "title": "Nuevo pedido B2B",
@@ -633,7 +660,21 @@
     "subtotal": "Subtotal",
     "discount_amount": "Descuento global",
     "total_ht": "Total sin IVA",
-    "create_order": "Crear el pedido"
+    "create_order": "Crear el pedido",
+    "revendeur": "Revendedor",
+    "livraison_souhaitee": "Entrega deseada",
+    "remise_globale": "Descuento global (%)",
+    "defaut_revendeur": "Descuento revendedor:",
+    "notes": "Notas",
+    "lignes": "Líneas",
+    "ajouter_produit": "Agregar producto",
+    "aucun_produit": "Sin producto — haga clic en \"Agregar producto\"",
+    "col_produit": "Producto",
+    "col_qte": "Cant.",
+    "col_prix_ht": "Precio s/IVA (cts)",
+    "col_remise": "Descuento %",
+    "sous_total": "Subtotal",
+    "creer_commande": "Crear el pedido"
   },
   "bons_commande": {
     "title": "Aprovisionamientos",

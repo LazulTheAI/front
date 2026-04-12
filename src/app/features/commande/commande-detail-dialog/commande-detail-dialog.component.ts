@@ -9,7 +9,7 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
 import { CommandeControllerService, CommandeResponse } from '@/app/modules/openapi';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { environment } from '../../../../environments/environment';
@@ -30,17 +30,22 @@ export class CommandeDetailDialogComponent implements OnChanges {
     saving = false;
 
     get dialogHeader(): string {
-        return this.commande ? `Commande ${this.commande.numero} — ${this.commande.revendeurNom}` : 'Détail commande';
+        if (!this.commande) return this.transloco.translate('commande_detail.header_empty');
+        return this.transloco.translate('commande_detail.header', {
+            numero: this.commande.numero,
+            revendeur: this.commande.revendeurNom
+        });
     }
 
     constructor(
         @Inject(CommandeControllerService)
         private commandeService: CommandeControllerService,
         private http: HttpClient,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private transloco: TranslocoService
     ) {}
 
-    ngOnChanges(changes: SimpleChanges): void {}
+    ngOnChanges(_changes: SimpleChanges): void {}
 
     changerStatut(statut: string): void {
         if (!this.commande?.id) return;
@@ -52,20 +57,21 @@ export class CommandeDetailDialogComponent implements OnChanges {
                 this.onStatutChange.emit();
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Statut mis à jour',
-                    detail: `Commande → ${statut}`
+                    summary: this.transloco.translate('commande_detail.statut_mis_a_jour'),
+                    detail: `${this.commande!.numero} → ${statut}`
                 });
             },
             error: (err: any) => {
                 this.saving = false;
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erreur',
-                    detail: err?.error?.message ?? 'Transition invalide'
+                    summary: this.transloco.translate('common.error'),
+                    detail: err?.error?.message ?? this.transloco.translate('commande_detail.transition_invalide')
                 });
             }
         });
     }
+
     downloadBonLivraison(): void {
         this.downloadPdf(`${environment.baseUrl}/api/pdf/commandes-b2b/${this.commande!.id}/bon-livraison`, `bon-livraison-${this.commande!.numero}.pdf`);
     }
@@ -89,8 +95,8 @@ export class CommandeDetailDialogComponent implements OnChanges {
                 console.error(e);
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erreur',
-                    detail: 'Impossible de générer le PDF'
+                    summary: this.transloco.translate('common.error'),
+                    detail: this.transloco.translate('commande_detail.erreur_pdf')
                 });
             }
         });
@@ -108,14 +114,8 @@ export class CommandeDetailDialogComponent implements OnChanges {
     }
 
     getStatutLabel(statut: string): string {
-        const map: Record<string, string> = {
-            BROUILLON: 'Brouillon',
-            CONFIRMEE: 'Confirmée',
-            EXPEDIEE: 'Expédiée',
-            LIVREE: 'Livrée',
-            ANNULEE: 'Annulée'
-        };
-        return map[statut] ?? statut;
+        const key = `commandes.statut_${statut.toLowerCase()}`;
+        return this.transloco.translate(key) || statut;
     }
 
     getNextStatut(statut: string): string | null {
@@ -123,7 +123,12 @@ export class CommandeDetailDialogComponent implements OnChanges {
     }
 
     getNextStatutLabel(statut: string): string {
-        return { BROUILLON: 'Confirmer', CONFIRMEE: 'Marquer expédiée', EXPEDIEE: 'Marquer livrée' }[statut] ?? '';
+        const map: Record<string, string> = {
+            BROUILLON: 'commande_detail.action_confirmer',
+            CONFIRMEE: 'commande_detail.action_expediee',
+            EXPEDIEE: 'commande_detail.action_livree'
+        };
+        return map[statut] ? this.transloco.translate(map[statut]) : '';
     }
 
     canAnnuler(statut: string): boolean {

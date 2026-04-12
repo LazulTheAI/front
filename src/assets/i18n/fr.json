@@ -70,7 +70,10 @@
     "select_warehouse": "Sélectionner un entrepôt...",
     "yes": "Oui",
     "no": "Non",
-    "voir_detail": "Voir le détail"
+    "voir_detail": "Voir le détail",
+    "fermer": "Fermer",
+    "annuler": "Annuler",
+    "selectionner": "Sélectionner..."
   },
   "lang": {
     "fr": "Français",
@@ -597,7 +600,8 @@
     "transition_invalide": "Transition invalide",
     "erreur_charger": "Impossible de charger les commandes",
     "commande_saved": "Commande enregistrée",
-    "aucune_commande": "Aucune commande"
+    "aucune_commande": "Aucune commande",
+    "page_report": "{first}-{last} sur {totalRecords} commandes"
   },
   "commande_detail": {
     "title": "Bon de livraison",
@@ -613,7 +617,30 @@
     "price_unit_ht": "Prix unit. HT",
     "discount": "Remise",
     "total_ht": "Total HT",
-    "global_discount": "Remise globale"
+    "global_discount": "Remise globale",
+    "bon_livraison": "Bon de livraison",
+    "facture": "Facture",
+    "revendeur": "Revendeur",
+    "livraison": "Livraison",
+    "souhaitee": "Souhaitée",
+    "expediee": "Expédiée",
+    "livree": "Livrée",
+    "non_renseignee": "Non renseignée",
+    "col_produit": "Produit",
+    "col_quantite": "Qté",
+    "col_prix_unit": "Prix unit. HT",
+    "col_remise": "Remise",
+    "col_total_ht": "Total HT",
+    "remise_globale": "Remise globale",
+    "annuler": "Annuler",
+    "header": "Commande {{numero}} — {{revendeur}}",
+    "header_empty": "Détail commande",
+    "statut_mis_a_jour": "Statut mis à jour",
+    "transition_invalide": "Transition invalide",
+    "erreur_pdf": "Impossible de générer le PDF",
+    "action_confirmer": "Confirmer",
+    "action_expediee": "Marquer expédiée",
+    "action_livree": "Marquer livrée"
   },
   "commande_form": {
     "title": "Nouvelle commande B2B",
@@ -633,7 +660,21 @@
     "subtotal": "Sous-total",
     "discount_amount": "Remise globale",
     "total_ht": "Total HT",
-    "create_order": "Créer la commande"
+    "create_order": "Créer la commande",
+    "revendeur": "Revendeur",
+    "livraison_souhaitee": "Livraison souhaitée",
+    "remise_globale": "Remise globale (%)",
+    "defaut_revendeur": "Défaut revendeur :",
+    "notes": "Notes",
+    "lignes": "Lignes",
+    "ajouter_produit": "Ajouter un produit",
+    "aucun_produit": "Aucun produit — cliquez sur \"Ajouter un produit\"",
+    "col_produit": "Produit",
+    "col_qte": "Qté",
+    "col_prix_ht": "Prix HT (cts)",
+    "col_remise": "Remise %",
+    "sous_total": "Sous-total",
+    "creer_commande": "Créer la commande"
   },
   "bons_commande": {
     "title": "Approvisionnements",

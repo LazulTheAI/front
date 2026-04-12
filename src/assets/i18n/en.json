@@ -70,7 +70,10 @@
     "select_warehouse": "Select a warehouse...",
     "yes": "Yes",
     "no": "No",
-    "voir_detail": "View detail"
+    "voir_detail": "View detail",
+    "fermer": "Close",
+    "annuler": "Cancel",
+    "selectionner": "Select..."
   },
   "lang": {
     "fr": "Français",
@@ -596,7 +599,8 @@
     "transition_invalide": "Invalid transition",
     "erreur_charger": "Failed to load orders",
     "commande_saved": "Order saved",
-    "aucune_commande": "No orders found"
+    "aucune_commande": "No orders found",
+    "page_report": "{first}-{last} of {totalRecords} orders"
   },
   "commande_detail": {
     "title": "Delivery slip",
@@ -612,7 +616,30 @@
     "price_unit_ht": "Unit price excl. tax",
     "discount": "Discount",
     "total_ht": "Total excl. tax",
-    "global_discount": "Global discount"
+    "global_discount": "Global discount",
+    "bon_livraison": "Delivery slip",
+    "facture": "Invoice",
+    "revendeur": "Reseller",
+    "livraison": "Delivery",
+    "souhaitee": "Desired",
+    "expediee": "Shipped",
+    "livree": "Delivered",
+    "non_renseignee": "Not specified",
+    "col_produit": "Product",
+    "col_quantite": "Qty",
+    "col_prix_unit": "Unit price excl. tax",
+    "col_remise": "Discount",
+    "col_total_ht": "Total excl. tax",
+    "remise_globale": "Global discount",
+    "annuler": "Cancel",
+    "header": "Order {{numero}} — {{revendeur}}",
+    "header_empty": "Order detail",
+    "statut_mis_a_jour": "Status updated",
+    "transition_invalide": "Invalid transition",
+    "erreur_pdf": "Failed to generate PDF",
+    "action_confirmer": "Confirm",
+    "action_expediee": "Mark as shipped",
+    "action_livree": "Mark as delivered"
   },
   "commande_form": {
     "title": "New B2B order",
@@ -632,7 +659,21 @@
     "subtotal": "Subtotal",
     "discount_amount": "Global discount",
     "total_ht": "Total excl. tax",
-    "create_order": "Create order"
+    "create_order": "Create order",
+    "revendeur": "Reseller",
+    "livraison_souhaitee": "Desired delivery",
+    "remise_globale": "Global discount (%)",
+    "defaut_revendeur": "Reseller default:",
+    "notes": "Notes",
+    "lignes": "Lines",
+    "ajouter_produit": "Add a product",
+    "aucun_produit": "No product — click \"Add a product\"",
+    "col_produit": "Product",
+    "col_qte": "Qty",
+    "col_prix_ht": "Price excl. tax (cts)",
+    "col_remise": "Discount %",
+    "sous_total": "Subtotal",
+    "creer_commande": "Create order"
   },
   "bons_commande": {
     "title": "Replenishments",

@@ -97,7 +97,7 @@
     (onLazyLoad)="onLazyLoad($event)"
     [showCurrentPageReport]="true"
     [showGridlines]="true"
-    currentPageReportTemplate="{first}-{last} sur {totalRecords} commandes"
+    [currentPageReportTemplate]="'commandes.page_report' | transloco"
     dataKey="id"
     [rowHover]="true"
     (onRowClick)="openDetail($event['data'])"
