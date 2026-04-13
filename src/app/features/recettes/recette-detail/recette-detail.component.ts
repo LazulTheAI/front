@@ -13,15 +13,15 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { IngredientResponse, ModifierIngredientsRequest, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { IngredientResponse, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
 import { TranslocoModule } from '@jsverse/transloco';
-import { IngredientLine, IngredientsEditorComponent } from '../ingredients-editor/ingredients-editor.component';
+import { IngredientLine } from '../ingredients-editor/ingredients-editor.component';
 import { IngredientsEnAlertePipe } from '../recette.pipes';
 
 @Component({
     selector: 'app-recette-detail',
     standalone: true,
-    imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, ButtonModule, TabsModule, TableModule, TagModule, DividerModule, ToastModule, TooltipModule, IngredientsEditorComponent, IngredientsEnAlertePipe],
+    imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, ButtonModule, TabsModule, TableModule, TagModule, DividerModule, ToastModule, TooltipModule, IngredientsEnAlertePipe],
     providers: [MessageService, ConfirmationService],
     templateUrl: './recette-detail.component.html'
 })
@@ -70,47 +70,6 @@ export class RecetteDetailComponent implements OnChanges {
     onHide(): void {
         this.visibleChange.emit(false);
         this.closed.emit();
-    }
-
-    // Ingrédients
-    startEditIngredients(): void {
-        this.editIngredients = (this.recette?.ingredients ?? []).map((i: IngredientResponse) => ({
-            materiauId: i.materiauId ?? null,
-            materiauNom: i.materiauNom ?? '',
-            quantite: i.quantite ?? null,
-            unite: i.unite ?? ''
-        }));
-        this.editingIngredients = true;
-    }
-
-    cancelEditIngredients(): void {
-        this.editingIngredients = false;
-    }
-
-    saveIngredients(): void {
-        if (!this.recette?.id) return;
-        this.savingIngredients = true;
-
-        const req: ModifierIngredientsRequest = {
-            ingredients: this.editIngredients.map((i) => ({
-                materiauId: i.materiauId!,
-                quantite: i.quantite!,
-                unite: i.unite
-            }))
-        };
-
-        this.recetteService.modifierIngredientsRecette(this.recette.id, req).subscribe({
-            next: (data: RecetteResponse) => {
-                this.recette = data;
-                this.savingIngredients = false;
-                this.editingIngredients = false;
-                this.messageService.add({ severity: 'success', summary: 'Ingrédients mis à jour', detail: 'La recette a été modifiée' });
-            },
-            error: () => {
-                this.savingIngredients = false;
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de mettre à jour les ingrédients' });
-            }
-        });
     }
 
     // Helpers

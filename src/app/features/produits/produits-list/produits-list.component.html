@@ -163,10 +163,10 @@
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
             <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
               severity="success" size="small" [pTooltip]="'produits.entry' | transloco"
-              (onClick)="showStockDialog = false; openEntreeProduit(selectedProduit!)" />
+              (onClick)="openEntreeProduit(produit)" />
             <p-button icon="pi pi-history" [text]="true" [rounded]="true"
               severity="info" size="small" [pTooltip]="'produits.history' | transloco"
-              (onClick)="showStockDialog = false; openHistoriqueProduit(selectedProduit!)" />
+              (onClick)="openHistoriqueProduit(produit)" />
             <p-button icon="pi pi-link" [rounded]="true" [text]="true"
               severity="primary" size="small" [pTooltip]="'produits.link_recipe' | transloco"
               (onClick)="openLierRecette(produit, $event)" />

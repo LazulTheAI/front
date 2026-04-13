@@ -70,17 +70,7 @@
         <!-- Toolbar ingrédients -->
         <div class="flex justify-content-between align-items-center mb-3">
           <span class="text-500 text-sm">{{ recette.ingredients?.length ?? 0 }} {{ 'recette_detail.ingredient_s' | transloco }}</span>
-          @if (!recette.archive) {
-            @if (!editingIngredients) {
-              <p-button
-                [label]="'recette_detail.modifier_ingredients' | transloco"
-                icon="pi pi-pencil"
-                severity="secondary"
-                size="small"
-                (onClick)="startEditIngredients()"
-              />
-            }
-          }
+         
         </div>
 
         <!-- Vue lecture -->
@@ -147,29 +137,6 @@
               </tr>
             </ng-template>
           </p-table>
-        }
-
-        <!-- Vue édition -->
-        @if (editingIngredients) {
-          <app-ingredients-editor [(ingredients)]="editIngredients" />
-
-          <div class="flex justify-content-end gap-2 mt-4">
-            <p-button
-              [label]="'common.annuler' | transloco"
-              severity="secondary"
-              [text]="true"
-              (onClick)="cancelEditIngredients()"
-              [disabled]="savingIngredients"
-            />
-            <p-button
-              [label]="'recette_detail.enregistrer_ingredients' | transloco"
-              icon="pi pi-check"
-              severity="success"
-              [loading]="savingIngredients"
-              [disabled]="editIngredients.length === 0"
-              (onClick)="saveIngredients()"
-            />
-          </div>
         }
       </p-tabpanel>
 

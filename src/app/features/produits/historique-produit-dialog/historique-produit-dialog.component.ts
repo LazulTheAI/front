@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 
 import { Button } from 'primeng/button';
 import { Paginator } from 'primeng/paginator';
 import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 import { EntrepotControllerService, EntrepotResponse, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { MouvementStockProduitResponse } from '@/app/modules/openapi/model/mouvement-stock-produit-response';
@@ -25,6 +25,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: string; css: string }> 
     ajustement_positif: { label: 'Ajustement +', icon: 'pi pi-plus text-green-500', css: 'text-green-600' },
     ajustement_negatif: { label: 'Ajustement −', icon: 'pi pi-minus text-orange-500', css: 'text-orange-600' },
     vente_bc: { label: 'Vente BC', icon: 'pi pi-shopping-cart text-blue-500', css: 'text-blue-600' },
+    vente_b2b: { label: 'Vente B2B', icon: 'pi pi-shopping-bag text-indigo-500', css: 'text-indigo-600' }, // ← manquant
     transfert_sortie: { label: 'Transfert sortie', icon: 'pi pi-arrow-up-right text-purple-500', css: 'text-purple-600' },
     transfert_entree: { label: 'Transfert entrée', icon: 'pi pi-arrow-down-left text-purple-500', css: 'text-purple-600' }
 };
@@ -66,14 +67,6 @@ export class HistoriqueProduitDialogComponent implements OnChanges, OnInit {
         });
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['visible'] && this.visible && this.produit?.id) {
-            this.page = 0;
-            this.filtreEntrepotId = null;
-            this.charger();
-        }
-    }
-
     charger(): void {
         if (!this.produit?.id) return;
         this.loading = true;
@@ -88,6 +81,24 @@ export class HistoriqueProduitDialogComponent implements OnChanges, OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    onLazyLoad(event: TableLazyLoadEvent): void {
+        this.page = Math.floor((event.first ?? 0) / (event.rows ?? this.pageSize));
+        this.pageSize = event.rows ?? this.pageSize;
+        this.charger();
+    }
+    ngOnChanges(changes: SimpleChanges): void {
+        // Déclencher si visible passe à true ET produit est défini
+        // OU si produit change alors que le dialog est déjà visible
+        const visibleChanged = changes['visible'] && this.visible;
+        const produitChanged = changes['produit'] && this.produit?.id;
+
+        if ((visibleChanged || produitChanged) && this.visible && this.produit?.id) {
+            this.page = 0;
+            this.filtreEntrepotId = null;
+            this.charger();
+        }
     }
 
     onPageChange(event: { page?: number }): void {

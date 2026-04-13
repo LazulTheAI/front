@@ -1,15 +1,13 @@
 <p-dialog
   [(visible)]="visible"
   (onHide)="onHide()"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '700px' }"
+  [modal]="true" [draggable]="false" [resizable]="false"
+  [style]="{ width: '760px' }"
 >
   <ng-template pTemplate="header">
     <div class="flex align-items-center gap-2">
       <i class="pi pi-history text-primary"></i>
-      <span class="font-bold text-900">{{ 'historique_produit.title' | transloco }} — {{ produit?.nom }}</span>
+      <span class="font-bold text-900">Historique — {{ produit?.nom }}</span>
     </div>
   </ng-template>
 
@@ -20,108 +18,97 @@
       [options]="entrepotOptions"
       optionLabel="label"
       optionValue="value"
-      [placeholder]="'historique_produit.filter_warehouse' | transloco"
+      placeholder="Tous les entrepôts"
       [showClear]="true"
-      (onChange)="charger()"
+      (onChange)="page = 0; charger()"
       class="w-14rem"
     />
-    <span class="text-400 text-xs">{{ 'historique_produit.days_30' | transloco }}</span>
   </div>
 
-  @if (loading) {
-    <div class="flex flex-column gap-2">
-      <p-skeleton height="2.5rem" *ngFor="let i of [1,2,3,4,5]" />
-    </div>
-  } @else if (mouvements.length === 0) {
-    <div class="text-center py-6 text-400">
-      <i class="pi pi-history text-4xl mb-3 block opacity-30"></i>
-      {{ 'historique_produit.no_movements' | transloco }}
-    </div>
-  } @else {
-    <p-table
-      [value]="mouvements"
-      [showGridlines]="true"
-      styleClass="p-datatable-sm"
-    >
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width:140px">{{ 'common.date' | transloco }}</th>
-          <th style="width:160px">Type</th>
-          <th style="width:130px">{{ 'common.warehouse' | transloco }}</th>
-          <th style="width:100px;text-align:right">{{ 'common.quantity' | transloco }}</th>
-          <th style="width:110px;text-align:right">{{ 'historique_produit.cost_unit' | transloco }}</th>
-          <th>{{ 'historique_produit.reference_notes' | transloco }}</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-m>
-        <tr>
-          <td>
-            <span class="text-xs text-500">{{ m.createdAt | date:'dd/MM/yy HH:mm' }}</span>
-          </td>
-          <td>
-            <span class="inline-flex align-items-center gap-1">
-              <i class="text-xs" [ngClass]="getTypeIcon(m.typeMouvement)"></i>
-              <span class="text-sm" [class]="getTypeCss(m.typeMouvement)">
-                {{ getTypeLabel(m.typeMouvement) }}
-              </span>
-            </span>
-          </td>
-          <td>
-            <span class="text-sm text-700">{{ m.entrepotNom }}</span>
-            @if (m.entrepotLieNom) {
-              <div class="text-400 text-xs">→ {{ m.entrepotLieNom }}</div>
-            }
-          </td>
-          <td style="text-align:right">
-            <span class="font-mono font-semibold text-sm"
-              [class.text-green-600]="m.quantite > 0"
-              [class.text-red-500]="m.quantite < 0">
-              {{ m.quantite > 0 ? '+' : '' }}{{ m.quantite | number:'1.0-2' }}
-            </span>
-          </td>
-          <td style="text-align:right">
-            @if (m.coutUnitaireSnapshot != null) {
-              <span class="font-mono text-sm text-500">
-                {{ m.coutUnitaireSnapshot | currency:'EUR':'symbol':'1.2-2' }}
-              </span>
-            } @else {
-              <span class="text-400 text-sm">—</span>
-            }
-          </td>
-          <td>
-            <div class="flex flex-column gap-1">
-              @if (m.referenceId) {
-                <span class="text-xs font-mono text-700 bg-gray-100 px-1 border-round">
-                  {{ m.referenceId }}
-                </span>
-              }
-              @if (m.numeroLot) {
-                <span class="text-400 text-xs">{{ 'historique_produit.lot' | transloco }} : {{ m.numeroLot }}</span>
-              }
-              @if (m.notes) {
-                <span class="text-400 text-xs">{{ m.notes }}</span>
-              }
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+  <p-table
+    [value]="mouvements"
+    [loading]="loading"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="pageSize"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalElements"
+    (onLazyLoad)="onLazyLoad($event)"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+    [showGridlines]="true"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:140px">Date</th>
+        <th style="width:160px">Type</th>
+        <th style="width:130px">Entrepôt</th>
+        <th style="width:100px; text-align:right">Quantité</th>
+        <th style="width:110px; text-align:right">Coût unit.</th>
+        <th>Référence / Notes</th>
+      </tr>
+    </ng-template>
 
-    <!-- Pagination simple -->
-    @if (totalElements > pageSize) {
-      <div class="flex justify-content-center mt-3">
-        <p-paginator
-          [rows]="pageSize"
-          [totalRecords]="totalElements"
-          [first]="page * pageSize"
-          (onPageChange)="onPageChange($event)"
-        />
-      </div>
-    }
-  }
+    <ng-template pTemplate="body" let-m>
+      <tr>
+        <td>
+          <span class="text-xs text-500">{{ m.createdAt | date:'dd/MM/yy HH:mm' }}</span>
+        </td>
+        <td>
+          <span class="inline-flex align-items-center gap-1">
+            <i class="text-xs" [ngClass]="getTypeIcon(m.typeMouvement)"></i>
+            <span class="text-sm" [class]="getTypeCss(m.typeMouvement)">
+              {{ getTypeLabel(m.typeMouvement) }}
+            </span>
+          </span>
+        </td>
+        <td>
+          <span class="text-sm text-700">{{ m.entrepotNom ?? '—' }}</span>
+          @if (m.entrepotLieNom) {
+            <div class="text-400 text-xs">→ {{ m.entrepotLieNom }}</div>
+          }
+        </td>
+        <td style="text-align:right">
+          <span class="font-mono font-semibold text-sm"
+            [class.text-green-600]="m.quantite > 0"
+            [class.text-red-500]="m.quantite < 0">
+            {{ m.quantite > 0 ? '+' : '' }}{{ m.quantite | number:'1.0-2' }}
+          </span>
+        </td>
+        <td style="text-align:right">
+          @if (m.coutUnitaireSnapshot != null) {
+            <span class="font-mono text-sm text-500">
+              {{ m.coutUnitaireSnapshot | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
+          } @else {
+            <span class="text-400 text-sm">—</span>
+          }
+        </td>
+        <td>
+          <div class="flex flex-column gap-1">
+            @if (m.numeroLot) {
+              <span class="text-400 text-xs">Lot : {{ m.numeroLot }}</span>
+            }
+            @if (m.notes) {
+              <span class="text-400 text-xs">{{ m.notes }}</span>
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center py-6 text-400">
+          <i class="pi pi-history text-4xl mb-3 block opacity-30"></i>
+          Aucun mouvement
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 
   <ng-template pTemplate="footer">
-    <p-button [label]="'common.close' | transloco" severity="secondary" (onClick)="onHide()" />
+    <p-button label="Fermer" severity="secondary" (onClick)="onHide()" />
   </ng-template>
-
 </p-dialog>

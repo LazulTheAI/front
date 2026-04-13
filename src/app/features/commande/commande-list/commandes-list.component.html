@@ -232,6 +232,12 @@
               [rounded]="true" size="small"
               [pTooltip]="'commandes.voir_detail' | transloco"
               (onClick)="openDetail(c)" />
+            @if (c.statut === 'BROUILLON' || c.statut === 'CONFIRMEE') {
+              <p-button icon="pi pi-box" severity="secondary" [text]="true"
+                [rounded]="true" size="small"
+                pTooltip="Modifier les lots"
+                (onClick)="openChangerLot(c, $event)" />
+            }
             @if (getNextStatut(c.statut!) && c.source === 'B2B_MANUEL') {
               <p-button icon="pi pi-arrow-right" severity="info" [text]="true"
                 [rounded]="true" size="small"
@@ -265,4 +271,10 @@
   [(visible)]="showDetailDialog"
   [commande]="selectedCommande"
   (closed)="onDetailClosed()"
+/>
+
+<app-commande-changer-lot-dialog
+  [(visible)]="showChangerLotDialog"
+  [commande]="selectedCommande"
+  (saved)="onFormSaved()"
 />

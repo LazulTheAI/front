@@ -18,6 +18,7 @@ import { Tooltip } from 'primeng/tooltip';
 
 import { CommandeControllerService, CommandeResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
+import { CommandeChangerLotDialogComponent } from '../commande-changer-lot-dialog/commande-changer-lot-dialog.component';
 import { CommandeDetailDialogComponent } from '../commande-detail-dialog/commande-detail-dialog.component';
 import { CommandeFormDialogComponent } from '../commande-form-dialog/commande-form-dialog.component';
 
@@ -30,7 +31,25 @@ interface SelectOption {
     selector: 'app-commandes-list',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, TranslocoModule, FormsModule, TableModule, Button, Tag, Toast, Toolbar, ConfirmDialog, Select, IconField, InputIcon, InputText, Tooltip, CommandeFormDialogComponent, CommandeDetailDialogComponent],
+    imports: [
+        CommonModule,
+        TranslocoModule,
+        FormsModule,
+        TableModule,
+        Button,
+        Tag,
+        Toast,
+        Toolbar,
+        ConfirmDialog,
+        CommandeChangerLotDialogComponent,
+        Select,
+        IconField,
+        InputIcon,
+        InputText,
+        Tooltip,
+        CommandeFormDialogComponent,
+        CommandeDetailDialogComponent
+    ],
     providers: [MessageService, ConfirmationService],
     templateUrl: './commandes-list.component.html'
 })
@@ -61,6 +80,7 @@ export class CommandesListComponent implements OnInit, OnDestroy {
     private searchSubject = new Subject<void>();
     private destroy$ = new Subject<void>();
 
+    showChangerLotDialog = false;
     constructor(
         @Inject(CommandeControllerService)
         private commandeService: CommandeControllerService,
@@ -104,6 +124,12 @@ export class CommandesListComponent implements OnInit, OnDestroy {
         });
 
         this.loadCommandes();
+    }
+
+    openChangerLot(c: CommandeResponse, event: Event) {
+        event.stopPropagation();
+        this.selectedCommande = c;
+        this.showChangerLotDialog = true;
     }
 
     ngOnDestroy(): void {
