@@ -14,6 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { BonCommandeControllerService, BonCommandeResponse, EntrepotControllerService, EntrepotResponse, LigneCommandeFournisseurResponse, ReceptionControllerService, ReceptionRequest } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 import { DatePickerModule } from 'primeng/datepicker';
 
@@ -44,6 +45,7 @@ export class BonCommandeDetailComponent implements OnChanges {
 
     bon: BonCommandeResponse | null = null;
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     // Mode réception
     modeReception = false;

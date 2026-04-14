@@ -23,6 +23,7 @@ import { Tooltip } from 'primeng/tooltip';
 
 // Services & modèles OpenAPI
 import { EntrepotControllerService, EntrepotResponse, MateriauControllerService, MateriauResponse, PageMateriauResponse, StockParEntrepot } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 
 // Dialogs
 import { TranslocoModule } from '@jsverse/transloco';
@@ -106,6 +107,7 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
     lignes: LigneStockMateriau[] = [];
     lignesFiltrees: LigneStockMateriau[] = [];
     entrepots: EntrepotResponse[] = [];
+    protected readonly appCurrency = APP_CURRENCY;
 
     entrepotOptions: SelectOption[] = [];
     readonly statutOptions: SelectOption[] = [

@@ -14,6 +14,7 @@ import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 
 import { EntrepotControllerService, EntrepotResponse, LancerRunRequest, ProductionControllerService, ProduitControllerService, ProduitResponse, RecetteControllerService, RecetteResponse, ResultatProductionResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { HttpEventType } from '@angular/common/http';
 
 interface SelectOption {
@@ -32,6 +33,7 @@ export class LancerRunDialogComponent implements OnChanges, OnInit {
     @Output() visibleChange = new EventEmitter<boolean>();
     @Output() saved = new EventEmitter<{ success: boolean; message: string }>();
 
+    protected readonly appCurrency = APP_CURRENCY;
     erreurRun: string | null = null;
     showConfirmPlanifier = false;
     private lastReq: LancerRunRequest | null = null;

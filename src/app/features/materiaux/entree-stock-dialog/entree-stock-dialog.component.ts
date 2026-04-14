@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { EntreeStockRequest, EntrepotControllerService, EntrepotResponse, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY, APP_CURRENCY_LOCALE } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -29,6 +30,8 @@ export class EntreeStockDialogComponent implements OnChanges, OnInit {
     saving = false;
     entrepots: EntrepotResponse[] = [];
     today = new Date();
+    protected readonly appCurrency = APP_CURRENCY;
+    protected readonly appCurrencyLocale = APP_CURRENCY_LOCALE;
 
     form = {
         quantite: null as number | null,
@@ -95,6 +98,7 @@ export class EntreeStockDialogComponent implements OnChanges, OnInit {
                     success: true,
                     message: `Entrée de ${this.form.quantite} ${this.materiau?.unite} enregistrée`
                 });
+                this.onHide();
             },
             error: () => {
                 this.saving = false;

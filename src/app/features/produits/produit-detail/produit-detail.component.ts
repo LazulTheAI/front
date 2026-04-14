@@ -16,6 +16,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ProductionControllerService, ProduitControllerService, ProduitResponse, RunProductionResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TabsModule } from 'primeng/tabs';
 
 @Component({
@@ -35,6 +36,7 @@ export class ProduitDetailComponent implements OnChanges {
     productions: any[] = [];
     loadingDetail = false;
     loadingProductions = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     constructor(
         private produitService: ProduitControllerService,

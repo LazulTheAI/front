@@ -17,6 +17,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 
 import { RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY, APP_CURRENCY_LOCALE } from '@/app/core/currency.config';
 
 import { AuthApiService } from '@/app/auth/services/api/auth.service';
 import { AvatarModule } from 'primeng/avatar';
@@ -36,6 +37,8 @@ export class RevendeursListComponent implements OnInit, OnDestroy {
     revendeurs: RevendeurResponse[] = [];
     totalRecords = 0;
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
+    protected readonly appCurrencyLocale = APP_CURRENCY_LOCALE;
 
     page = 0;
     size = 20;

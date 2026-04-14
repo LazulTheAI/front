@@ -14,6 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { IngredientResponse, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 import { IngredientLine } from '../ingredients-editor/ingredients-editor.component';
 import { IngredientsEnAlertePipe } from '../recette.pipes';
@@ -34,6 +35,7 @@ export class RecetteDetailComponent implements OnChanges {
 
     recette: RecetteResponse | null = null;
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     // Edit ingrédients
     editingIngredients = false;

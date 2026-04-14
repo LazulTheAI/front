@@ -90,7 +90,7 @@
         <td class="text-right">
           @if (produit.prixCents != null) {
             <span class="text-sm font-mono text-900">
-              {{ produit.prixCents / 100 | currency:'EUR':'symbol':'1.2-2' }}
+              {{ produit.prixCents / 100 | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           } @else {
             <span class="text-400">—</span>

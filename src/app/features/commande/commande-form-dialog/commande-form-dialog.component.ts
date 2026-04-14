@@ -1,4 +1,5 @@
 import { CommandeControllerService, LotDisponibleResponse, ProduitControllerService, RevendeurControllerService } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -52,6 +53,7 @@ export class CommandeFormDialogComponent implements OnInit {
     selectedRevendeur: { remiseGlobale?: number } | null = null;
     today = new Date();
     saving = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     constructor(
         private commandeService: CommandeControllerService,

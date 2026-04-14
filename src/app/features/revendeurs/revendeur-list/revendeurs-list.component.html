@@ -108,7 +108,7 @@
         <!-- CA mois précédent + évolution -->
         <td class="text-right">
           @if (r.caMoisPrecedent != null) {
-            <div>{{ r.caMoisPrecedent | currency:'EUR':'symbol':'1.2-2':'fr' }}</div>
+            <div>{{ r.caMoisPrecedent | currency:appCurrency:'symbol':'1.2-2':appCurrencyLocale }}</div>
             @if (r.caMoisCourant != null && r.caMoisPrecedent > 0) {
               <div class="text-xs mt-1" [ngClass]="{
                 'text-green-500': r.caMoisCourant >= r.caMoisPrecedent,
@@ -134,7 +134,7 @@
         <!-- CA année courante -->
         <td class="text-right">
           @if (r.caAnneeCourante != null) {
-            <span class="text-700">{{ r.caAnneeCourante | currency:'EUR':'symbol':'1.2-2':'fr' }}</span>
+            <span class="text-700">{{ r.caAnneeCourante | currency:appCurrency:'symbol':'1.2-2':appCurrencyLocale }}</span>
           } @else {
             <span class="text-400">—</span>
           }
@@ -143,7 +143,7 @@
         <!-- Panier moyen -->
         <td class="text-right">
           @if (r.panierMoyen != null) {
-            <span class="text-700">{{ r.panierMoyen | currency:'EUR':'symbol':'1.2-2':'fr' }}</span>
+            <span class="text-700">{{ r.panierMoyen | currency:appCurrency:'symbol':'1.2-2':appCurrencyLocale }}</span>
           } @else {
             <span class="text-400">—</span>
           }

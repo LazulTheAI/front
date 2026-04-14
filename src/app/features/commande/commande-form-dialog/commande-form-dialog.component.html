@@ -12,7 +12,7 @@
     <div class="grid">
       <div class="col-6 flex flex-column gap-1">
         <label class="text-sm font-medium text-700">
-          {{ 'commande_form.revendeur' | transloco }} <span class="text-red-400">*</span>
+          {{ 'commande_form.revendeur' | transloco }} <span class="text-red-500">*</span>
         </label>
         <p-select [(ngModel)]="form.revendeurId" [options]="revendeurOptions"
           optionLabel="label" optionValue="value"
@@ -146,7 +146,7 @@
             <span class="font-semibold text-900">
               {{ ((ligne.prixUnitaireCents / 100) * ligne.quantite *
                 (ligne.remise ? (1 - ligne.remise / 100) : 1))
-                | currency:'EUR':'symbol':'1.2-2' }}
+                | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           </div>
         }
@@ -159,18 +159,18 @@
         <div class="surface-100 border-round px-4 py-2 flex flex-column gap-1" style="min-width:220px">
           <div class="flex justify-content-between text-sm text-500">
             <span>Sous-total</span>
-            <span>{{ sousTotal | currency:'EUR':'symbol':'1.2-2' }}</span>
+            <span>{{ sousTotal | currency:appCurrency:'symbol':'1.2-2' }}</span>
           </div>
           @if (form.remise) {
             <div class="flex justify-content-between text-sm text-orange-500">
               <span>Remise ({{ form.remise }}%)</span>
-              <span>- {{ sousTotal * form.remise / 100 | currency:'EUR':'symbol':'1.2-2' }}</span>
+              <span>- {{ sousTotal * form.remise / 100 | currency:appCurrency:'symbol':'1.2-2' }}</span>
             </div>
           }
           <p-divider styleClass="my-1" />
           <div class="flex justify-content-between">
             <span class="font-semibold text-900">Total HT</span>
-            <span class="font-bold text-xl text-primary">{{ totalHT | currency:'EUR':'symbol':'1.2-2' }}</span>
+            <span class="font-bold text-xl text-primary">{{ totalHT | currency:appCurrency:'symbol':'1.2-2' }}</span>
           </div>
         </div>
       </div>

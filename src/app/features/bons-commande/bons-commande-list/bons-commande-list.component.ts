@@ -15,6 +15,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { BonCommandeControllerService, BonCommandeResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
@@ -35,6 +36,7 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
     bons: BonCommandeResponse[] = [];
     totalRecords = 0;
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     // Pagination & tri
     page = 0;

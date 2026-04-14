@@ -17,7 +17,7 @@
         <p-select
           inputId="fourn" name="fournisseurId"
           [(ngModel)]="form.fournisseurId"
-          required
+          [required]="true"
           [options]="fournisseurOptions"
           optionLabel="label" optionValue="value"
           [placeholder]="'bon_form.selectionner_fournisseur' | transloco"
@@ -133,7 +133,7 @@
           <p-inputNumber
             [name]="'prix_' + i"
             [(ngModel)]="ligne.prixUnitaireCents"
-            mode="currency" currency="EUR" locale="fr-FR"
+            mode="currency" [currency]="appCurrency" [locale]="appCurrencyLocale"
             [minFractionDigits]="2" [maxFractionDigits]="4"
             [min]="0"
             [style]="{'width':'100%'}"
@@ -154,7 +154,7 @@
           <div class="text-right text-xs text-500 mt-2">
             {{ 'bon_form.sous_total' | transloco }} :
             <span class="font-semibold text-900">
-              {{ (ligne.prixUnitaireCents * ligne.quantiteCommandee) | currency:'EUR':'symbol':'1.2-2' }}
+              {{ (ligne.prixUnitaireCents * ligne.quantiteCommandee) | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           </div>
         }
@@ -176,7 +176,7 @@
       <div class="flex justify-content-end">
         <div class="surface-100 border-round px-4 py-2 flex align-items-center gap-3">
           <span class="text-500 text-sm">{{ 'bon_form.total_estime' | transloco }} :</span>
-          <span class="font-bold text-900 text-lg">{{ totalEstime | currency:'EUR':'symbol':'1.2-2' }}</span>
+          <span class="font-bold text-900 text-lg">{{ totalEstime | currency:appCurrency:'symbol':'1.2-2' }}</span>
         </div>
       </div>
     }
@@ -201,7 +201,7 @@
       [label]="'bon_form.creer_bon' | transloco"
       icon="pi pi-check"
       [loading]="saving"
-      [disabled]="lignes.length === 0"
+      [disabled]="ngForm.invalid || !lignesValides"
       (onClick)="submit(ngForm)"
     />
   </ng-template>

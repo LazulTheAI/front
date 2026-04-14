@@ -5,5 +5,7 @@
 
 export const environment = {
     production: true,
-    apiUrl: 'https://makerstocks.com'
+    apiUrl: 'https://makerstocks.com',
+    currency: 'EUR',
+    currencyLocale: 'fr-FR'
 };

@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { TranslocoModule } from '@jsverse/transloco';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
@@ -59,6 +60,7 @@ export class ProduitLotsComponent implements OnInit, OnDestroy {
     lots: LotResponse[] = [];
     lotsFiltres: LotResponse[] = [];
     loading = true;
+    protected readonly appCurrency = APP_CURRENCY;
     produitId!: number;
 
     entrepots: EntrepotResponse[] = [];

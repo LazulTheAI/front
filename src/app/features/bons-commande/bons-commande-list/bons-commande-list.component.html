@@ -133,7 +133,7 @@
         <td class="text-right">
           @if (getTotalBC(bon) > 0) {
             <span class="font-semibold text-900 font-mono text-sm">
-              {{ getTotalBC(bon) | currency:'EUR':'symbol':'1.2-2' }}
+              {{ getTotalBC(bon) | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           } @else {
             <span class="text-400">—</span>

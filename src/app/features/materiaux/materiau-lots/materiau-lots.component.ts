@@ -16,6 +16,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 
 import { EntrepotControllerService, EntrepotResponse, LotResponse, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { DegreverLotDialogComponent } from '../degrever-lot-dialog/degrever-lot-dialog.component';
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
 import { TransfererLotDialogComponent } from '../transferer-lot-dialog/transferer-lot-dialog.component';
@@ -38,6 +39,7 @@ export class MateriauLotsComponent implements OnInit, OnDestroy {
     lots: LotResponse[] = [];
     lotsFiltres: LotResponse[] = [];
     loading = true;
+    protected readonly appCurrency = APP_CURRENCY;
     materiauId!: number;
 
     // Filtre entrepôt

@@ -102,7 +102,7 @@
         <td>
           @if (r.coutTheorique != null && r.coutTheorique > 0) {
             <span class="font-semibold text-900">
-              {{ r.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
+              {{ r.coutTheorique | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
             <div class="text-400 text-xs">/ batch</div>
           } @else {

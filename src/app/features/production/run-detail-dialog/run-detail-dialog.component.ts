@@ -16,6 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { LotConsommeResponse, ProductionControllerService, ReportControllerService, RunProductionResponse } from '@/app/modules/openapi';
 import { environment } from '@/environments/environment';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { HttpClient } from '@angular/common/http';
 
 interface LotParMateriau {
@@ -41,6 +42,7 @@ export class RunDetailDialogComponent implements OnChanges {
 
     run: RunProductionResponse | null = null;
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
     exportingCsv = false;
     activeTab: string = '1';
     constructor(

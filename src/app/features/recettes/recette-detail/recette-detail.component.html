@@ -37,7 +37,7 @@
         <div class="surface-50 border-round p-3 text-center">
           <div class="text-400 text-xs font-medium mb-1">{{ 'recette_detail.cout_theorique' | transloco }}</div>
           <div class="font-bold text-primary">
-            {{ recette.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
+            {{ recette.coutTheorique | currency:appCurrency:'symbol':'1.2-2' }}
           </div>
           <div class="text-500 text-xs">/ batch</div>
         </div>
@@ -113,7 +113,7 @@
                 </td>
                 <td class="text-right">
                   @if (ing.coutLigne != null) {
-                    <span class="font-mono text-sm">{{ ing.coutLigne | currency:'EUR':'symbol':'1.2-4' }}</span>
+                    <span class="font-mono text-sm">{{ ing.coutLigne | currency:appCurrency:'symbol':'1.2-4' }}</span>
                   } @else {
                     <span class="text-400">—</span>
                   }
@@ -131,7 +131,7 @@
               <tr>
                 <td colspan="3" class="text-right font-medium text-500">{{ 'recette_detail.total_cout_theorique' | transloco }}</td>
                 <td class="text-right font-bold text-900">
-                  {{ recette.coutTheorique | currency:'EUR':'symbol':'1.2-2' }}
+                  {{ recette.coutTheorique | currency:appCurrency:'symbol':'1.2-2' }}
                 </td>
                 <td></td>
               </tr>

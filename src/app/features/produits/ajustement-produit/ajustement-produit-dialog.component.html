@@ -17,7 +17,7 @@
 
     <!-- Entrepôt -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">{{ 'common.warehouse' | transloco }} <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'common.warehouse' | transloco }} <span class="text-red-500">*</span></label>
       <p-select
         name="entrepotId"
         [(ngModel)]="form.entrepotId"
@@ -38,7 +38,7 @@
 
     <!-- Direction -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">{{ 'ajustement_produit.direction' | transloco }} <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'ajustement_produit.direction' | transloco }} <span class="text-red-500">*</span></label>
       <p-selectbutton
         name="direction"
         [(ngModel)]="form.direction"
@@ -50,7 +50,7 @@
 
     <!-- Quantité -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">{{ 'common.quantity' | transloco }} <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'common.quantity' | transloco }} <span class="text-red-500">*</span></label>
       <p-inputNumber
         name="quantite"
         [(ngModel)]="form.quantite"
@@ -62,7 +62,7 @@
         styleClass="w-full"
       />
       @if (form.direction === 'negatif' && stockEntrepot !== null && form.quantite && form.quantite > stockEntrepot) {
-        <small class="text-red-400">
+        <small class="text-red-500">
           {{ 'ajustement_produit.insufficient' | transloco }} : {{ stockEntrepot | number:'1.0-2' }}
         </small>
       }

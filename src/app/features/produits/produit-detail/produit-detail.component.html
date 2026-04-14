@@ -75,7 +75,7 @@
             <label class="text-400 text-xs font-semibold uppercase tracking-widest block mb-1">{{ 'produit_detail.sale_price' | transloco }}</label>
             @if ((produitDetail ?? produit)?.prixCents != null) {
               <span class="text-900 text-xl font-semibold">
-                {{ ((produitDetail ?? produit)!.prixCents! / 100) | currency:'EUR':'symbol':'1.2-2' }}
+                {{ ((produitDetail ?? produit)!.prixCents! / 100) | currency:appCurrency:'symbol':'1.2-2' }}
               </span>
             } @else {
               <span class="text-400">—</span>

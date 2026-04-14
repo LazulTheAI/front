@@ -22,6 +22,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ProduitControllerService, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { Router } from '@angular/router';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { IconField } from 'primeng/iconfield';
@@ -84,6 +85,7 @@ export class ProduitsListComponent implements OnInit {
     produits: ProduitResponse[] = [];
     totalRecords = 0;
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     page = 0;
     size = 20;

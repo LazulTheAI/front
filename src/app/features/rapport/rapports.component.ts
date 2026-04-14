@@ -15,6 +15,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { AlerteControllerService, AlerteResponse, ConsommationMateriauResponse, RapportConsommationResponse, ReportControllerService } from '@/app/modules/openapi';
 import { environment } from '@/environments/environment';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { HttpClient } from '@angular/common/http';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TranslocoModule } from '@jsverse/transloco';
@@ -69,6 +70,7 @@ export class RapportsComponent implements OnInit {
     periodeSelectionnee = 30;
 
     loadingValeur = false;
+    protected readonly appCurrency = APP_CURRENCY;
     loadingConso = false;
     loadingMouvements = false;
     loadingAlertes = false;

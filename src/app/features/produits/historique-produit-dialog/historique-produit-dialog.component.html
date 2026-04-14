@@ -79,7 +79,7 @@
         <td style="text-align:right">
           @if (m.coutUnitaireSnapshot != null) {
             <span class="font-mono text-sm text-500">
-              {{ m.coutUnitaireSnapshot | currency:'EUR':'symbol':'1.2-2' }}
+              {{ m.coutUnitaireSnapshot | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           } @else {
             <span class="text-400 text-sm">—</span>

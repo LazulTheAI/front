@@ -1,4 +1,5 @@
 import { EntrepotControllerService, EntrepotResponse, MateriauControllerService, MateriauResponse, MouvementStockResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -27,6 +28,7 @@ export class HistoriqueDialogComponent implements OnChanges {
 
     loading = false;
     mouvements: MouvementStockResponse[] = [];
+    protected readonly appCurrency = APP_CURRENCY;
     entrepots: EntrepotResponse[] = [];
     totalMouvements = 0;
 

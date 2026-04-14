@@ -61,8 +61,8 @@
         name="coutUnitaire"
         [(ngModel)]="form.coutUnitaire"
         mode="currency"
-        currency="EUR"
-        locale="fr-FR"
+        [currency]="appCurrency"
+        [locale]="appCurrencyLocale"
         [minFractionDigits]="2"
         [maxFractionDigits]="4"
         [min]="0"
@@ -152,6 +152,7 @@
       icon="pi pi-arrow-down"
       severity="success"
       [loading]="saving"
+      [disabled]="ngForm.invalid"
       (onClick)="submit(ngForm)"
     />
   </ng-template>

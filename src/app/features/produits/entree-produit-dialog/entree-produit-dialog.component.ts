@@ -11,6 +11,7 @@ import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 
 import { EntrepotControllerService, EntrepotResponse, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
+import { APP_CURRENCY, APP_CURRENCY_LOCALE } from '@/app/core/currency.config';
 import { EntreeManuelleRequest } from '@/app/modules/openapi/model/entree-manuelle-request';
 import { DialogModule } from 'primeng/dialog';
 
@@ -36,6 +37,8 @@ export class EntreeProduitDialogComponent implements OnInit, OnChanges {
     entrepots: EntrepotResponse[] = [];
     today = new Date();
     dialogHeader = '';
+    protected readonly appCurrency = APP_CURRENCY;
+    protected readonly appCurrencyLocale = APP_CURRENCY_LOCALE;
 
     form = {
         entrepotId: null as number | null,

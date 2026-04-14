@@ -108,10 +108,10 @@
         <div>
           <span class="text-500 text-sm">{{ 'planifier_run.theoretical_cost' | transloco }} : </span>
           <span class="font-semibold text-900">
-            {{ (selectedRecette!.coutTheorique! * form.batches) | currency:'EUR':'symbol':'1.2-2' }}
+            {{ (selectedRecette!.coutTheorique! * form.batches) | currency:appCurrency:'symbol':'1.2-2' }}
           </span>
           <span class="text-400 text-xs ml-1">
-            ({{ selectedRecette!.coutTheorique! | currency:'EUR':'symbol':'1.2-2' }} × {{ form.batches }} batch)
+            ({{ selectedRecette!.coutTheorique! | currency:appCurrency:'symbol':'1.2-2' }} × {{ form.batches }} batch)
           </span>
         </div>
       </div>
@@ -156,6 +156,7 @@
       severity="secondary"
       [outlined]="true"
       [loading]="saving"
+      [disabled]="ngForm.invalid"
       (onClick)="submit(ngForm)"
     />
   </ng-template>

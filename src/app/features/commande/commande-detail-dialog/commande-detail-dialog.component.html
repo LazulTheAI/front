@@ -119,7 +119,7 @@
           <td class="text-right font-mono">{{ ligne.quantite | number:'1.0-2' }}</td>
           <td class="text-right font-mono">
             @if (ligne.prixUnitaireCents != null) {
-              {{ ligne.prixUnitaireCents / 100 | currency:'EUR':'symbol':'1.2-2' }}
+              {{ ligne.prixUnitaireCents / 100 | currency:appCurrency:'symbol':'1.2-2' }}
             } @else {
               <span class="text-400">—</span>
             }
@@ -133,7 +133,7 @@
           </td>
           <td class="text-right font-semibold">
             @if (ligne.prixUnitaireCents != null) {
-              {{ (ligne.prixUnitaireCents / 100) * ligne.quantite * (ligne.remise ? (1 - ligne.remise / 100) : 1) | currency:'EUR':'symbol':'1.2-2' }}
+              {{ (ligne.prixUnitaireCents / 100) * ligne.quantite * (ligne.remise ? (1 - ligne.remise / 100) : 1) | currency:appCurrency:'symbol':'1.2-2' }}
             } @else {
               <span class="text-400">—</span>
             }
@@ -154,7 +154,7 @@
         <div class="flex justify-content-between gap-4">
           <span class="font-semibold text-700">{{ 'commande_detail.total_ht' | transloco }}</span>
           <span class="font-bold text-xl text-primary">
-            {{ commande.totalHT | currency:'EUR':'symbol':'1.2-2' }}
+            {{ commande.totalHT | currency:appCurrency:'symbol':'1.2-2' }}
           </span>
         </div>
       </div>

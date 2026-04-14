@@ -12,7 +12,7 @@
 
     <!-- Entrepôt -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">{{ 'common.warehouse' | transloco }} <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'common.warehouse' | transloco }} <span class="text-red-500">*</span></label>
       <p-select
         name="entrepotId"
         [(ngModel)]="form.entrepotId"
@@ -27,7 +27,7 @@
 
     <!-- Quantité -->
     <div class="flex flex-column gap-1">
-      <label class="text-sm font-medium text-700">{{ 'common.quantity' | transloco }} <span class="text-red-400">*</span></label>
+      <label class="text-sm font-medium text-700">{{ 'common.quantity' | transloco }} <span class="text-red-500">*</span></label>
       <p-inputNumber
         name="quantite"
         [(ngModel)]="form.quantite"
@@ -50,8 +50,8 @@
         [minFractionDigits]="2"
         [maxFractionDigits]="4"
         mode="currency"
-        currency="EUR"
-        locale="fr-FR"
+        [currency]="appCurrency"
+        [locale]="appCurrencyLocale"
         placeholder="0,00 €"
         styleClass="w-full"
       />

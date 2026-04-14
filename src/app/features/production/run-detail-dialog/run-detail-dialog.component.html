@@ -57,7 +57,7 @@
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
           <div class="text-400 text-xs font-medium mb-2">{{ 'run_detail.cogs_total' | transloco }}</div>
           @if (cogsTotal > 0) {
-            <div class="font-bold text-2xl text-primary">{{ cogsTotal | currency:'EUR':'symbol':'1.2-2' }}</div>
+            <div class="font-bold text-2xl text-primary">{{ cogsTotal | currency:appCurrency:'symbol':'1.2-2' }}</div>
           } @else {
             <div class="font-bold text-2xl text-400">—</div>
           }
@@ -67,7 +67,7 @@
         <div class="surface-card border-round-xl p-3 text-center border-1 surface-border">
           <div class="text-400 text-xs font-medium mb-2">{{ 'run_detail.cost_per_unit' | transloco }}</div>
           @if (coutParUniteValue > 0) {
-            <div class="font-bold text-2xl text-900">{{ coutParUniteValue | currency:'EUR':'symbol':'1.2-4' }}</div>
+            <div class="font-bold text-2xl text-900">{{ coutParUniteValue | currency:appCurrency:'symbol':'1.2-4' }}</div>
           } @else {
             <div class="font-bold text-2xl text-400">—</div>
           }
@@ -171,7 +171,7 @@
                   </td>
                   <td class="text-right">
                     @if (lot.coutUnitaire) {
-                      <span class="font-mono text-sm">{{ lot.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }}</span>
+                      <span class="font-mono text-sm">{{ lot.coutUnitaire | currency:appCurrency:'symbol':'1.2-4' }}</span>
                     } @else {
                       <span class="text-400">—</span>
                     }
@@ -179,7 +179,7 @@
                   <td class="text-right">
                     @if (lot.coutTotal) {
                       <span class="font-mono text-sm font-semibold text-primary">
-                        {{ lot.coutTotal | currency:'EUR':'symbol':'1.2-4' }}
+                        {{ lot.coutTotal | currency:appCurrency:'symbol':'1.2-4' }}
                       </span>
                     } @else {
                       <span class="text-400">—</span>
@@ -191,7 +191,7 @@
                 <tr>
                   <td colspan="7" class="text-right font-medium text-500">{{ 'run_detail.cogs_total' | transloco }}</td>
                   <td class="text-right font-bold text-900">
-                    {{ getTotalCogs() | currency:'EUR':'symbol':'1.2-2' }}
+                    {{ getTotalCogs() | currency:appCurrency:'symbol':'1.2-2' }}
                   </td>
                 </tr>
               </ng-template>
@@ -229,7 +229,7 @@
                     </div>
                     <div class="text-right">
                       <div class="font-bold text-primary text-lg">
-                        {{ mat.cogsTotaux | currency:'EUR':'symbol':'1.2-2' }}
+                        {{ mat.cogsTotaux | currency:appCurrency:'symbol':'1.2-2' }}
                       </div>
                       <div class="text-400 text-xs">{{ getPctMateriau(mat) }}% du COGS total</div>
                     </div>

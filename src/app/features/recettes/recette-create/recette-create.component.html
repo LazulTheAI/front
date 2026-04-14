@@ -252,7 +252,7 @@
                 <div class="flex align-items-center gap-2 flex-shrink-0">
                   @if (item.coutUnitaire) {
                     <p-tag
-                      [value]="(item.coutUnitaire | currency:'EUR':'symbol':'1.2-2') + '/' + item.unite"
+                      [value]="(item.coutUnitaire | currency:appCurrency:'symbol':'1.2-2') + '/' + item.unite"
                       severity="secondary"
                       styleClass="text-xs"
                     />
@@ -321,7 +321,7 @@
                       }
                       @if (ing.coutUnitaire && ing.quantite) {
                         <span class="text-400 text-xs font-mono">
-                          ≈ {{ ing.coutUnitaire * ing.quantite | currency:'EUR':'symbol':'1.2-2' }}
+                          ≈ {{ ing.coutUnitaire * ing.quantite | currency:appCurrency:'symbol':'1.2-2' }}
                         </span>
                       }
                     </div>
@@ -342,7 +342,7 @@
                         <div>
                           <div class="text-400 text-xs mb-1">{{ 'recette_create.cout_unitaire' | transloco }}</div>
                           <div class="font-semibold text-900">
-                            {{ ing.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }} / {{ ing.unite }}
+                            {{ ing.coutUnitaire | currency:appCurrency:'symbol':'1.2-4' }} / {{ ing.unite }}
                           </div>
                         </div>
                       }
@@ -364,7 +364,7 @@
                       @if (ing.coutUnitaire && ing.quantite) {
                         <small class="text-primary">
                           {{ 'recette_create.cout_estime' | transloco }}
-                          {{ ing.coutUnitaire * ing.quantite | currency:'EUR':'symbol':'1.2-4' }}
+                          {{ ing.coutUnitaire * ing.quantite | currency:appCurrency:'symbol':'1.2-4' }}
                           / batch
                         </small>
                       }
@@ -459,7 +459,7 @@
                     </span>
                     @if (ing.coutUnitaire && ing.quantite) {
                       <span class="text-400 text-xs font-mono">
-                        {{ ing.coutUnitaire * ing.quantite | currency:'EUR':'symbol':'1.2-2' }}
+                        {{ ing.coutUnitaire * ing.quantite | currency:appCurrency:'symbol':'1.2-2' }}
                       </span>
                     }
                   </div>
@@ -473,11 +473,11 @@
             <div>
               <div class="text-primary-700 font-semibold">{{ 'recette_create.cout_theorique_batch' | transloco }}</div>
               <div class="text-primary-500 text-xs mt-1">
-                {{ 'recette_create.soit' | transloco }} {{ coutParUnite | currency:'EUR':'symbol':'1.2-4' }} / {{ meta.uniteProduite || ('recette_create.unite_default' | transloco) }}
+                {{ 'recette_create.soit' | transloco }} {{ coutParUnite | currency:appCurrency:'symbol':'1.2-4' }} / {{ meta.uniteProduite || ('recette_create.unite_default' | transloco) }}
               </div>
             </div>
             <span class="font-bold text-primary text-2xl">
-              {{ coutTheoriqueTotal | currency:'EUR':'symbol':'1.2-2' }}
+              {{ coutTheoriqueTotal | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           </div>
 
@@ -523,11 +523,11 @@
       <div>
         <div class="text-400 text-xs font-semibold uppercase mb-1">{{ 'recette_create.cout_estime_batch' | transloco }}</div>
         <div class="text-3xl font-bold text-primary">
-          {{ coutTheoriqueTotal | currency:'EUR':'symbol':'1.2-2' }}
+          {{ coutTheoriqueTotal | currency:appCurrency:'symbol':'1.2-2' }}
         </div>
         @if (meta.quantiteProduite && meta.uniteProduite) {
           <div class="text-400 text-xs mt-1">
-            = {{ coutParUnite | currency:'EUR':'symbol':'1.2-4' }} / {{ meta.uniteProduite }}
+            = {{ coutParUnite | currency:appCurrency:'symbol':'1.2-4' }} / {{ meta.uniteProduite }}
           </div>
         }
       </div>
@@ -544,7 +544,7 @@
             <span class="text-900 text-sm">{{ ing.materiauNom }}</span>
             @if (ing.coutUnitaire && ing.quantite) {
               <span class="text-xs font-mono text-primary font-semibold">
-                {{ ing.coutUnitaire * ing.quantite | currency:'EUR':'symbol':'1.2-2' }}
+                {{ ing.coutUnitaire * ing.quantite | currency:appCurrency:'symbol':'1.2-2' }}
               </span>
             } @else {
               <span class="text-300 text-xs">—</span>

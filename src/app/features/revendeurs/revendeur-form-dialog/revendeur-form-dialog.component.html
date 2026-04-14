@@ -3,7 +3,7 @@
             <form #f="ngForm" class="flex flex-column gap-4 pt-2">
                 <div class="grid">
                     <div class="col-12 flex flex-column gap-1">
-                        <label class="text-sm font-medium text-700">{{ 'revendeur_form.company_name' | transloco }} <span class="text-red-400">*</span></label>
+                        <label class="text-sm font-medium text-700">{{ 'revendeur_form.company_name' | transloco }} <span class="text-red-500">*</span></label>
                         <input pInputText name="nom" [(ngModel)]="form.nom" required [placeholder]="'revendeur_form.company_placeholder' | transloco" class="w-full" />
                     </div>
                 </div>

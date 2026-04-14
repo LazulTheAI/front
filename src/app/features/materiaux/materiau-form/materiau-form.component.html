@@ -70,8 +70,8 @@
         name="coutUnitaire"
         [(ngModel)]="form.coutUnitaire"
         mode="currency"
-        currency="EUR"
-        locale="fr-FR"
+        [currency]="appCurrency"
+        [locale]="appCurrencyLocale"
         [minFractionDigits]="2"
         [maxFractionDigits]="4"
         [min]="0"
@@ -123,6 +123,7 @@
       [label]="isEdit ? ('common.save' | transloco) : ('common.create' | transloco)"
       icon="pi pi-check"
       [loading]="saving"
+      [disabled]="ngForm.invalid"
       (onClick)="submit(ngForm)"
     />
   </ng-template>

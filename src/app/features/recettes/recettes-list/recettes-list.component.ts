@@ -14,6 +14,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { LierProduitRecetteDialogComponent } from '../lier-produit-recette-dialog/lier-produit-recette-dialog.component';
@@ -48,6 +49,7 @@ import { RecetteFormComponent } from '../recette-form/recette-form.component';
 export class RecettesListComponent implements OnInit {
     recettes: RecetteResponse[] = [];
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
     inclureArchives = false;
 
     showFormDialog = false;

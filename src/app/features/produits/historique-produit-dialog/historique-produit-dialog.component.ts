@@ -10,6 +10,7 @@ import { Skeleton } from 'primeng/skeleton';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 import { EntrepotControllerService, EntrepotResponse, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { MouvementStockProduitResponse } from '@/app/modules/openapi/model/mouvement-stock-produit-response';
 import { DialogModule } from 'primeng/dialog';
 
@@ -43,6 +44,7 @@ export class HistoriqueProduitDialogComponent implements OnChanges, OnInit {
     @Input() produit: ProduitResponse | null = null;
 
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
     mouvements: MouvementStockProduitResponse[] = [];
     entrepots: EntrepotResponse[] = [];
 

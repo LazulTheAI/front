@@ -110,7 +110,7 @@
           <i class="pi pi-calculator text-primary"></i>
           <span class="text-500 text-sm">{{ 'lancer_run.estimated_cost' | transloco }} : </span>
           <span class="font-semibold text-900">
-            {{ (selectedRecette!.coutTheorique! * form.batches) | currency:'EUR':'symbol':'1.2-2' }}
+            {{ (selectedRecette!.coutTheorique! * form.batches) | currency:appCurrency:'symbol':'1.2-2' }}
           </span>
         </div>
       }
@@ -206,7 +206,7 @@
           <div class="surface-card border-round p-3 text-center border-1 surface-border">
             <div class="text-400 text-xs font-medium mb-1">{{ 'lancer_run.cogs_total' | transloco }}</div>
             <div class="font-bold text-xl text-primary">
-              {{ resultat.cogsTotal | currency:'EUR':'symbol':'1.2-2' }}
+              {{ resultat.cogsTotal | currency:appCurrency:'symbol':'1.2-2' }}
             </div>
           </div>
         </div>
@@ -232,7 +232,7 @@
                 </td>
                 <td class="text-right">
                   <span class="font-mono text-sm">
-                    {{ d.cogs | currency:'EUR':'symbol':'1.2-4' }}
+                    {{ d.cogs | currency:appCurrency:'symbol':'1.2-4' }}
                   </span>
                 </td>
               </tr>

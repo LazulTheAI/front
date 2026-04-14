@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { CreerRecetteRequest, MateriauControllerService, RecetteControllerService } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -96,6 +97,7 @@ export class RecetteCreateComponent implements OnInit, OnDestroy {
     // Duplication
     recettesExistantes: any[] = [];
     loadingRecettes = false;
+    protected readonly appCurrency = APP_CURRENCY;
     selectedDupliqueId: number | null = null;
 
     saving = false;

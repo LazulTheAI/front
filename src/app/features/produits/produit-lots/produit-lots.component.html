@@ -157,7 +157,7 @@
         <td class="text-right">
           @if (lot.coutUnitaire != null) {
             <span class="font-mono text-sm text-900">
-              {{ lot.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }}
+              {{ lot.coutUnitaire | currency:appCurrency:'symbol':'1.2-4' }}
             </span>
           } @else {
             <span class="text-400">—</span>

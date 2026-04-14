@@ -12,6 +12,7 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
 import { EntrepotControllerService, EntrepotResponse, PlanifierRunRequest, ProductionControllerService, ProduitControllerService, ProduitResponse, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 
 interface SelectOption {
     label: string;
@@ -31,6 +32,7 @@ export class PlanifierRunDialogComponent implements OnChanges, OnInit {
     @Output() saved = new EventEmitter<{ success: boolean; message: string }>();
 
     saving = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     produits: ProduitResponse[] = [];
     recettes: RecetteResponse[] = [];
@@ -144,6 +146,7 @@ export class PlanifierRunDialogComponent implements OnChanges, OnInit {
             next: () => {
                 this.saving = false;
                 this.saved.emit({ success: true, message: 'Run planifié avec succès' });
+                this.onHide();
             },
             error: () => {
                 this.saving = false;

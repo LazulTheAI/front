@@ -9,6 +9,7 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
 import { CommandeControllerService, CommandeResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
@@ -28,6 +29,7 @@ export class CommandeDetailDialogComponent implements OnChanges {
     @Output() onStatutChange = new EventEmitter<void>();
 
     saving = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     get dialogHeader(): string {
         if (!this.commande) return this.transloco.translate('commande_detail.header_empty');

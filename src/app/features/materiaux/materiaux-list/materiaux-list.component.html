@@ -212,7 +212,7 @@
         <td style="text-align:right;background:rgba(230,241,251,0.25)">
           @if (m.coutUnitaire !== null) {
             <span class="font-mono font-semibold text-sm text-900">
-              {{ m.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }}
+              {{ m.coutUnitaire | currency:appCurrency:'symbol':'1.2-4' }}
             </span>
             <span class="text-400 text-xs ml-1">/ {{ m.unite }}</span>
           } @else {
@@ -224,7 +224,7 @@
         <td style="text-align:right;background:rgba(230,241,251,0.25)">
           @if (m.coutUnitaire !== null) {
             <span class="font-mono font-semibold text-sm text-primary">
-              {{ m.valeurStock | currency:'EUR':'symbol':'1.2-2' }}
+              {{ m.valeurStock | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           } @else {
             <span class="text-400 text-sm">—</span>

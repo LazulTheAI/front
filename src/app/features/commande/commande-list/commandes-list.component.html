@@ -203,7 +203,7 @@
         <td class="text-right">
           @if (c.totalHT != null) {
             <span class="font-mono font-semibold text-sm text-900">
-              {{ c.totalHT | currency:'EUR':'symbol':'1.2-2' }}
+              {{ c.totalHT | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           } @else {
             <span class="text-400 text-sm">—</span>

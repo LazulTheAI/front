@@ -23,7 +23,7 @@
 
       <div class="field">
         <label class="font-semibold text-900 block mb-2" for="nom">
-          {{ 'recette_form.nom_recette' | transloco }} <span class="text-red-400">*</span>
+          {{ 'recette_form.nom_recette' | transloco }} <span class="text-red-500">*</span>
         </label>
         <input pInputText id="nom" name="nom" [(ngModel)]="meta.nom"
           required maxlength="255" class="w-full"
@@ -32,7 +32,7 @@
 
       <div class="field">
         <label class="font-semibold text-900 block mb-2">
-          {{ 'recette_form.quantite_produite_batch' | transloco }} <span class="text-red-400">*</span>
+          {{ 'recette_form.quantite_produite_batch' | transloco }} <span class="text-red-500">*</span>
         </label>
         <div class="flex gap-3">
           <p-inputNumber name="quantiteProduite" [(ngModel)]="meta.quantiteProduite"
@@ -60,11 +60,12 @@
         <p-inputNumber
           name="coutVariableParBatch"
           [(ngModel)]="meta.coutVariableParBatch"
+          mode="currency"
+          [currency]="appCurrency"
           [min]="0"
           [minFractionDigits]="2"
           [maxFractionDigits]="4"
           [placeholder]="'recette_form.cout_variable_placeholder' | transloco"
-          suffix=" €"
           styleClass="w-full"
         />
         <small class="text-400">
@@ -115,7 +116,7 @@
 
         <div class="field">
           <label class="font-semibold text-900 block mb-2" for="nom">
-            {{ 'recette_form.nom_recette' | transloco }} <span class="text-red-400">*</span>
+            {{ 'recette_form.nom_recette' | transloco }} <span class="text-red-500">*</span>
           </label>
           <input pInputText id="nom" name="nom" [(ngModel)]="meta.nom"
             required maxlength="255" class="w-full"
@@ -124,7 +125,7 @@
 
         <div class="field">
           <label class="font-semibold text-900 block mb-2">
-            {{ 'recette_form.production_batch' | transloco }} <span class="text-red-400">*</span>
+            {{ 'recette_form.production_batch' | transloco }} <span class="text-red-500">*</span>
           </label>
           <div class="flex gap-3">
             <p-inputNumber name="quantiteProduite" [(ngModel)]="meta.quantiteProduite"
@@ -186,7 +187,7 @@
             <div class="flex align-items-center gap-2 flex-shrink-0">
               @if (item.coutUnitaire) {
                 <p-tag
-                  [value]="(item.coutUnitaire | currency:'EUR':'symbol':'1.2-2') + '/' + item.unite"
+                  [value]="(item.coutUnitaire | currency:appCurrency:'symbol':'1.2-2') + '/' + item.unite"
                   severity="secondary" styleClass="text-xs" />
               }
               <span class="text-400 text-xs font-mono">{{ item.unite }}</span>
@@ -237,7 +238,7 @@
                     }
                     @if (ing.coutUnitaire && ing.quantite) {
                       <span class="text-400 text-xs font-mono">
-                        ≈ {{ (ing.coutUnitaire * ing.quantite) | currency:'EUR':'symbol':'1.2-2' }}
+                        ≈ {{ (ing.coutUnitaire * ing.quantite) | currency:appCurrency:'symbol':'1.2-2' }}
                       </span>
                     }
                   </div>
@@ -259,7 +260,7 @@
                       <div class="ml-4">
                         <div class="text-400 text-xs mb-1">{{ 'recette_form.cout_unitaire' | transloco }}</div>
                         <div class="font-semibold text-900">
-                          {{ ing.coutUnitaire | currency:'EUR':'symbol':'1.2-4' }} / {{ ing.unite }}
+                          {{ ing.coutUnitaire | currency:appCurrency:'symbol':'1.2-4' }} / {{ ing.unite }}
                         </div>
                       </div>
                     }
@@ -267,7 +268,7 @@
 
                   <div class="field">
                     <label class="font-semibold text-900 block mb-2">
-                      {{ 'recette_form.quantite_necessaire_batch' | transloco }} <span class="text-red-400">*</span>
+                      {{ 'recette_form.quantite_necessaire_batch' | transloco }} <span class="text-red-500">*</span>
                     </label>
                     <p-inputNumber [(ngModel)]="ing.quantite"
                       [ngModelOptions]="{ standalone: true }"
@@ -275,7 +276,7 @@
                       [placeholder]="'recette_form.quantite_ex_placeholder' | transloco" styleClass="w-full" />
                     @if (ing.coutUnitaire && ing.quantite) {
                       <small class="text-primary">
-                        {{ 'recette_form.cout_estime' | transloco }} {{ (ing.coutUnitaire * ing.quantite) | currency:'EUR':'symbol':'1.2-4' }} / batch
+                        {{ 'recette_form.cout_estime' | transloco }} {{ (ing.coutUnitaire * ing.quantite) | currency:appCurrency:'symbol':'1.2-4' }} / batch
                       </small>
                     }
                   </div>
@@ -305,7 +306,7 @@
               <span class="font-medium text-sm">{{ 'recette_form.cout_theorique_estime_batch' | transloco }}</span>
             </div>
             <span class="font-bold text-primary text-lg">
-              {{ coutTheoriqueTotal | currency:'EUR':'symbol':'1.2-2' }}
+              {{ coutTheoriqueTotal | currency:appCurrency:'symbol':'1.2-2' }}
             </span>
           </div>
         }

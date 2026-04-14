@@ -17,6 +17,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 
 import { CommandeControllerService, CommandeResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { CommandeChangerLotDialogComponent } from '../commande-changer-lot-dialog/commande-changer-lot-dialog.component';
 import { CommandeDetailDialogComponent } from '../commande-detail-dialog/commande-detail-dialog.component';
@@ -57,6 +58,7 @@ export class CommandesListComponent implements OnInit, OnDestroy {
     commandes: CommandeResponse[] = [];
     totalRecords = 0;
     loading = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     page = 0;
     size = 20;

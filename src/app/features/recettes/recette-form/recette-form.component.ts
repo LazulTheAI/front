@@ -16,6 +16,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { CreerRecetteRequest, MateriauControllerService, MateriauResponse, ModifierRecetteMetaRequest, RecetteControllerService, RecetteResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 
 export interface IngredientSelectionne {
@@ -45,6 +46,7 @@ export class RecetteFormComponent implements OnChanges, OnInit {
     @Output() saved = new EventEmitter<void>();
 
     saving = false;
+    protected readonly appCurrency = APP_CURRENCY;
 
     // 0 = infos, 1 = sélection matériaux (picklist), 2 = quantités (accordéons)
     step = 0;
@@ -255,6 +257,7 @@ export class RecetteFormComponent implements OnChanges, OnInit {
         this.saving = false;
         this.messageService.add({ severity: 'success', summary: 'Succès', detail: msg });
         this.saved.emit();
+        this.visibleChange.emit(false);
     }
 
     private handleError(): void {

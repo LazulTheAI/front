@@ -14,6 +14,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { BonCommandeControllerService, BonCommandeRequest, FournisseurControllerService, FournisseurResponse, LigneCommandeFournisseurRequest, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
+import { APP_CURRENCY, APP_CURRENCY_LOCALE } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 
 interface LigneForm {
@@ -39,6 +40,8 @@ export class BonCommandeFormComponent implements OnChanges, OnInit {
     @Output() saved = new EventEmitter<{ success: boolean; message: string }>();
 
     saving = false;
+    protected readonly appCurrency = APP_CURRENCY;
+    protected readonly appCurrencyLocale = APP_CURRENCY_LOCALE;
 
     fournisseurs: FournisseurResponse[] = [];
     materiaux: MateriauResponse[] = [];
@@ -159,6 +162,7 @@ export class BonCommandeFormComponent implements OnChanges, OnInit {
             next: () => {
                 this.saving = false;
                 this.saved.emit({ success: true, message: 'Bon de commande créé' });
+                this.visibleChange.emit(false);
             },
             error: () => {
                 this.saving = false;

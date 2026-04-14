@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { MateriauControllerService, MateriauResponse, ModifierMateriauRequest } from '@/app/modules/openapi';
+import { APP_CURRENCY, APP_CURRENCY_LOCALE } from '@/app/core/currency.config';
 import { TranslocoModule } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -39,6 +40,8 @@ export class MateriauFormComponent implements OnChanges {
     @Output() saved = new EventEmitter<void>();
 
     saving = false;
+    protected readonly appCurrency = APP_CURRENCY;
+    protected readonly appCurrencyLocale = APP_CURRENCY_LOCALE;
 
     form = {
         nom: '',
@@ -127,6 +130,7 @@ export class MateriauFormComponent implements OnChanges {
         this.saving = false;
         this.messageService.add({ severity: 'success', summary: 'Succès', detail: msg });
         this.saved.emit();
+        this.visibleChange.emit(false);
     }
 
     private handleError(): void {

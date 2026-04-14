@@ -53,7 +53,7 @@
       @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-primary">
-          {{ valeurTotale | currency:'EUR':'symbol':'1.2-2' }}
+          {{ valeurTotale | currency:appCurrency:'symbol':'1.2-2' }}
         </div>
       }
     </div>
@@ -79,7 +79,7 @@
       @else {
         <div class="text-3xl font-bold text-900">
           {{ totalMateriaux > 0
-            ? (valeurTotale / totalMateriaux | currency:'EUR':'symbol':'1.2-2')
+            ? (valeurTotale / totalMateriaux | currency:appCurrency:'symbol':'1.2-2')
             : '—' }}
         </div>
       }
@@ -118,7 +118,7 @@
       @if (loadingConso) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-primary">
-          {{ coutTotalConso | currency:'EUR':'symbol':'1.2-2' }}
+          {{ coutTotalConso | currency:appCurrency:'symbol':'1.2-2' }}
         </div>
       }
     </div>
@@ -172,7 +172,7 @@
         <td class="font-mono text-sm">{{ row.quantiteTotale | number:'1.0-4' }} {{ row.unite }}</td>
         <td class="font-semibold text-primary">
           @if (row.coutTotal) {
-            {{ row.coutTotal | currency:'EUR':'symbol':'1.2-2' }}
+            {{ row.coutTotal | currency:appCurrency:'symbol':'1.2-2' }}
           } @else {
             <span class="text-400">—</span>
           }
@@ -287,7 +287,7 @@
         </td>
         <td class="font-mono text-sm text-400">
           @if (m.coutUnitaireSnapshot) {
-            {{ m.coutUnitaireSnapshot | currency:'EUR':'symbol':'1.2-4' }}
+            {{ m.coutUnitaireSnapshot | currency:appCurrency:'symbol':'1.2-4' }}
           } @else { — }
         </td>
         <td class="text-xs text-400 font-mono">
