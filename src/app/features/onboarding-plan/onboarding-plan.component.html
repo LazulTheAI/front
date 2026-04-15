@@ -1,0 +1,104 @@
+<p-toast />
+
+<!-- Banner essai gratuit -->
+<div class="bg-primary text-white text-center py-3 px-3">
+    <div class="flex align-items-center justify-content-center gap-2 mb-1">
+        <i class="pi pi-gift text-xl"></i>
+        <span class="font-bold text-lg">{{ trialJours }} jours d'essai gratuit</span>
+    </div>
+    <p class="m-0 text-sm" style="opacity:0.9">
+        Aucune carte bancaire requise. Annulation possible à tout moment.
+    </p>
+</div>
+
+<!-- Titre -->
+<div class="text-center pt-6 pb-5 px-4">
+    <div class="flex align-items-center justify-content-center gap-2 mb-3">
+        <i class="pi pi-box text-primary text-2xl"></i>
+        <span class="text-primary font-semibold text-lg">MakerStock</span>
+    </div>
+    <h1 class="text-4xl font-bold text-900 m-0 mb-3">Choisissez votre plan</h1>
+    <p class="text-600 text-lg m-0">
+        Gérez votre production artisanale et synchronisez votre boutique BigCommerce
+    </p>
+</div>
+
+<!-- Grille des plans -->
+<div class="flex justify-content-center px-4 pb-6">
+    <div class="grid w-full" style="max-width:1100px">
+
+        @for (plan of plans; track plan.id) {
+            <div class="col-12 md:col-4 flex">
+                <div class="surface-card border-round-xl border-1 w-full flex flex-column p-4"
+                    [class.border-primary]="plan.badge === 'Recommandé'"
+                    [class.surface-border]="plan.badge !== 'Recommandé'">
+                    <!-- Badge -->
+                    <div class="h-2rem flex align-items-center mb-3">
+                        @if (plan.badge) {
+                            <p-tag [value]="plan.badge" severity="success" />
+                        }
+                    </div>
+
+                    <!-- Nom -->
+                    <h2 class="text-2xl font-bold text-primary m-0 mb-2">{{ plan.nom }}</h2>
+                    <p class="text-600 text-sm m-0 mb-4 line-height-3">{{ plan.description }}</p>
+
+                    <!-- Prix -->
+                    <div class="mb-4 pb-4 border-bottom-1 surface-border">
+                        <div class="flex align-items-end gap-1">
+                            <span class="text-5xl font-bold text-900">{{ plan.prix }}€</span>
+                            <span class="text-600 text-sm pb-2">/mois</span>
+                        </div>
+                        <div class="text-400 text-xs mt-1">
+                            ou {{ plan.prixAnnuel }}€/mois en annuel
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-primary text-xs font-medium
+                                bg-primary-50 px-2 py-1 border-round">
+                                {{ trialJours }} jours gratuits
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="flex flex-column gap-2 flex-1 mb-5">
+                        @for (feature of plan.features; track feature.label) {
+                            <div class="flex align-items-center gap-2">
+                                @if (feature.included) {
+                                    <i class="pi pi-check-circle text-green-500 text-sm flex-shrink-0"></i>
+                                } @else {
+                                    <i class="pi pi-times-circle text-300 text-sm flex-shrink-0"></i>
+                                }
+                                <span class="text-sm"
+                                    [class.text-700]="feature.included"
+                                    [class.text-400]="!feature.included">
+                                    {{ feature.label }}
+                                </span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- CTA -->
+                    <p-button
+                        [label]="loading && planChoisi === plan.id ? 'Redirection...' : 'Commencer l\'essai'"
+                        [icon]="loading && planChoisi === plan.id ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"
+                        iconPos="right"
+                        [loading]="loading && planChoisi === plan.id"
+                        [disabled]="loading"
+                        styleClass="w-full"
+                        (onClick)="choisirPlan(plan)" />
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="text-center pb-6 text-400 text-sm">
+    <div class="flex align-items-center justify-content-center gap-4 flex-wrap">
+        <span><i class="pi pi-shield mr-1"></i>Paiement sécurisé via BigCommerce</span>
+        <span><i class="pi pi-times-circle mr-1"></i>Sans engagement</span>
+        <span><i class="pi pi-refresh mr-1"></i>Changement de plan à tout moment</span>
+    </div>
+</div>

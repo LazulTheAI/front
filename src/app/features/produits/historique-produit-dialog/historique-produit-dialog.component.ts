@@ -4,13 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@jsverse/transloco';
 
 import { Button } from 'primeng/button';
-import { Paginator } from 'primeng/paginator';
 import { Select } from 'primeng/select';
-import { Skeleton } from 'primeng/skeleton';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
-import { EntrepotControllerService, EntrepotResponse, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { APP_CURRENCY } from '@/app/core/currency.config';
+import { EntrepotControllerService, EntrepotResponse, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { MouvementStockProduitResponse } from '@/app/modules/openapi/model/mouvement-stock-produit-response';
 import { DialogModule } from 'primeng/dialog';
 
@@ -35,7 +33,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: string; css: string }> 
     selector: 'app-historique-produit-dialog',
     templateUrl: './historique-produit-dialog.component.html',
     standalone: true,
-    imports: [CommonModule, FormsModule, Button, DialogModule, Select, TableModule, Skeleton, Paginator, TranslocoModule]
+    imports: [CommonModule, FormsModule, Button, DialogModule, Select, TableModule, TranslocoModule]
 })
 export class HistoriqueProduitDialogComponent implements OnChanges, OnInit {
     @Input() visible = false;

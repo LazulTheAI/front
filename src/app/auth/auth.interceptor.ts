@@ -12,7 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authService = inject(AuthApiService);
     const router = inject(Router);
 
-    const skipUrls = ['/auth/login', '/auth/refresh', '/auth/load', '/api/bc/', '/api/mobile/auth/login', '/api/subscription'];
+    const skipUrls = ['/auth/login', '/auth/refresh', '/auth/load', '/api/bc/', '/api/mobile/auth/login'];
 
     if (skipUrls.some((url) => req.url.includes(url))) {
         return next(req);

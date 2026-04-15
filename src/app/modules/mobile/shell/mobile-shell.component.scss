@@ -6,6 +6,17 @@
     background: var(--p-surface-ground);
 }
 
+.mobile-alert-bar {
+    flex-shrink: 0;
+    padding: 6px 12px;
+
+    // Masque la barre si vide (aucune alerte)
+    &:empty,
+    app-alerte-widget:empty {
+        display: none;
+    }
+}
+
 .mobile-content {
     flex: 1;
     overflow-y: auto;

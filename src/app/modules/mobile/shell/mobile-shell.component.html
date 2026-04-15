@@ -1,4 +1,8 @@
 <div class="mobile-shell">
+    <div class="mobile-alert-bar">
+        <app-alerte-widget />
+    </div>
+
     <main class="mobile-content">
         <router-outlet></router-outlet>
     </main>
@@ -13,7 +17,7 @@
             <span>Stock</span>
         </a>
         <a routerLink="scanner" routerLinkActive="active" class="nav-item nav-item--scanner">
-            <i class="pi pi-qrcode"></i>
+            <i class="pi pi-barcode"></i>
             <span>Scanner</span>
         </a>
         <a routerLink="fabrication" routerLinkActive="active" class="nav-item">

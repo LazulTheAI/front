@@ -13,14 +13,19 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 
-// QR code format: makerstockmaterial:{materiauId}
-const QR_PREFIX = 'makerstockmaterial:';
+// Formats codes-barres natifs (Capacitor MLKit)
+const NATIVE_BARCODE_FORMATS = ['Code128', 'Code39', 'Code93', 'Ean13', 'Ean8', 'UpcA', 'UpcE', 'Itf', 'Codabar'];
+
+// Formats codes-barres web (BarcodeDetector API)
+const WEB_BARCODE_FORMATS = ['code-128', 'code-39', 'ean-13', 'ean-8', 'upc-a', 'upc-e', 'itf', 'codabar'];
 
 /**
  * Stratégie de scan :
  *  1. Natif Android/iOS → @capacitor-mlkit/barcode-scanning (importé dynamiquement)
  *  2. Web Chrome/Edge   → BarcodeDetector natif (API expérimentale)
- *  3. Fallback universel→ saisie manuelle de l'ID
+ *  3. Fallback universel→ saisie manuelle du SKU
+ *
+ * La valeur scannée est traitée comme un SKU : on recherche la matière correspondante.
  */
 @Component({
     selector: 'app-mobile-scanner',
@@ -37,7 +42,7 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
     scanning = false;
     loadingMateriau = false;
     showManualInput = false;
-    manualId = '';
+    manualSku = '';
     cameraError = '';
 
     scannedMateriau: MateriauResponse | null = null;
@@ -65,7 +70,6 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
     }
 
     private async detectCapabilities(): Promise<void> {
-        // Détecte si on est dans Capacitor (Android/iOS)
         try {
             const { Capacitor } = await import('@capacitor/core');
             this.isNative = Capacitor.isNativePlatform();
@@ -94,7 +98,6 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
         try {
             const { BarcodeScanner, BarcodeFormat } = await import('@capacitor-mlkit/barcode-scanning');
 
-            // Demande de permission
             const { camera } = await BarcodeScanner.requestPermissions();
             if (camera !== 'granted' && camera !== 'limited') {
                 this.cameraError = 'Permission caméra refusée.';
@@ -103,13 +106,18 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
                 return;
             }
 
-            const { barcodes } = await BarcodeScanner.scan({ formats: [BarcodeFormat.QrCode] });
+            // Scan tous les formats codes-barres standard (pas QR)
+            const formats = NATIVE_BARCODE_FORMATS
+                .map((f) => (BarcodeFormat as any)[f])
+                .filter(Boolean);
+
+            const { barcodes } = await BarcodeScanner.scan({ formats });
 
             this.scanning = false;
             this.cdr.markForCheck();
 
             if (barcodes.length > 0) {
-                this.handleRawValue(barcodes[0].rawValue);
+                this.handleScannedSku(barcodes[0].rawValue);
             }
         } catch (err: any) {
             this.cameraError = err?.message ?? 'Erreur lors du scan.';
@@ -136,7 +144,7 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
             this.videoEl.muted = true;
             await this.videoEl.play();
 
-            this.barcodeDetector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+            this.barcodeDetector = new (window as any).BarcodeDetector({ formats: WEB_BARCODE_FORMATS });
 
             this.scanInterval = setInterval(async () => {
                 if (!this.videoEl || !this.scanning) return;
@@ -144,7 +152,7 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
                     const barcodes = await this.barcodeDetector.detect(this.videoEl);
                     if (barcodes.length > 0) {
                         this.stopWebCamera();
-                        this.handleRawValue(barcodes[0].rawValue ?? '');
+                        this.handleScannedSku(barcodes[0].rawValue ?? '');
                     }
                 } catch { /* frame error, ignore */ }
             }, 300);
@@ -173,7 +181,6 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
 
     stopScan(): void {
         if (this.isNative) {
-            // Le scan natif est modal, rien à arrêter manuellement
             this.scanning = false;
             this.cdr.markForCheck();
         } else {
@@ -183,43 +190,46 @@ export class MobileScannerComponent implements OnInit, OnDestroy {
 
     // ─── Traitement commun ───────────────────────────────────────────────────
 
-    handleRawValue(raw: string): void {
-        if (!raw.startsWith(QR_PREFIX)) {
-            this.messageService.add({ severity: 'warn', summary: 'QR invalide', detail: `Format attendu : ${QR_PREFIX}{id}` });
+    handleScannedSku(sku: string): void {
+        const cleaned = sku.trim();
+        if (!cleaned) {
+            this.messageService.add({ severity: 'warn', summary: 'Code-barre vide', detail: 'Aucune valeur lue' });
             this.cdr.markForCheck();
             return;
         }
-        const id = parseInt(raw.replace(QR_PREFIX, ''), 10);
-        if (isNaN(id)) {
-            this.messageService.add({ severity: 'error', summary: 'QR invalide', detail: 'ID matière non reconnu' });
-            this.cdr.markForCheck();
-            return;
-        }
-        this.fetchMateriau(id);
+        this.fetchMateriauBySku(cleaned);
     }
 
-    submitManualId(): void {
-        const id = parseInt(this.manualId, 10);
-        if (isNaN(id) || id <= 0) {
-            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'ID invalide' });
+    submitManualSku(): void {
+        const sku = this.manualSku.trim();
+        if (!sku) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'SKU invalide' });
             return;
         }
         this.showManualInput = false;
-        this.fetchMateriau(id);
+        this.fetchMateriauBySku(sku);
     }
 
-    private fetchMateriau(id: number): void {
+    private fetchMateriauBySku(sku: string): void {
         this.loadingMateriau = true;
         this.cdr.markForCheck();
-        this.materiauService.detailMateriau(id).subscribe({
-            next: (m) => {
-                this.scannedMateriau = m;
-                this.showResult = true;
+
+        // Recherche par SKU exact : on filtre le premier résultat dont le sku correspond
+        this.materiauService.listerMateriau(false, 0, 50, undefined, undefined, sku).subscribe({
+            next: (data: any) => {
+                const results: MateriauResponse[] = data.content ?? [];
+                const found = results.find((m) => m.sku === sku) ?? results[0];
+                if (found) {
+                    this.scannedMateriau = found;
+                    this.showResult = true;
+                } else {
+                    this.messageService.add({ severity: 'warn', summary: 'Introuvable', detail: `Aucune matière avec le SKU « ${sku} »` });
+                }
                 this.loadingMateriau = false;
                 this.cdr.markForCheck();
             },
             error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: `Matière #${id} introuvable` });
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de rechercher la matière' });
                 this.loadingMateriau = false;
                 this.cdr.markForCheck();
             }

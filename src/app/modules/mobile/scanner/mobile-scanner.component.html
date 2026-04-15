@@ -3,7 +3,7 @@
 
     <div class="mobile-page-header">
         <h2 class="mobile-page-title">
-            <i class="pi pi-qrcode"></i>
+            <i class="pi pi-barcode"></i>
             Scanner
         </h2>
     </div>
@@ -11,22 +11,22 @@
     @if (loadingMateriau) {
         <div class="loading-overlay">
             <p-progressSpinner />
-            <p>Chargement de la matière...</p>
+            <p>Recherche de la matière...</p>
         </div>
     } @else if (!scanning) {
         <div class="scanner-idle">
             <div class="scanner-icon-wrap">
-                <i class="pi pi-qrcode scanner-big-icon"></i>
+                <i class="pi pi-barcode scanner-big-icon"></i>
             </div>
 
             <p class="scanner-hint">
-                Scannez le QR code d'une matière pour consulter son stock, enregistrer une réception ou ajuster le stock.
+                Scannez le code-barre (EAN-13, CODE-128…) d'une matière pour consulter son stock, enregistrer une réception ou ajuster le stock.
             </p>
 
             @if (!canScan) {
                 <div class="warning-banner">
                     <i class="pi pi-info-circle"></i>
-                    <span>Scanner non disponible dans ce navigateur. Utilisez la saisie manuelle ou l'application Android.</span>
+                    <span>Scanner non disponible dans ce navigateur. Utilisez la saisie manuelle du SKU ou l'application Android.</span>
                 </div>
             }
 
@@ -39,14 +39,12 @@
 
             <div class="scanner-actions">
                 @if (canScan) {
-                    <button pButton label="Scanner une matière" icon="pi pi-camera" class="scan-btn" (click)="startScan()"></button>
+                    <button pButton label="Scanner un code-barre" icon="pi pi-camera" class="scan-btn" (click)="startScan()"></button>
                 }
-                <button pButton label="Saisir un ID manuellement" icon="pi pi-keyboard" class="p-button-outlined scan-btn" (click)="showManualInput = true"></button>
+                <button pButton label="Saisir un SKU manuellement" icon="pi pi-keyboard" class="p-button-outlined scan-btn" (click)="showManualInput = true"></button>
             </div>
         </div>
     } @else {
-        <!-- État "scan en cours" — natif : l'UI est gérée par MLKit (overlay système)
-             Web : on affiche juste un spinner car la vidéo est dans un élément non attaché au DOM -->
         <div class="scanning-state">
             <p-progressSpinner />
             <p>Scan en cours...</p>
@@ -58,29 +56,29 @@
     }
 </div>
 
-<!-- Saisie manuelle -->
+<!-- Saisie manuelle SKU -->
 <p-dialog
     [(visible)]="showManualInput"
-    header="Saisir un ID manuellement"
+    header="Saisir un SKU manuellement"
     [modal]="true"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '90vw', maxWidth: '400px' }"
 >
     <div class="manual-form">
-        <p class="manual-hint">Entrez l'ID numérique de la matière (visible sur l'étiquette ou dans l'application).</p>
+        <p class="manual-hint">Entrez le SKU (code article) de la matière, visible sur l'étiquette ou dans l'application.</p>
         <input
             pInputText
-            type="number"
-            placeholder="Ex: 42"
-            [(ngModel)]="manualId"
+            type="text"
+            placeholder="Ex: MAT-001 ou 3760123456789"
+            [(ngModel)]="manualSku"
             class="manual-input"
-            (keyup.enter)="submitManualId()"
+            (keyup.enter)="submitManualSku()"
         />
     </div>
     <ng-template pTemplate="footer">
         <button pButton label="Annuler" class="p-button-text" (click)="showManualInput = false"></button>
-        <button pButton label="Rechercher" icon="pi pi-search" (click)="submitManualId()"></button>
+        <button pButton label="Rechercher" icon="pi pi-search" (click)="submitManualSku()"></button>
     </ng-template>
 </p-dialog>
 
@@ -104,6 +102,10 @@
 
     @if (scannedMateriau) {
         <div class="result-body">
+            @if (scannedMateriau.sku) {
+                <p class="result-sku">SKU : <strong>{{ scannedMateriau.sku }}</strong></p>
+            }
+
             <div class="result-stock">
                 <span class="result-stock-value">{{ scannedMateriau.stockTotal ?? 0 }}</span>
                 <span class="result-stock-unit">{{ scannedMateriau.unite }} en stock</span>

@@ -4,7 +4,7 @@
 //  Usage dans les routes :
 //    {
 //      path: 'planning',
-//      canActivate: [planGuard('atelier')],
+//      canActivate: [planGuard('business')],
 //      component: PlanningComponent
 //    }
 // ─────────────────────────────────────────────────────────────

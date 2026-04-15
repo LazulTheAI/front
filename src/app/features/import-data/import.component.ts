@@ -31,14 +31,35 @@ interface ErreurImport {
     message: string;
 }
 
+interface ImportResultat {
+    statut: string;
+    ok: number;
+    nbCrees: number;
+    nbMisAJour: number;
+    erreurs: number;
+    details: ErreurImport[];
+}
+
+interface TypeConfig {
+    label: string;
+    icon: string;
+    description: string;
+    formats: string;
+    templateUrl: string;
+    templateLabel: string;
+    colonnesInfo: string[];
+}
+
 const CHAMPS_PAR_TYPE: Record<string, ChampSysteme[]> = {
     MATIERES: [
         { label: 'Nom *', value: 'nom', requis: true },
         { label: 'Unité *', value: 'unite', requis: true },
+        { label: 'SKU', value: 'sku', requis: false },
+        { label: 'Quantité', value: 'quantite', requis: false },
         { label: 'Coût unitaire', value: 'coutUnitaire', requis: false },
-        { label: 'Seuil alerte', value: 'seuilAlerte', requis: false },
+        { label: 'Numéro de lot', value: 'numeroLot', requis: false },
+        { label: 'DLC (DD/MM/YYYY)', value: 'dlc', requis: false },
         { label: 'Fournisseur', value: 'fournisseur', requis: false },
-        { label: 'Stock initial', value: 'stockInitial', requis: false },
         { label: 'Entrepôt', value: 'entrepot', requis: false }
     ],
     FOURNISSEURS: [
@@ -46,15 +67,45 @@ const CHAMPS_PAR_TYPE: Record<string, ChampSysteme[]> = {
         { label: 'Email', value: 'email', requis: false },
         { label: 'Téléphone', value: 'telephone', requis: false }
     ],
-    RECETTES: [
-        { label: 'Nom recette *', value: 'recette', requis: true },
-        { label: 'Qté produite *', value: 'quantiteProduite', requis: true },
-        { label: 'Unité produite *', value: 'uniteProduite', requis: true },
-        { label: 'Durée (min)', value: 'dureeFabricationMinutes', requis: false },
-        { label: 'Matière *', value: 'matiere', requis: true },
-        { label: 'Qté matière *', value: 'quantiteMatiere', requis: true },
-        { label: 'Unité matière', value: 'uniteMatiere', requis: false }
+    RECETTE: [
+        { label: 'recipe_name *', value: 'recipe_name', requis: true },
+        { label: 'batch_size *', value: 'batch_size', requis: true },
+        { label: 'batch_unit *', value: 'batch_unit', requis: true },
+        { label: 'ingredient_name *', value: 'ingredient_name', requis: true },
+        { label: 'ingredient_amount *', value: 'ingredient_amount', requis: true },
+        { label: 'ingredient_unit', value: 'ingredient_unit', requis: false },
+        { label: 'ingredient_type', value: 'ingredient_type', requis: false }
     ]
+};
+
+const TYPE_CONFIG: Record<string, TypeConfig> = {
+    MATIERES: {
+        label: 'Matières premières',
+        icon: 'pi-box',
+        description: 'Importer des matières premières depuis un fichier Excel ou CSV. Les matières existantes (même nom) seront mises à jour.',
+        formats: '.csv, .xlsx',
+        templateUrl: '/api/imports/templates/matieres',
+        templateLabel: 'Template Excel',
+        colonnesInfo: ['nom *', 'unite *', 'sku', 'quantite', 'coutUnitaire', 'numeroLot', 'dlc (DD/MM/YYYY)', 'fournisseur', 'entrepot']
+    },
+    FOURNISSEURS: {
+        label: 'Fournisseurs',
+        icon: 'pi-truck',
+        description: 'Importer ou mettre à jour des fournisseurs.',
+        formats: '.csv, .xlsx',
+        templateUrl: '/api/imports/templates/fournisseurs',
+        templateLabel: 'Template Excel',
+        colonnesInfo: ['nom *', 'email', 'telephone']
+    },
+    RECETTE: {
+        label: 'Recettes',
+        icon: 'pi-file-import',
+        description: "Importer des recettes depuis un export CSV RECETTE. Les matières sont auto-créées si elles n'existent pas.",
+        formats: '.csv',
+        templateUrl: '/api/imports/templates/recettes-RECETTE',
+        templateLabel: 'Exemple CSV',
+        colonnesInfo: ['recipe_name *', 'batch_size *', 'batch_unit *', 'ingredient_name *', 'ingredient_amount *', 'ingredient_unit', 'ingredient_type']
+    }
 };
 
 @Component({
@@ -73,7 +124,7 @@ export class ImportComponent {
     typeOptions = [
         { label: 'Matières premières', value: 'MATIERES' },
         { label: 'Fournisseurs', value: 'FOURNISSEURS' },
-        { label: 'Recettes', value: 'RECETTES' }
+        { label: 'Recettes', value: 'RECETTE' }
     ];
     typeSelectionne: string | null = null;
     uploading = false;
@@ -86,16 +137,18 @@ export class ImportComponent {
 
     // ── Step 3 ────────────────────────────────────────────────
     processing = false;
-    resultat: { statut: string; ok: number; erreurs: number; details: ErreurImport[] } | null = null;
+    resultat: ImportResultat | null = null;
 
     // ── Historique ────────────────────────────────────────────
     historique: any[] = [];
     loadingHistorique = false;
+
     ordreImport = [
         { ordre: 1, label: 'Fournisseurs', icon: 'pi-truck', note: 'optionnel' },
-        { ordre: 2, label: 'Matières', icon: 'pi-box', note: 'avec stock initial' },
+        { ordre: 2, label: 'Matières', icon: 'pi-box', note: 'avec lot et DLC' },
         { ordre: 3, label: 'Recettes', icon: 'pi-book', note: 'matières auto-créées' }
     ];
+
     constructor(
         private http: HttpClient,
         private messageService: MessageService,
@@ -106,12 +159,16 @@ export class ImportComponent {
 
     // ── Getters ───────────────────────────────────────────────
 
+    get config(): TypeConfig | null {
+        return this.typeSelectionne ? TYPE_CONFIG[this.typeSelectionne] : null;
+    }
+
     get champsSysteme(): ChampSysteme[] {
         return this.typeSelectionne ? (CHAMPS_PAR_TYPE[this.typeSelectionne] ?? []) : [];
     }
 
     get champOptions(): { label: string; value: string | null }[] {
-        const opts = (CHAMPS_PAR_TYPE[this.typeSelectionne ?? ''] ?? []).map((c) => ({ label: c.label, value: c.value }));
+        const opts = this.champsSysteme.map((c) => ({ label: c.label, value: c.value }));
         return [{ label: '— Ignorer —', value: null }, ...opts];
     }
 
@@ -121,33 +178,27 @@ export class ImportComponent {
         return requis.every((r) => mapped.includes(r));
     }
 
-    undoImport(job: any): void {
-        this.http.delete(`${environment.baseUrl}/api/imports/${job.id}/undo`).subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Import annulé',
-                    detail: `Les données de l'import #${job.id} ont été supprimées`
-                });
-                this.loadHistorique();
-            },
-            error: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erreur',
-                    detail: "Impossible d'annuler cet import"
-                });
-            }
-        });
-    }
-
     get champsMappesRequisManquants(): string[] {
         const requis = this.champsSysteme.filter((c) => c.requis).map((c) => c.value);
         const mapped = Object.values(this.mapping).filter((v) => v != null);
         return requis.filter((r) => !mapped.includes(r)).map((r) => this.champsSysteme.find((c) => c.value === r)?.label ?? r);
     }
 
+    get hasErreurs(): boolean {
+        return (this.resultat?.erreurs ?? 0) > 0;
+    }
+
     // ── Step 1 : Upload ───────────────────────────────────────
+
+    onTypeChange(): void {
+        this.jobId = null;
+        this.colonnes = [];
+        this.apercu = [];
+        this.mapping = {};
+        this.resultat = null;
+        this.activeStep = 0;
+        this.cdr.markForCheck();
+    }
 
     onFileSelect(event: any): void {
         const file: File = event.files?.[0];
@@ -178,6 +229,11 @@ export class ImportComponent {
                 this.cdr.markForCheck();
             }
         });
+    }
+
+    telechargerTemplate(): void {
+        if (!this.config) return;
+        window.open(`${environment.baseUrl}${this.config.templateUrl}`, '_blank');
     }
 
     // ── Step 2 : Mapping ──────────────────────────────────────
@@ -258,6 +314,26 @@ export class ImportComponent {
         });
     }
 
+    undoImport(job: any): void {
+        this.http.delete(`${environment.baseUrl}/api/imports/${job.id}/undo`).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Import annulé',
+                    detail: `Les données de l'import #${job.id} ont été supprimées`
+                });
+                this.loadHistorique();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: "Impossible d'annuler cet import"
+                });
+            }
+        });
+    }
+
     // ── Helpers ───────────────────────────────────────────────
 
     getStatutSeverity(statut: string): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
@@ -281,10 +357,5 @@ export class ImportComponent {
 
     isMapped(colonne: string): boolean {
         return !!this.mapping[colonne];
-    }
-
-    getChampsNonMappes(): string[] {
-        const mapped = Object.values(this.mapping).filter(Boolean);
-        return this.champsSysteme.filter((c) => c.requis && !mapped.includes(c.value)).map((c) => c.label);
     }
 }

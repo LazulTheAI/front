@@ -25,8 +25,13 @@ export const appConfig: ApplicationConfig = {
         {
             provide: APP_INITIALIZER,
             useFactory: (sub: SubscriptionService, auth: AuthApiService) => () => {
-                if (!auth.getToken()) return Promise.resolve(null); // ← skip si pas connecté
-                return firstValueFrom(sub.load(), { defaultValue: null }).catch(() => null);
+                console.log('APP_INITIALIZER — token:', auth.getToken() ? 'présent' : 'absent');
+                if (!auth.getToken()) return Promise.resolve(null);
+                console.log('APP_INITIALIZER — appel load()');
+                return firstValueFrom(sub.load(), { defaultValue: null }).catch((err) => {
+                    console.error('APP_INITIALIZER load() error:', err);
+                    return null;
+                });
             },
             deps: [SubscriptionService, AuthApiService],
             multi: true

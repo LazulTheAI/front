@@ -4,6 +4,7 @@ import { BcAuthComponent } from './app/auth/big-commerce/bc-load/bc-auth.compone
 import { BcLoadComponent } from './app/auth/big-commerce/bc-load/bc-load.component';
 import { BillingPendingComponent } from './app/auth/big-commerce/bc-load/billing-pending.component';
 import { authGuard } from './app/auth/guards/guards';
+import { OnboardingPlanComponent } from './app/features/onboarding-plan/onboarding-plan.component';
 import { AppLayout } from './app/layout/component/app.layout';
 import { Notfound } from './app/pages/notfound/notfound';
 
@@ -18,6 +19,7 @@ export const appRoutes: Routes = [
         path: 'billing/pending',
         component: BillingPendingComponent
     },
+    { path: 'onboarding/plan', component: OnboardingPlanComponent },
 
     // Routes protégées sous AppLayout
     {

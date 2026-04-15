@@ -1,15 +1,13 @@
 <p-toast />
 
-<!-- ═══ TOOLBAR ═════════════════════════════════════════════ -->
+<!-- ═══ TOOLBAR ════════════════════════════════════════════════ -->
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
     <div class="flex align-items-center gap-3">
       <i class="pi pi-upload text-primary text-2xl"></i>
       <div>
         <h2 class="m-0 text-900 font-semibold">{{ 'import_data.title' | transloco }}</h2>
-        <p class="m-0 text-400 text-sm mt-1">
-          {{ 'import_data.subtitle' | transloco }}
-        </p>
+        <p class="m-0 text-400 text-sm mt-1">{{ 'import_data.subtitle' | transloco }}</p>
       </div>
     </div>
   </ng-template>
@@ -21,7 +19,7 @@
   }
 </p-toolbar>
 
-<!-- ═══ GUIDE D'ORDRE ════════════════════════════════════════ -->
+<!-- ═══ GUIDE D'ORDRE ══════════════════════════════════════════ -->
 <div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
   <div class="flex align-items-center gap-2 mb-3">
     <i class="pi pi-info-circle text-primary"></i>
@@ -30,8 +28,8 @@
   <div class="flex align-items-center gap-2 flex-wrap">
     @for (step of ordreImport; track step.ordre; let last = $last) {
       <div class="flex align-items-center gap-2 px-3 py-2 border-round border-1 surface-border surface-50">
-        <div class="border-circle flex align-items-center justify-content-center font-bold text-xs text-white bg-primary flex-shrink-0"
-          style="width:22px;height:22px">
+        <div class="border-circle flex align-items-center justify-content-center font-bold text-xs
+          text-white bg-primary flex-shrink-0" style="width:22px;height:22px">
           {{ step.ordre }}
         </div>
         <i class="pi {{ step.icon }} text-primary text-sm"></i>
@@ -40,9 +38,7 @@
           <span class="text-400 text-xs">({{ step.note }})</span>
         }
       </div>
-      @if (!last) {
-        <i class="pi pi-arrow-right text-300 text-sm"></i>
-      }
+      @if (!last) { <i class="pi pi-arrow-right text-300 text-sm"></i> }
     }
   </div>
   <div class="text-400 text-xs mt-3">
@@ -51,22 +47,20 @@
   </div>
 </div>
 
-<!-- ═══ STEPPER ═════════════════════════════════════════════ -->
+<!-- ═══ STEPPER ════════════════════════════════════════════════ -->
 <div class="surface-card border-round-xl border-1 surface-border p-4 mb-4">
   <div class="flex align-items-center">
     @for (step of [
-      { labelKey: 'import_data.step_file', icon: 'pi-file-arrow-up' },
-      { labelKey: 'import_data.step_mapping', icon: 'pi-sliders-h' },
-      { labelKey: 'import_data.step_import',  icon: 'pi-check-circle' }
+      { labelKey: 'import_data.step_file',    icon: 'pi-file-arrow-up' },
+      { labelKey: 'import_data.step_mapping', icon: 'pi-sliders-h'     },
+      { labelKey: 'import_data.step_import',  icon: 'pi-check-circle'  }
     ]; track step.labelKey; let i = $index) {
       <div class="flex align-items-center gap-2 cursor-pointer"
         (click)="i < activeStep ? activeStep = i : null">
         <div class="border-circle flex align-items-center justify-content-center font-bold flex-shrink-0"
           style="width:36px;height:36px"
-          [class.bg-primary]="i <= activeStep"
-          [class.text-white]="i <= activeStep"
-          [class.surface-200]="i > activeStep"
-          [class.text-400]="i > activeStep">
+          [class.bg-primary]="i <= activeStep" [class.text-white]="i <= activeStep"
+          [class.surface-200]="i > activeStep" [class.text-400]="i > activeStep">
           @if (i < activeStep) {
             <i class="pi pi-check text-sm"></i>
           } @else {
@@ -82,14 +76,13 @@
       @if (i < 2) {
         <div class="flex-1 mx-3 border-top-1"
           [class.border-primary]="i < activeStep"
-          [class.surface-border]="i >= activeStep">
-        </div>
+          [class.surface-border]="i >= activeStep"></div>
       }
     }
   </div>
 </div>
 
-<!-- ═══ STEP 0 : TYPE + UPLOAD ══════════════════════════════ -->
+<!-- ═══ STEP 0 : TYPE + UPLOAD ════════════════════════════════ -->
 @if (activeStep === 0) {
   <div class="surface-card border-round-xl border-1 surface-border p-5">
 
@@ -99,7 +92,7 @@
     </h3>
 
     <!-- Choix du type -->
-    <div class="grid mb-5">
+    <div class="grid mb-4">
       @for (opt of typeOptions; track opt.value) {
         <div class="col-6 md:col-3">
           <div class="border-round-xl border-2 p-4 cursor-pointer transition-all transition-duration-150 text-center"
@@ -107,15 +100,14 @@
             [class.bg-primary-50]="typeSelectionne === opt.value"
             [class.surface-border]="typeSelectionne !== opt.value"
             [class.surface-50]="typeSelectionne !== opt.value"
-            (click)="typeSelectionne = opt.value">
+            (click)="typeSelectionne = opt.value; onTypeChange()">
             <i class="pi text-3xl mb-3 block"
               [class.text-primary]="typeSelectionne === opt.value"
               [class.text-400]="typeSelectionne !== opt.value"
               [ngClass]="{
-                'pi-box':            opt.value === 'MATIERES',
-                'pi-truck':          opt.value === 'FOURNISSEURS',
-                'pi-warehouse':      opt.value === 'STOCK',
-                'pi-book':           opt.value === 'RECETTES'
+                'pi-box':          opt.value === 'MATIERES',
+                'pi-truck':        opt.value === 'FOURNISSEURS',
+                'pi-file-import':  opt.value === 'RECETTE'
               }"></i>
             <div class="font-semibold text-900 text-sm">{{ opt.label }}</div>
           </div>
@@ -123,32 +115,46 @@
       }
     </div>
 
-    @if (typeSelectionne) {
+    @if (typeSelectionne && config) {
 
-      <!-- Champs attendus -->
-      <div class="surface-50 border-round p-4 mb-4">
-        <div class="text-400 text-xs font-semibold uppercase mb-3">
-          {{ 'import_data.available_fields' | transloco }} {{ getTypeLabel(typeSelectionne) }}
+      <!-- Description + template -->
+      <div class="flex align-items-start justify-content-between gap-4 surface-50 border-round p-4 mb-4">
+        <div class="flex-1">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi {{ config.icon }} text-primary"></i>
+            <span class="font-semibold text-900">{{ config.label }}</span>
+          </div>
+          <p class="m-0 text-600 text-sm mb-3">{{ config.description }}</p>
+
+          <!-- Colonnes attendues -->
+          <div class="flex flex-wrap gap-2">
+            @for (col of config.colonnesInfo; track col) {
+              <span class="px-2 py-1 border-round text-xs font-mono surface-100 text-700"
+                [class.border-1]="col.includes('*')"
+                [class.border-primary]="col.includes('*')"
+                [class.text-primary]="col.includes('*')">
+                {{ col }}
+              </span>
+            }
+          </div>
+          <p class="m-0 text-400 text-xs mt-2">
+            <i class="pi pi-info-circle mr-1"></i>
+            Les colonnes <strong>*</strong> sont obligatoires.
+            Formats acceptés : {{ config.formats }}. Taille max : 10 MB.
+          </p>
         </div>
-        <div class="flex flex-wrap gap-2">
-          @for (champ of champsSysteme; track champ.value) {
-            <p-tag
-              [value]="champ.label"
-              [severity]="champ.requis ? 'danger' : 'secondary'"
-              [pTooltip]="champ.requis ? ('import_data.required_tooltip' | transloco) : ('import_data.optional_tooltip' | transloco)"
-            />
-          }
-        </div>
-        <div class="text-400 text-xs mt-2">
-          <i class="pi pi-info-circle mr-1"></i>
-          {{ 'import_data.required_fields_note' | transloco }}
-        </div>
+
+        <p-button
+          [label]="config.templateLabel"
+          icon="pi pi-download"
+          severity="secondary" [outlined]="true" size="small"
+          (onClick)="telechargerTemplate()"
+          pTooltip="Télécharger un fichier exemple à compléter" />
       </div>
-
       <!-- Upload -->
       <p-fileUpload
         mode="advanced"
-        accept=".csv,.xlsx,.xls"
+        [accept]="config.formats"
         [maxFileSize]="10000000"
         [auto]="true"
         [customUpload]="true"
@@ -156,29 +162,27 @@
         [chooseLabel]="'import_data.choose_file' | transloco"
         [showUploadButton]="false"
         [showCancelButton]="false"
-        styleClass="w-full"
-      >
+        styleClass="w-full">
         <ng-template pTemplate="empty">
           <div class="flex flex-column align-items-center py-4 text-400">
             <i class="pi pi-cloud-upload text-4xl mb-3"></i>
             <span class="text-sm">{{ 'import_data.drag_drop' | transloco }}</span>
-            <span class="text-xs mt-1">{{ 'import_data.max_size' | transloco }}</span>
+            <span class="text-xs mt-1">{{ config.formats }} · max 10 MB</span>
           </div>
         </ng-template>
       </p-fileUpload>
 
       @if (uploading) {
         <div class="mt-3">
-          <p-progressBar mode="indeterminate" styleClass="h-1rem" style="height:4px" />
-          <div class="text-400 text-sm text-center mt-2">{{ 'import_data.analyzing' | transloco }}</div>
+          <p-progressBar mode="indeterminate" style="height:4px" />
+          <div class="text-400 text-sm text-center mt-2">Analyse du fichier en cours…</div>
         </div>
       }
     }
-
   </div>
 }
 
-<!-- ═══ STEP 1 : MAPPING ═════════════════════════════════════ -->
+<!-- ═══ STEP 1 : MAPPING ════════════════════════════════════════ -->
 @if (activeStep === 1) {
   <div class="surface-card border-round-xl border-1 surface-border p-5">
 
@@ -188,9 +192,7 @@
           <i class="pi pi-sliders-h text-primary mr-2"></i>
           {{ 'import_data.column_mapping' | transloco }}
         </h3>
-        <p class="text-400 text-sm m-0 mt-1">
-          {{ 'import_data.mapping_desc' | transloco }}
-        </p>
+        <p class="text-400 text-sm m-0 mt-1">{{ 'import_data.mapping_desc' | transloco }}</p>
       </div>
     </div>
 
@@ -199,7 +201,7 @@
       <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-4">
         <i class="pi pi-exclamation-triangle text-orange-500"></i>
         <span class="text-sm text-orange-800">
-          {{ 'import_data.required_fields_missing' | transloco }}
+          Champs requis non mappés :
           <strong>{{ champsMappesRequisManquants.join(', ') }}</strong>
         </span>
       </div>
@@ -207,8 +209,6 @@
 
     <!-- Tableau de mapping -->
     <div class="flex flex-column gap-2 mb-4">
-
-      <!-- Header -->
       <div style="display:grid; grid-template-columns:1fr 40px 1fr; gap:12px; align-items:center;"
         class="text-400 text-xs font-semibold uppercase px-3">
         <span>{{ 'import_data.file_column' | transloco }}</span>
@@ -222,27 +222,20 @@
           [class.border-primary]="isMapped(col)"
           [class.surface-border]="!isMapped(col)">
 
-          <!-- Colonne fichier -->
           <div class="flex align-items-center gap-2">
             <i class="pi pi-table text-400 text-sm"></i>
             <span class="font-medium text-900">{{ col }}</span>
             @if (apercu[0]?.[col]) {
-              <span class="text-400 text-xs font-mono">
-                ex: {{ apercu[0][col] }}
-              </span>
+              <span class="text-400 text-xs font-mono">ex: {{ apercu[0][col] }}</span>
             }
           </div>
 
-          <!-- Flèche -->
           <div class="text-center">
             <i class="pi text-lg"
-              [class.pi-arrow-right]="isMapped(col)"
-              [class.text-primary]="isMapped(col)"
-              [class.pi-minus]="!isMapped(col)"
-              [class.text-300]="!isMapped(col)"></i>
+              [class.pi-arrow-right]="isMapped(col)" [class.text-primary]="isMapped(col)"
+              [class.pi-minus]="!isMapped(col)"      [class.text-300]="!isMapped(col)"></i>
           </div>
 
-          <!-- Champ système -->
           <p-select
             [(ngModel)]="mapping[col]"
             [options]="champOptions"
@@ -250,16 +243,15 @@
             optionValue="value"
             [placeholder]="'import_data.ignore' | transloco"
             appendTo="body"
-            [style]="{'width':'100%'}"
-          />
+            [style]="{'width':'100%'}" />
         </div>
       }
     </div>
 
-    <!-- Aperçu données -->
+    <!-- Aperçu -->
     <p-divider align="left">
       <span class="text-400 text-xs font-semibold uppercase">
-        {{ 'import_data.preview' | transloco }} ({{ apercu.length }} {{ 'import_data.first_lines' | transloco }})
+        {{ 'import_data.preview' | transloco }} ({{ apercu.length }} premières lignes)
       </span>
     </p-divider>
 
@@ -282,8 +274,7 @@
           <tr>
             @for (col of colonnes; track col) {
               <td style="font-size:12px; white-space:nowrap; max-width:200px;
-                overflow:hidden; text-overflow:ellipsis"
-                [pTooltip]="row[col]">
+                overflow:hidden; text-overflow:ellipsis" [pTooltip]="row[col]">
                 {{ row[col] || '—' }}
               </td>
             }
@@ -292,22 +283,19 @@
       </p-table>
     </div>
 
-    <!-- Footer -->
     <div class="flex justify-content-between align-items-center mt-4">
-      <p-button [label]="'import_data.back' | transloco" icon="pi pi-arrow-left" severity="secondary"
+      <p-button label="Retour" icon="pi pi-arrow-left" severity="secondary"
         [text]="true" (onClick)="activeStep = 0" />
       <p-button
-        [label]="'import_data.start_import' | transloco"
+        label="Valider le mapping"
         icon="pi pi-arrow-right" iconPos="right"
         [disabled]="!mappingComplet"
-        (onClick)="saveMapping()"
-      />
+        (onClick)="saveMapping()" />
     </div>
-
   </div>
 }
 
-<!-- ═══ STEP 2 : PROCESS + RÉSULTAT ═════════════════════════ -->
+<!-- ═══ STEP 2 : PROCESS + RÉSULTAT ════════════════════════════ -->
 @if (activeStep === 2) {
   <div class="surface-card border-round-xl border-1 surface-border p-5">
 
@@ -315,11 +303,8 @@
       <div class="text-center py-6">
         <i class="pi pi-play-circle text-primary text-5xl mb-4 block"></i>
         <h3 class="text-900 font-semibold mb-2">{{ 'import_data.ready_to_import' | transloco }}</h3>
-        <p class="text-400 mb-4">
-          {{ 'import_data.mapping_configured' | transloco }}
-        </p>
-        <p-button [label]="'import_data.start_import' | transloco" icon="pi pi-play"
-          size="large" (onClick)="process()" />
+        <p class="text-400 mb-4">{{ 'import_data.mapping_configured' | transloco }}</p>
+        <p-button label="Lancer l'import" icon="pi pi-play" size="large" (onClick)="process()" />
       </div>
     }
 
@@ -334,35 +319,47 @@
 
     @if (resultat) {
 
+      <!-- En-tête statut -->
+      <div class="flex align-items-center gap-2 mb-4">
+        <i class="pi text-xl"
+          [class.pi-check-circle]="resultat.statut === 'DONE'"
+          [class.text-green-500]="resultat.statut === 'DONE'"
+          [class.pi-exclamation-triangle]="resultat.statut !== 'DONE'"
+          [class.text-orange-500]="resultat.statut !== 'DONE'"></i>
+        <span class="font-semibold text-900 text-lg">
+          {{ resultat.statut === 'DONE' ? 'Import terminé avec succès' : 'Import terminé avec des avertissements' }}
+        </span>
+      </div>
+
       <!-- KPIs -->
       <div class="grid mb-4">
-        <div class="col-4">
-          <div class="surface-50 border-round-xl border-1 p-4 text-center"
-            [class.border-green-300]="resultat.statut === 'DONE'"
-            [class.border-red-300]="resultat.statut === 'ERROR'"
-            [class.surface-border]="resultat.statut === 'PROCESSING'">
-            <p-tag
-              [value]="resultat.statut === 'DONE' ? ('import_data.done' | transloco) : ('import_data.error' | transloco)"
-              [severity]="resultat.statut === 'DONE' ? 'success' : 'danger'"
-              styleClass="mb-2"
-            />
-            <div class="text-400 text-xs mt-1">{{ 'import_data.status' | transloco }}</div>
+        <div class="col-12 md:col-4">
+          <div class="border-round-lg border-1 border-green-200 bg-green-50 p-4 text-center">
+            <div class="text-3xl font-bold text-green-600">{{ resultat.nbCrees ?? resultat.ok }}</div>
+            <div class="text-sm text-600 mt-1">
+              <i class="pi pi-plus-circle mr-1"></i>Créé(s)
+            </div>
           </div>
         </div>
-        <div class="col-4">
-          <div class="surface-50 border-round-xl border-1 surface-border p-4 text-center">
-            <div class="text-3xl font-bold text-green-600">{{ resultat.ok }}</div>
-            <div class="text-400 text-xs mt-1">{{ 'import_data.imported_lines' | transloco }}</div>
+        <div class="col-12 md:col-4">
+          <div class="border-round-lg border-1 border-blue-200 bg-blue-50 p-4 text-center">
+            <div class="text-3xl font-bold text-blue-600">{{ resultat.nbMisAJour ?? 0 }}</div>
+            <div class="text-sm text-600 mt-1">
+              <i class="pi pi-pencil mr-1"></i>Mis à jour
+            </div>
           </div>
         </div>
-        <div class="col-4">
-          <div class="surface-50 border-round-xl border-1 surface-border p-4 text-center">
+        <div class="col-12 md:col-4">
+          <div class="border-round-lg border-1 p-4 text-center"
+            [class.border-red-200]="hasErreurs" [class.bg-red-50]="hasErreurs"
+            [class.surface-border]="!hasErreurs" [class.surface-50]="!hasErreurs">
             <div class="text-3xl font-bold"
-              [class.text-red-500]="resultat.erreurs > 0"
-              [class.text-400]="resultat.erreurs === 0">
+              [class.text-red-600]="hasErreurs" [class.text-400]="!hasErreurs">
               {{ resultat.erreurs }}
             </div>
-            <div class="text-400 text-xs mt-1">{{ 'import_data.errors' | transloco }}</div>
+            <div class="text-sm text-600 mt-1">
+              <i class="pi pi-times-circle mr-1"></i>Erreur(s)
+            </div>
           </div>
         </div>
       </div>
@@ -370,17 +367,14 @@
       <!-- Erreurs détaillées -->
       @if (resultat.details?.length > 0) {
         <p-divider align="left">
-          <span class="text-red-500 text-xs font-semibold uppercase">
-            {{ 'import_data.error_details' | transloco }}
-          </span>
+          <span class="text-red-500 text-xs font-semibold uppercase">Détail des erreurs</span>
         </p-divider>
-        <p-table [value]="resultat.details" styleClass="p-datatable-sm"
-          [showGridlines]="true">
+        <p-table [value]="resultat.details" styleClass="p-datatable-sm" [showGridlines]="true">
           <ng-template pTemplate="header">
             <tr>
-              <th style="width:80px">{{ 'import_data.line' | transloco }}</th>
-              <th style="width:150px">{{ 'import_data.column' | transloco }}</th>
-              <th>{{ 'import_data.message' | transloco }}</th>
+              <th style="width:80px">Ligne</th>
+              <th style="width:150px">Colonne</th>
+              <th>Message</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-err>
@@ -394,14 +388,14 @@
       }
 
       <div class="flex justify-content-between mt-4">
-        <p-button [label]="'import_data.new_import' | transloco" icon="pi pi-plus"
+        <p-button label="Nouvel import" icon="pi pi-plus"
           severity="secondary" [outlined]="true" (onClick)="reset()" />
       </div>
     }
   </div>
 }
 
-<!-- ═══ HISTORIQUE ═══════════════════════════════════════════ -->
+<!-- ═══ HISTORIQUE ═══════════════════════════════════════════════ -->
 <div class="surface-card border-round-xl border-1 surface-border p-4 mt-4">
   <div class="flex align-items-center justify-content-between mb-3">
     <div class="flex align-items-center gap-2">
@@ -425,25 +419,40 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="width:80px">#</th>
-          <th style="width:160px">Type</th>
+          <th style="width:170px">Type</th>
           <th>Fichier</th>
-          <th style="width:120px">{{ 'import_data.status' | transloco }}</th>
-          <th style="width:80px" class="text-center">OK</th>
-          <th style="width:80px" class="text-center">{{ 'import_data.errors' | transloco }}</th>
-          <th style="width:150px">{{ 'common.date' | transloco }}</th>
+          <th style="width:120px">Statut</th>
+          <th style="width:80px" class="text-center">Créés</th>
+          <th style="width:90px" class="text-center">Mis à jour</th>
+          <th style="width:80px" class="text-center">Erreurs</th>
+          <th style="width:150px">Date</th>
           <th style="width:60px"></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-job>
         <tr>
           <td><span class="text-400 font-mono text-sm">#{{ job.id }}</span></td>
-          <td><span class="text-sm text-900">{{ getTypeLabel(job.type) }}</span></td>
+          <td>
+            <div class="flex align-items-center gap-1">
+              <i class="pi pi-sm"
+                [ngClass]="{
+                  'pi-box':         job.type === 'MATIERES',
+                  'pi-truck':       job.type === 'FOURNISSEURS',
+                  'pi-book':        job.type === 'RECETTES',
+                  'pi-file-import': job.type === 'RECETTE'
+                }" class="text-400 text-xs"></i>
+              <span class="text-sm text-900">{{ getTypeLabel(job.type) }}</span>
+            </div>
+          </td>
           <td><span class="text-sm text-500 font-mono">{{ job.nomFichier }}</span></td>
           <td>
             <p-tag [value]="job.statut" [severity]="getStatutSeverity(job.statut)" />
           </td>
           <td class="text-center">
-            <span class="font-semibold text-green-600">{{ job.nbLignesOk ?? '—' }}</span>
+            <span class="font-semibold text-green-600">{{ job.nbCrees ?? job.nbLignesOk ?? '—' }}</span>
+          </td>
+          <td class="text-center">
+            <span class="font-semibold text-blue-600">{{ job.nbMisAJour ?? '—' }}</span>
           </td>
           <td class="text-center">
             <span [class.text-red-500]="job.nbLignesErreur > 0"
@@ -454,13 +463,9 @@
           <td><span class="text-sm text-500">{{ job.createdAt | date:'dd/MM/yyyy HH:mm' }}</span></td>
           <td>
             @if (job.statut === 'DONE') {
-              <p-button
-                icon="pi pi-undo"
-                severity="danger"
-                [text]="true" [rounded]="true" size="small"
-                [pTooltip]="'import_data.cancel_import' | transloco"
-                (onClick)="undoImport(job)"
-              />
+              <p-button icon="pi pi-undo" severity="danger" [text]="true"
+                [rounded]="true" size="small" pTooltip="Annuler cet import"
+                (onClick)="undoImport(job)" />
             }
           </td>
         </tr>

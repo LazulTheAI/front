@@ -28,10 +28,6 @@ export class AppMenu implements OnInit {
         this.transloco.selectTranslation().subscribe(() => {
             this.buildMenu();
         });
-
-        this.transloco.langChanges$.subscribe(() => {
-            this.buildMenu();
-        });
     }
 
     private buildMenu(): void {

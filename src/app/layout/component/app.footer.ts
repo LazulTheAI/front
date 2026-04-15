@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     standalone: true,
     selector: 'app-footer',
     template: `<div class="layout-footer">
-        For ore information
+        For more information
         <a href="https://todo.org" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline">documentation</a>
     </div>`
 })

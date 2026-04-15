@@ -103,7 +103,7 @@ export class UpgradeBannerComponent {
     subscription = inject(SubscriptionService);
 
     get requiredPlan(): PlanLevel {
-        return this.subscription.requiredPlanFor(this.feature) ?? 'maker';
+        return this.subscription.requiredPlanFor(this.feature) ?? 'pro';
     }
 
     get planMeta() {

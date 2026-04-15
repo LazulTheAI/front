@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            @if (materiau.stocks && materiau.stocks.length > 1) {
+            @if (materiau.stocks && materiau.stocks.length > 0) {
                 <div class="entrepot-breakdown">
                     <p class="section-label">Répartition par entrepôt</p>
                     @for (s of materiau.stocks; track s.entrepotId) {

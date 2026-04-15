@@ -164,8 +164,8 @@ export class ProductUsageBarComponent implements OnInit {
         const plan = this.subscription.planLevel();
         const nextPlan: Record<PlanLevel, Exclude<PlanLevel, 'trial'> | null> = {
             trial: 'starter',
-            starter: 'maker',
-            maker: 'atelier',
+            starter: 'pro',
+            maker: 'business',
             atelier: null
         };
         const target = nextPlan[plan];
