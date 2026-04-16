@@ -1,9 +1,0 @@
-recipe_name,batch_size,batch_unit,ingredient_name,ingredient_amount,ingredient_unit,ingredient_type
-Bière Blonde 20L,20,L,Malt Pilsner,4000,g,grain
-Bière Blonde 20L,20,L,Houblon Cascade,25,g,hop
-Bière Blonde 20L,20,L,Levure Blanche,11,g,yeast
-Bière Ambrée 20L,20,L,Malt Crystal,3500,g,grain
-Bière Ambrée 20L,20,L,Houblon Fuggles,20,g,hop
-Bière Ambrée 20L,20,L,Levure Blanche,11,g,yeast
-Cidre Brut 10L,10,L,Jus de pomme concentré,8000,mL,other
-Cidre Brut 10L,10,L,Levure de cidre,5,g,yeast

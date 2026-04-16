@@ -1148,7 +1148,27 @@
     "history": "Historique des imports",
     "no_history": "Aucun import effectué",
     "ignore": "— Ignorer —",
-    "cancel_import": "Annuler cet import"
+    "cancel_import": "Annuler cet import",
+    "cols": {
+      "nom": "Nom",
+      "unite": "Unité",
+      "sku": "Référence SKU",
+      "quantite": "Quantité",
+      "cout_unitaire": "Coût unitaire",
+      "numero_lot": "Numéro de lot",
+      "dlc": "DLC (DD/MM/YYYY)",
+      "fournisseur": "Fournisseur",
+      "entrepot": "Entrepôt",
+      "email": "Email",
+      "telephone": "Téléphone",
+      "recipe_name": "Nom de la recette",
+      "batch_size": "Taille du batch",
+      "batch_unit": "Unité du batch",
+      "ingredient_name": "Nom de l'ingrédient",
+      "ingredient_amount": "Quantité",
+      "ingredient_unit": "Unité",
+      "ingredient_type": "Type d'ingrédient"
+    }
   },
   "rapports": {
     "title": "Rapports",

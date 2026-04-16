@@ -128,12 +128,12 @@
 
           <!-- Colonnes attendues -->
           <div class="flex flex-wrap gap-2">
-            @for (col of config.colonnesInfo; track col) {
+            @for (col of config.colonnesInfo; track col.key) {
               <span class="px-2 py-1 border-round text-xs font-mono surface-100 text-700"
-                [class.border-1]="col.includes('*')"
-                [class.border-primary]="col.includes('*')"
-                [class.text-primary]="col.includes('*')">
-                {{ col }}
+                [class.border-1]="col.required"
+                [class.border-primary]="col.required"
+                [class.text-primary]="col.required">
+                {{ 'import_data.cols.' + col.key | transloco }}@if (col.required) { <span class="ml-1">*</span> }
               </span>
             }
           </div>

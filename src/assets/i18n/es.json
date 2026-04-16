@@ -1148,7 +1148,27 @@
     "history": "Historial de importaciones",
     "no_history": "Ninguna importación realizada",
     "ignore": "— Ignorar —",
-    "cancel_import": "Cancelar esta importación"
+    "cancel_import": "Cancelar esta importación",
+    "cols": {
+      "nom": "Nombre",
+      "unite": "Unidad",
+      "sku": "Referencia SKU",
+      "quantite": "Cantidad",
+      "cout_unitaire": "Coste unitario",
+      "numero_lot": "Número de lote",
+      "dlc": "Fecha vencimiento (DD/MM/YYYY)",
+      "fournisseur": "Proveedor",
+      "entrepot": "Almacén",
+      "email": "Email",
+      "telephone": "Teléfono",
+      "recipe_name": "Nombre de receta",
+      "batch_size": "Tamaño del lote",
+      "batch_unit": "Unidad del lote",
+      "ingredient_name": "Nombre del ingrediente",
+      "ingredient_amount": "Cantidad",
+      "ingredient_unit": "Unidad",
+      "ingredient_type": "Tipo de ingrediente"
+    }
   },
   "rapports": {
     "title": "Informes",

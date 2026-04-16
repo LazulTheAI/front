@@ -1147,7 +1147,27 @@
     "history": "Import history",
     "no_history": "No imports performed",
     "ignore": "— Ignore —",
-    "cancel_import": "Cancel this import"
+    "cancel_import": "Cancel this import",
+    "cols": {
+      "nom": "Name",
+      "unite": "Unit",
+      "sku": "SKU Reference",
+      "quantite": "Quantity",
+      "cout_unitaire": "Unit cost",
+      "numero_lot": "Batch number",
+      "dlc": "Expiry date (DD/MM/YYYY)",
+      "fournisseur": "Supplier",
+      "entrepot": "Warehouse",
+      "email": "Email",
+      "telephone": "Phone",
+      "recipe_name": "Recipe name",
+      "batch_size": "Batch size",
+      "batch_unit": "Batch unit",
+      "ingredient_name": "Ingredient name",
+      "ingredient_amount": "Quantity",
+      "ingredient_unit": "Unit",
+      "ingredient_type": "Ingredient type"
+    }
   },
   "rapports": {
     "title": "Reports",

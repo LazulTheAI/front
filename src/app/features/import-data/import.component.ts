@@ -17,7 +17,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { environment } from '@/environments/environment';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 interface ChampSysteme {
     label: string;
@@ -40,14 +40,19 @@ interface ImportResultat {
     details: ErreurImport[];
 }
 
+interface ColonneInfo {
+    key: string;   // clé i18n sous import_data.cols.*
+    required: boolean;
+}
+
 interface TypeConfig {
     label: string;
     icon: string;
     description: string;
     formats: string;
-    templateUrl: string;
     templateLabel: string;
-    colonnesInfo: string[];
+    colonnesInfo: ColonneInfo[];
+    templateExemples: string[][];  // lignes d'exemple sans les en-têtes
 }
 
 const CHAMPS_PAR_TYPE: Record<string, ChampSysteme[]> = {
@@ -84,27 +89,61 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
         icon: 'pi-box',
         description: 'Importer des matières premières depuis un fichier Excel ou CSV. Les matières existantes (même nom) seront mises à jour.',
         formats: '.csv, .xlsx',
-        templateUrl: '/api/imports/templates/matieres',
-        templateLabel: 'Template Excel',
-        colonnesInfo: ['nom *', 'unite *', 'sku', 'quantite', 'coutUnitaire', 'numeroLot', 'dlc (DD/MM/YYYY)', 'fournisseur', 'entrepot']
+        templateLabel: 'Template CSV',
+        colonnesInfo: [
+            { key: 'nom', required: true },
+            { key: 'unite', required: true },
+            { key: 'sku', required: false },
+            { key: 'quantite', required: false },
+            { key: 'cout_unitaire', required: false },
+            { key: 'numero_lot', required: false },
+            { key: 'dlc', required: false },
+            { key: 'fournisseur', required: false },
+            { key: 'entrepot', required: false }
+        ],
+        templateExemples: [
+            ['Farine de blé T55', 'kg', 'FAR-001', '50', '1.20', 'LOT-2024-001', '31/12/2025', 'Moulin du Sud', 'Entrepôt principal'],
+            ['Sucre blanc', 'kg', 'SUC-001', '25', '0.90', '', '', '', ''],
+            ['Beurre doux', 'kg', 'BEU-001', '10', '8.50', 'LOT-2024-002', '15/06/2025', 'Laiterie Nord', 'Chambre froide']
+        ]
     },
     FOURNISSEURS: {
         label: 'Fournisseurs',
         icon: 'pi-truck',
         description: 'Importer ou mettre à jour des fournisseurs.',
         formats: '.csv, .xlsx',
-        templateUrl: '/api/imports/templates/fournisseurs',
-        templateLabel: 'Template Excel',
-        colonnesInfo: ['nom *', 'email', 'telephone']
+        templateLabel: 'Template CSV',
+        colonnesInfo: [
+            { key: 'nom', required: true },
+            { key: 'email', required: false },
+            { key: 'telephone', required: false }
+        ],
+        templateExemples: [
+            ['Moulin du Sud', 'contact@moulin-du-sud.fr', '04 91 00 11 22'],
+            ['Laiterie Nord', 'commandes@laiterie-nord.fr', '03 20 00 33 44'],
+            ['Ferme Dupont', 'ferme.dupont@email.com', '']
+        ]
     },
     RECETTE: {
         label: 'Recettes',
         icon: 'pi-file-import',
         description: "Importer des recettes depuis un export CSV RECETTE. Les matières sont auto-créées si elles n'existent pas.",
         formats: '.csv',
-        templateUrl: '/api/imports/templates/recettes-RECETTE',
         templateLabel: 'Exemple CSV',
-        colonnesInfo: ['recipe_name *', 'batch_size *', 'batch_unit *', 'ingredient_name *', 'ingredient_amount *', 'ingredient_unit', 'ingredient_type']
+        colonnesInfo: [
+            { key: 'recipe_name', required: true },
+            { key: 'batch_size', required: true },
+            { key: 'batch_unit', required: true },
+            { key: 'ingredient_name', required: true },
+            { key: 'ingredient_amount', required: true },
+            { key: 'ingredient_unit', required: false },
+            { key: 'ingredient_type', required: false }
+        ],
+        templateExemples: [
+            ['Tarte aux pommes', '1', 'unité', 'Farine de blé T55', '250', 'g', 'MATIERE_PREMIERE'],
+            ['Tarte aux pommes', '1', 'unité', 'Beurre doux', '125', 'g', 'MATIERE_PREMIERE'],
+            ['Tarte aux pommes', '1', 'unité', 'Sucre blanc', '80', 'g', 'MATIERE_PREMIERE']
+        ]
     }
 };
 
@@ -152,7 +191,8 @@ export class ImportComponent {
     constructor(
         private http: HttpClient,
         private messageService: MessageService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private transloco: TranslocoService
     ) {
         this.loadHistorique();
     }
@@ -233,7 +273,16 @@ export class ImportComponent {
 
     telechargerTemplate(): void {
         if (!this.config) return;
-        window.open(`${environment.baseUrl}${this.config.templateUrl}`, '_blank');
+        const headers = this.config.colonnesInfo.map((c) => this.transloco.translate(`import_data.cols.${c.key}`));
+        const rows = [headers, ...this.config.templateExemples];
+        const csv = rows.map((r) => r.map((cell) => `"${cell}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `template-${this.typeSelectionne!.toLowerCase()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
     // ── Step 2 : Mapping ──────────────────────────────────────
