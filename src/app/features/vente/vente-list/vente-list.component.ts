@@ -128,6 +128,19 @@ export class CommandesListComponent implements OnInit, OnDestroy {
         this.loadCommandes();
     }
 
+    getWorkflowPct(c: any): number {
+        const map: Record<string, number> = {
+            BROUILLON: 10,
+            CONFIRMEE: 30,
+            EN_COURS: 60,
+            EXPEDIEE: 80,
+            LIVREE: 100,
+            ANNULEE: 0,
+            ERREUR: 0
+        };
+        return map[c.statut] ?? 0;
+    }
+
     openChangerLot(c: CommandeResponse, event: Event) {
         event.stopPropagation();
         this.selectedCommande = c;
@@ -198,19 +211,6 @@ export class CommandesListComponent implements OnInit, OnDestroy {
 
     onDetailClosed(): void {
         this.loadCommandes();
-    }
-
-    getStatutSeverity(statut: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-        const map: Record<string, any> = {
-            BROUILLON: 'secondary',
-            CONFIRMEE: 'info',
-            EN_COURS: 'info',
-            EXPEDIEE: 'warn',
-            LIVREE: 'success',
-            ANNULEE: 'danger',
-            ERREUR: 'danger'
-        };
-        return map[statut] ?? 'secondary';
     }
 
     getStatutLabel(statut: string): string {

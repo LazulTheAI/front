@@ -1,5 +1,5 @@
 import { APP_CURRENCY } from '@/app/core/currency.config';
-import { CommandeControllerService, LotDisponibleResponse, ProduitControllerService, RevendeurControllerService } from '@/app/modules/openapi';
+import { CommandeControllerService, EntrepotControllerService, LotDisponibleResponse, ProduitControllerService, RevendeurControllerService } from '@/app/modules/openapi';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -40,8 +40,12 @@ export class CommandeFormDialogComponent implements OnInit {
     @Output() visibleChange = new EventEmitter<boolean>();
     @Output() saved = new EventEmitter<void>();
 
+    entrepotOptions: { label: string; value: number }[] = [];
+    submitted = false;
+
     form = {
         revendeurId: null as number | null,
+        entrepotId: null as number | null,
         dateLivraisonSouhaitee: null as Date | null,
         remise: null as number | null,
         notes: null as string | null
@@ -59,7 +63,8 @@ export class CommandeFormDialogComponent implements OnInit {
         private commandeService: CommandeControllerService,
         private revendeurService: RevendeurControllerService,
         private produitService: ProduitControllerService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private entrepotService: EntrepotControllerService
     ) {}
 
     ngOnInit() {
@@ -81,6 +86,18 @@ export class CommandeFormDialogComponent implements OnInit {
                         prixCents: p.prixCents
                     })) ?? [])
         );
+
+        this.entrepotService.listerEntrepot().subscribe(
+            (list) =>
+                (this.entrepotOptions = list.map((e) => ({
+                    label: e.nom!,
+                    value: e.id!
+                })))
+        );
+    }
+
+    isFormValid(): boolean {
+        return !!this.form.revendeurId && !!this.form.entrepotId && this.lignes.length > 0 && this.lignes.every((l) => !!l.produitId && !!l.quantite && l.quantite > 0);
     }
 
     onRevendeurChange() {
@@ -165,16 +182,14 @@ export class CommandeFormDialogComponent implements OnInit {
         return this.sousTotal * (1 - remise / 100);
     }
 
-    isFormValid(): boolean {
-        return !!this.form.revendeurId && this.lignes.length > 0 && this.lignes.every((l) => !!l.produitId && !!l.quantite && l.quantite > 0);
-    }
-
     submit() {
+        this.submitted = true;
         if (!this.isFormValid()) return;
         this.saving = true;
 
         const payload = {
             revendeurId: this.form.revendeurId!,
+            entrepotId: this.form.entrepotId!, // ← à envoyer au backend
             dateLivraisonSouhaitee: this.form.dateLivraisonSouhaitee?.toISOString() ?? null,
             remise: this.form.remise,
             notes: this.form.notes,
@@ -184,7 +199,7 @@ export class CommandeFormDialogComponent implements OnInit {
                 prixUnitaireCents: l.prixUnitaireCents,
                 remise: l.remise,
                 notes: l.notes,
-                lotId: l.lotId // ← envoyé au backend
+                lotId: l.lotId
             }))
         };
 
@@ -212,9 +227,10 @@ export class CommandeFormDialogComponent implements OnInit {
     }
 
     private reset() {
-        this.form = { revendeurId: null, dateLivraisonSouhaitee: null, remise: null, notes: null };
+        this.form = { revendeurId: null, entrepotId: null, dateLivraisonSouhaitee: null, remise: null, notes: null };
         this.lignes = [];
         this.saving = false;
+        this.submitted = false;
         this.selectedRevendeur = null;
     }
 }
