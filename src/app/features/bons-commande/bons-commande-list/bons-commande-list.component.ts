@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -47,7 +47,10 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
     // Filtres
     filtreStatut: string | null = null;
     search = '';
+
+    private load$ = new Subject<void>();
     private search$ = new Subject<string>();
+    private destroy$ = new Subject<void>();
 
     statutOptions = [
         { label: 'Tous les statuts', value: null },
@@ -70,17 +73,46 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.search$.pipe(debounceTime(400), distinctUntilChanged()).subscribe((value) => {
-            this.search = value;
-            this.page = 0;
-            this.loadBons();
+        // switchMap annule la requête précédente si une nouvelle est déclenchée avant la réponse
+        this.load$.pipe(
+            switchMap(() => {
+                this.loading = true;
+                this.cdr.markForCheck();
+                return this.bonService.listerBonCommande(
+                    this.page, this.size, this.sortBy, this.sortDir,
+                    (this.filtreStatut as any) ?? undefined,
+                    this.search || undefined
+                );
+            }),
+            takeUntil(this.destroy$)
+        ).subscribe({
+            next: (data: any) => {
+                this.bons = data.content;
+                this.totalRecords = data.totalElements;
+                this.loading = false;
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.loading = false;
+                this.cdr.markForCheck();
+            }
         });
 
-        this.loadBons();
+        // La recherche texte met à jour this.search puis déclenche le chargement
+        this.search$.pipe(
+            debounceTime(400),
+            distinctUntilChanged(),
+            takeUntil(this.destroy$)
+        ).subscribe((value) => {
+            this.search = value;
+            this.page = 0;
+            this.load$.next();
+        });
     }
 
     ngOnDestroy(): void {
-        this.search$.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     onSearchInput(value: string): void {
@@ -98,22 +130,6 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
         return map[bon.statut] ?? 0;
     }
 
-    loadBons(): void {
-        this.loading = true;
-        this.bonService.listerBonCommande(this.page, this.size, this.sortBy, this.sortDir, (this.filtreStatut as any) ?? undefined, this.search || undefined).subscribe({
-            next: (data: any) => {
-                this.bons = data.content;
-                this.totalRecords = data.totalElements;
-                this.loading = false;
-                this.cdr.markForCheck();
-            },
-            error: () => {
-                this.loading = false;
-                this.cdr.markForCheck();
-            }
-        });
-    }
-
     onLazyLoad(event: TableLazyLoadEvent): void {
         this.page = Math.floor((event.first ?? 0) / (event.rows ?? this.size));
         this.size = event.rows ?? this.size;
@@ -123,12 +139,12 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
             this.sortDir = event.sortOrder === -1 ? 'desc' : 'asc';
         }
 
-        this.loadBons();
+        this.load$.next();
     }
 
     onFiltreChange(): void {
         this.page = 0;
-        this.loadBons();
+        this.load$.next();
     }
 
     openCreate(): void {
@@ -157,7 +173,7 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
                             summary: 'Annulé',
                             detail: `BC #${bon.id} annulé`
                         });
-                        this.loadBons();
+                        this.load$.next();
                     }
                 });
             }
@@ -178,7 +194,7 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
                             summary: 'Supprimé',
                             detail: `BC #${bon.id} supprimé`
                         });
-                        this.loadBons();
+                        this.load$.next();
                     }
                 });
             }
@@ -192,13 +208,13 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
             summary: result.success ? 'Succès' : 'Erreur',
             detail: result.message
         });
-        if (result.success) this.loadBons();
+        if (result.success) this.load$.next();
         this.cdr.markForCheck();
     }
 
     onDetailClosed(): void {
         this.showDetailDialog = false;
-        this.loadBons();
+        this.load$.next();
         this.cdr.markForCheck();
     }
 
@@ -263,7 +279,7 @@ export class BonsCommandeListComponent implements OnInit, OnDestroy {
                     summary: 'Envoyé',
                     detail: `BC #${bon.id} marqué comme envoyé`
                 });
-                this.loadBons();
+                this.load$.next();
             }
         });
     }

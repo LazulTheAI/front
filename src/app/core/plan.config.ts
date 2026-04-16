@@ -26,7 +26,7 @@ export const FEATURE_PLAN_REQUIREMENTS: Record<string, PlanLevel> = {
     'api-publique': 'business',
     'multi-devises': 'business',
     'support-prioritaire': 'business',
-    'commandes-b2b': 'business'
+    vente: 'business'
 };
 
 export const PLAN_PRODUCT_LIMITS: Record<PlanLevel, number> = {

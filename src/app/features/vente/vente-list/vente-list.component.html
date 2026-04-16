@@ -49,13 +49,13 @@
         />
       }
 
-      <!-- Produit -->
+      <!-- SKU produit -->
       <p-iconfield>
-        <p-inputicon styleClass="pi pi-box" />
+        <p-inputicon styleClass="pi pi-barcode" />
         <input pInputText
-          [(ngModel)]="filtreProduitNom"
+          [(ngModel)]="filtreProduitSku"
           (ngModelChange)="onSearchInput()"
-          [placeholder]="'commandes.filtre_produit' | transloco"
+          [placeholder]="'commandes.filtre_sku' | transloco"
           class="w-10rem" />
       </p-iconfield>
 

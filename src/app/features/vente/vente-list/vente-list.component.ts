@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
@@ -16,12 +16,12 @@ import { Toast } from 'primeng/toast';
 import { Toolbar } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 
-import { CommandeControllerService, CommandeResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
 import { APP_CURRENCY } from '@/app/core/currency.config';
+import { CommandeControllerService, CommandeResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { CommandeChangerLotDialogComponent } from '../commande-changer-lot-dialog/commande-changer-lot-dialog.component';
-import { CommandeDetailDialogComponent } from '../commande-detail-dialog/commande-detail-dialog.component';
-import { CommandeFormDialogComponent } from '../commande-form-dialog/commande-form-dialog.component';
+import { CommandeChangerLotDialogComponent } from '../vente-changer-lot-dialog/vente-changer-lot-dialog.component';
+import { CommandeDetailDialogComponent } from '../vente-detail-dialog/vente-detail-dialog.component';
+import { CommandeFormDialogComponent } from '../vente-form-dialog/vente-form-dialog.component';
 
 interface SelectOption {
     label: string;
@@ -52,7 +52,7 @@ interface SelectOption {
         CommandeDetailDialogComponent
     ],
     providers: [MessageService, ConfirmationService],
-    templateUrl: './commandes-list.component.html'
+    templateUrl: './vente-list.component.html'
 })
 export class CommandesListComponent implements OnInit, OnDestroy {
     commandes: CommandeResponse[] = [];
@@ -68,7 +68,7 @@ export class CommandesListComponent implements OnInit, OnDestroy {
     filtreSource: string | null = null;
     filtreRevendeurId: number | null = null;
     filtreNumeroLot = '';
-    filtreProduitNom = '';
+    filtreProduitSku = '';
 
     revendeurs: RevendeurResponse[] = [];
     revendeurOptions: SelectOption[] = [];
@@ -120,7 +120,7 @@ export class CommandesListComponent implements OnInit, OnDestroy {
         });
 
         // Debounce sur les filtres texte
-        this.searchSubject.pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$)).subscribe(() => {
+        this.searchSubject.pipe(debounceTime(300), takeUntil(this.destroy$)).subscribe(() => {
             this.page = 0;
             this.loadCommandes();
         });
@@ -141,7 +141,7 @@ export class CommandesListComponent implements OnInit, OnDestroy {
 
     loadCommandes(): void {
         this.loading = true;
-        this.commandeService.listerCommande(this.filtreRevendeurId ?? undefined, this.filtreStatut ?? undefined, this.filtreSource ?? undefined, this.filtreNumeroLot || undefined, this.filtreProduitNom || undefined, this.page, this.size).subscribe({
+        this.commandeService.listerCommande(this.filtreRevendeurId ?? undefined, this.filtreStatut ?? undefined, this.filtreSource ?? undefined, this.filtreNumeroLot || undefined, this.filtreProduitSku || undefined, this.page, this.size).subscribe({
             next: (data: any) => {
                 this.commandes = data.content;
                 this.totalRecords = data.totalElements;
@@ -281,12 +281,12 @@ export class CommandesListComponent implements OnInit, OnDestroy {
         this.filtreSource = null;
         this.filtreRevendeurId = null;
         this.filtreNumeroLot = '';
-        this.filtreProduitNom = '';
+        this.filtreProduitSku = '';
         this.page = 0;
         this.loadCommandes();
     }
 
     get hasFiltresActifs(): boolean {
-        return !!(this.filtreStatut || this.filtreSource || this.filtreRevendeurId || this.filtreNumeroLot || this.filtreProduitNom);
+        return !!(this.filtreStatut || this.filtreSource || this.filtreRevendeurId || this.filtreNumeroLot || this.filtreProduitSku);
     }
 }

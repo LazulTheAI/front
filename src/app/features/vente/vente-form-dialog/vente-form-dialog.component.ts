@@ -1,5 +1,5 @@
-import { CommandeControllerService, LotDisponibleResponse, ProduitControllerService, RevendeurControllerService } from '@/app/modules/openapi';
 import { APP_CURRENCY } from '@/app/core/currency.config';
+import { CommandeControllerService, LotDisponibleResponse, ProduitControllerService, RevendeurControllerService } from '@/app/modules/openapi';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -33,7 +33,7 @@ interface LigneForm {
     standalone: true,
     imports: [CommonModule, FormsModule, DialogModule, ButtonModule, DividerModule, InputNumberModule, InputTextModule, SelectModule, DatePickerModule, TagModule, TranslocoModule, ToastModule, CurrencyPipe],
     providers: [MessageService],
-    templateUrl: './commande-form-dialog.component.html'
+    templateUrl: './vente-form-dialog.component.html'
 })
 export class CommandeFormDialogComponent implements OnInit {
     @Input() visible = false;

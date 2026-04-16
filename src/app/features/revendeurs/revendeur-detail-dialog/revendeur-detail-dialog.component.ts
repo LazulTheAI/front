@@ -74,7 +74,7 @@ export class RevendeurDetailDialogComponent implements OnChanges {
     downloadBonLivraison(c: CommandeResponse): void {
         const lang = navigator.language?.split('-')[0] ?? 'fr';
         this.http
-            .get(`${environment.baseUrl}/api/pdf/commandes-b2b/${c.id}/bon-livraison?lang=${lang}`, {
+            .get(`${environment.baseUrl}/api/pdf/vente/${c.id}/bon-livraison?lang=${lang}`, {
                 responseType: 'blob'
             })
             .subscribe({

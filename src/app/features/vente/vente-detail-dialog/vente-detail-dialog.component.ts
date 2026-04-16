@@ -8,8 +8,8 @@ import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
-import { CommandeControllerService, CommandeResponse } from '@/app/modules/openapi';
 import { APP_CURRENCY } from '@/app/core/currency.config';
+import { CommandeControllerService, CommandeResponse } from '@/app/modules/openapi';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
@@ -20,7 +20,7 @@ import { environment } from '../../../../environments/environment';
     standalone: true,
     imports: [CommonModule, TranslocoModule, FormsModule, DialogModule, Button, Tag, TableModule, Toast],
     providers: [MessageService],
-    templateUrl: './commande-detail-dialog.component.html'
+    templateUrl: './vente-detail-dialog.component.html'
 })
 export class CommandeDetailDialogComponent implements OnChanges {
     @Input() visible = false;
@@ -75,11 +75,11 @@ export class CommandeDetailDialogComponent implements OnChanges {
     }
 
     downloadBonLivraison(): void {
-        this.downloadPdf(`${environment.baseUrl}/api/pdf/commandes-b2b/${this.commande!.id}/bon-livraison`, `bon-livraison-${this.commande!.numero}.pdf`);
+        this.downloadPdf(`${environment.baseUrl}/api/pdf/vente/${this.commande!.id}/bon-livraison`, `bon-livraison-${this.commande!.numero}.pdf`);
     }
 
     downloadFacture(): void {
-        this.downloadPdf(`${environment.baseUrl}/api/pdf/commandes-b2b/${this.commande!.id}/facture`, `facture-${this.commande!.numero}.pdf`);
+        this.downloadPdf(`${environment.baseUrl}/api/pdf/vente/${this.commande!.id}/facture`, `facture-${this.commande!.numero}.pdf`);
     }
 
     private downloadPdf(url: string, filename: string): void {

@@ -52,7 +52,7 @@ export class AppMenu implements OnInit {
                 items: [
                     { label: this.t('menu.products'), icon: 'pi pi-tag', routerLink: ['produits'] },
                     { label: this.t('menu.resellers'), icon: 'pi pi-users', routerLink: ['revendeurs'] },
-                    { label: this.t('menu.b2b_orders'), icon: 'pi pi-shopping-bag', routerLink: ['commandes-b2b'] }
+                    { label: this.t('menu.b2b_orders'), icon: 'pi pi-shopping-bag', routerLink: ['vente'] }
                 ]
             },
             {

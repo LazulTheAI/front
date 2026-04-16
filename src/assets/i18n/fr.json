@@ -640,6 +640,7 @@
     "col_statut": "Statut",
     "col_date": "Date",
     "filtre_produit": "Produit...",
+    "filtre_sku": "SKU...",
     "filtre_lot": "N° lot...",
     "reset_filtres": "Effacer les filtres",
     "nouvelle_commande": "Nouvelle commande",
