@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule, NgForm } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
@@ -10,8 +10,8 @@ import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 
-import { EntrepotControllerService, EntrepotResponse, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { APP_CURRENCY, APP_CURRENCY_LOCALE } from '@/app/core/currency.config';
+import { EntrepotControllerService, EntrepotResponse, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { EntreeManuelleRequest } from '@/app/modules/openapi/model/entree-manuelle-request';
 import { DialogModule } from 'primeng/dialog';
 
@@ -66,8 +66,11 @@ export class EntreeProduitDialogComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['visible'] && this.visible) {
-            this.resetForm();
+        const visibleChanged = changes['visible']?.currentValue === true;
+        const produitChanged = !!changes['produit'];
+
+        if ((visibleChanged || produitChanged) && this.visible && this.produit) {
+            setTimeout(() => this.resetForm());
         }
     }
 
@@ -106,14 +109,17 @@ export class EntreeProduitDialogComponent implements OnInit, OnChanges {
     }
 
     private resetForm(): void {
+        console.log('resetForm — produit:', this.produit);
+        console.log('resetForm — prixCents:', this.produit?.prixCents);
         this.form = {
             entrepotId: null,
             quantite: null,
-            coutUnitaireSnapshot: null,
+            coutUnitaireSnapshot: this.produit?.prixCents != null ? this.produit.prixCents / 100 : null,
             referenceId: '',
             numeroLot: '',
             dlc: null,
             notes: ''
         };
+        console.log('resetForm — coutUnitaireSnapshot:', this.form.coutUnitaireSnapshot);
     }
 }

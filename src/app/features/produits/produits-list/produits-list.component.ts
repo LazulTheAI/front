@@ -299,10 +299,6 @@ export class ProduitsListComponent implements OnInit {
         return (produit as any).enAlerteProduit ?? false;
     }
 
-    getSeuilProduit(produit: ProduitResponse): number | null {
-        return (produit as any).seuilAlerte ?? null;
-    }
-
     isDlcProche(dlc: string | null | undefined): boolean {
         if (!dlc) return false;
         const limite = new Date();

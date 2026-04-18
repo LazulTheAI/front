@@ -63,7 +63,6 @@
         <th style="width:160px">{{ 'produits.internal_stock' | transloco }}</th>
         <th style="width:160px">{{ 'produits.alert_threshold' | transloco }}</th>
         <th>{{ 'produits.linked_recipe' | transloco }}</th>
-        <th style="width:110px">{{ 'produits.bc_sync' | transloco }}</th>
         <th style="width:80px" class="text-center">{{ 'common.actions' | transloco }}</th>
       </tr>
     </ng-template>
@@ -118,10 +117,22 @@
         <!-- Seuil alerte -->
         <td (click)="$event.stopPropagation()">
           <div class="flex align-items-center gap-2">
-            @if (getSeuilProduit(produit) != null) {
-              <span class="text-sm text-900">
-                {{ getSeuilProduit(produit) | number:'1.0-2' }}
-              </span>
+            @if (produit.seuils && produit.seuils.length > 0) {
+              <div class="flex flex-column gap-1">
+                @for (s of produit.seuils; track s.entrepotId) {
+                  <div class="flex align-items-center gap-1">
+                    @if (s.enAlerte) {
+                      <i class="pi pi-exclamation-circle text-red-500 text-xs"></i>
+                    }
+                    <span class="text-xs text-400">{{ s.entrepotNom }}:</span>
+                    <span class="text-sm font-semibold"
+                      [class.text-red-500]="s.enAlerte"
+                      [class.text-900]="!s.enAlerte">
+                      {{ s.seuilAlerte | number:'1.0-2' }}
+                    </span>
+                  </div>
+                }
+              </div>
             } @else {
               <span class="text-400 text-sm">—</span>
             }
@@ -145,17 +156,6 @@
             <span class="text-orange-400 text-sm flex align-items-center gap-1">
               <i class="pi pi-exclamation-circle"></i>{{ 'produits.no_recipe' | transloco }}
             </span>
-          }
-        </td>
-
-        <td>
-          @if (produit.lastSyncedAt) {
-            <span class="text-xs text-500"
-              [pTooltip]="(produit.lastSyncedAt | date:'dd/MM/yyyy HH:mm:ss') ?? ''">
-              {{ produit.lastSyncedAt | date:'dd/MM HH:mm' }}
-            </span>
-          } @else {
-            <span class="text-400 text-xs">{{ 'produits.never' | transloco }}</span>
           }
         </td>
 
