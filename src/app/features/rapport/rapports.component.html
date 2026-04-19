@@ -40,61 +40,132 @@
   </ng-template>
 </p-toolbar>
 
-<!-- ═══ SECTION : Valeur du stock ════════════════════════════ -->
+<!-- ═══ SECTION : Ventes par plateforme ══════════════════════ -->
+<p-divider />
+
 <div class="flex align-items-center gap-2 mb-3">
-  <i class="pi pi-wallet text-primary"></i>
-  <h2 class="text-900 font-semibold text-lg m-0">{{ 'rapports.stock_value' | transloco }}</h2>
+  <i class="pi pi-shopping-cart text-primary"></i>
+  <h2 class="text-900 font-semibold text-lg m-0">Ventes</h2>
 </div>
 
+<!-- KPIs -->
 <div class="grid mb-4">
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.total_value' | transloco }}</div>
-      @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
+      <div class="text-400 text-xs font-semibold uppercase mb-2">CA total</div>
+      @if (loadingVentes) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-primary">
-          {{ valeurTotale | currency:appCurrency:'symbol':'1.2-2' }}
+          {{ caTotalVentes | currency:appCurrency:'symbol':'1.2-2' }}
         </div>
       }
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.valued_references' | transloco }}</div>
-      @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Commandes</div>
+      @if (loadingVentes) { <p-skeleton height="2.5rem" /> }
       @else {
-        <div class="text-3xl font-bold text-900">
-          {{ totalMateriaux - materiauSansCout }} / {{ totalMateriaux }}
-        </div>
-        @if (materiauSansCout > 0) {
-          <div class="text-orange-500 text-xs mt-1">{{ materiauSansCout }} {{ 'rapports.without_cost' | transloco }}</div>
-        }
+        <div class="text-3xl font-bold text-900">{{ nbTotalCommandes }}</div>
       }
     </div>
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.average_value' | transloco }}</div>
-      @if (loadingValeur) { <p-skeleton height="2.5rem" /> }
+      <div class="text-400 text-xs font-semibold uppercase mb-2">Coût matières / CA</div>
+      @if (loadingConso || loadingVentes) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-900">
-          {{ totalMateriaux > 0
-            ? (valeurTotale / totalMateriaux | currency:appCurrency:'symbol':'1.2-2')
-            : '—' }}
+          {{ caTotalVentes > 0 ? ((coutTotalConso / caTotalVentes) * 100).toFixed(1) + '%' : '—' }}
+        </div>
+        <div class="text-xs text-400 mt-1">
+          {{ coutTotalConso | currency:appCurrency:'symbol':'1.2-2' }} de matières
         </div>
       }
     </div>
   </div>
 </div>
 
-@if (!loadingValeur && materiauSansCout > 0) {
-  <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-4">
-    <i class="pi pi-exclamation-triangle text-orange-500"></i>
-    <span class="text-sm text-orange-800">
-      {{ materiauSansCout }} {{ 'rapports.materials_without_cost' | transloco }}
-    </span>
+<!-- Doughnut + tableau -->
+<div class="grid mb-4">
+  <div class="col-12 md:col-5">
+    <div class="card flex flex-column align-items-center">
+      <div class="font-semibold text-xl mb-4 align-self-start">Répartition par plateforme</div>
+      @if (loadingVentes) {
+        <p-skeleton shape="circle" size="220px" />
+      } @else if (ventesChartData && (ventesData?.parPlateforme?.length ?? 0) > 0) {
+        <p-chart
+          type="doughnut"
+          [data]="ventesChartData"
+          [options]="ventesChartOptions"
+          styleClass="w-full"
+        />
+      } @else {
+        <div class="flex justify-content-center align-items-center text-400 text-sm"
+             style="height:260px">
+          Aucune vente sur la période
+        </div>
+      }
+    </div>
   </div>
-}
+
+  <div class="col-12 md:col-7">
+    <div class="card h-full">
+      <div class="font-semibold text-xl mb-4">Détail par plateforme</div>
+      @if (loadingVentes) {
+        <p-skeleton height="200px" />
+      } @else {
+        <p-table
+          [value]="ventesData?.parPlateforme ?? []"
+          [showGridlines]="true"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Plateforme</th>
+              <th style="width:110px" class="text-center">Commandes</th>
+              <th style="width:150px" class="text-right">CA</th>
+              <th style="width:90px" class="text-right">%</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-p>
+            <tr>
+              <td>
+                <span class="font-medium text-900">{{ getPlatformLabel(p.source) }}</span>
+              </td>
+              <td class="text-center font-mono text-sm">{{ p.nbCommandes }}</td>
+              <td class="text-right font-semibold text-primary font-mono text-sm">
+                {{ p.caTotal | currency:appCurrency:'symbol':'1.2-2' }}
+              </td>
+              <td class="text-right text-400 text-sm">
+                @if (caTotalVentes > 0) {
+                  {{ ((p.caTotal / caTotalVentes) * 100).toFixed(1) }}%
+                } @else { — }
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+            <tr>
+              <td class="font-semibold">Total</td>
+              <td class="text-center font-semibold font-mono text-sm">{{ nbTotalCommandes }}</td>
+              <td class="text-right font-semibold text-primary font-mono text-sm">
+                {{ caTotalVentes | currency:appCurrency:'symbol':'1.2-2' }}
+              </td>
+              <td class="text-right font-semibold text-sm">100%</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4" class="text-center text-400 py-4">
+                Aucune vente sur la période
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    </div>
+  </div>
+</div>
 
 <!-- ═══ SECTION : Consommation ═══════════════════════════════ -->
 <p-divider />

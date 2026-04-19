@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { MessageService } from 'primeng/api';
@@ -13,14 +13,16 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { AlerteControllerService, AlerteResponse, ConsommationMateriauResponse, RapportConsommationResponse, ReportControllerService } from '@/app/modules/openapi';
-import { environment } from '@/environments/environment';
 import { APP_CURRENCY } from '@/app/core/currency.config';
-import { HttpClient } from '@angular/common/http';
-import { ToolbarModule } from 'primeng/toolbar';
-import { TranslocoModule } from '@jsverse/transloco';
+import { LayoutConfig } from '@/app/layout/service/layout.service';
+import { AlerteControllerService, AlerteResponse, ConsommationMateriauResponse, RapportConsommationResponse, ReportControllerService } from '@/app/modules/openapi';
 import { UpgradeBannerComponent } from '@/app/shared/plan-gating.components';
 import { RequiresFeatureDirective } from '@/app/shared/requires-plan.directive';
+import { environment } from '@/environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { TranslocoModule } from '@jsverse/transloco';
+import { ChartModule } from 'primeng/chart';
+import { ToolbarModule } from 'primeng/toolbar';
 
 interface ValeurStockReportResponse {
     valeurTotale: number;
@@ -45,7 +47,24 @@ interface MouvementExportResponse {
     selector: 'app-rapports',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, TableModule, ButtonModule, TagModule, ToolbarModule, TooltipModule, ToastModule, SkeletonModule, DatePickerModule, SelectModule, DividerModule, TranslocoModule, RequiresFeatureDirective, UpgradeBannerComponent],
+    imports: [
+        CommonModule,
+        ChartModule,
+        FormsModule,
+        TableModule,
+        ButtonModule,
+        TagModule,
+        ToolbarModule,
+        TooltipModule,
+        ToastModule,
+        SkeletonModule,
+        DatePickerModule,
+        SelectModule,
+        DividerModule,
+        TranslocoModule,
+        RequiresFeatureDirective,
+        UpgradeBannerComponent
+    ],
     providers: [MessageService],
     templateUrl: './rapports.component.html',
     styles: `
@@ -96,9 +115,30 @@ export class RapportsComponent implements OnInit {
     ngOnInit(): void {
         this.loadAll();
     }
+
     get isRangePersonnalisee(): boolean {
         return this.periodeSelectionnee === null;
     }
+
+    loadingVentes = false;
+    ventesData: any = null;
+    ventesChartData: any = null;
+    ventesChartOptions: any = null;
+    caTotalVentes = 0;
+
+    private readonly PLATFORM_COLORS: Record<string, string> = {
+        BC: '--p-indigo-500',
+        SHOPIFY: '--p-teal-500',
+        B2B_MANUEL: '--p-orange-500',
+        DIRECT: '--p-purple-500'
+    };
+
+    private readonly PLATFORM_LABELS: Record<string, string> = {
+        BC: 'BigCommerce',
+        SHOPIFY: 'Shopify',
+        B2B_MANUEL: 'B2B Manuel',
+        DIRECT: 'Direct'
+    };
 
     onPeriodeChange(): void {
         // Reset la plage custom quand on choisit une période prédéfinie
@@ -170,6 +210,82 @@ export class RapportsComponent implements OnInit {
         this.loadConsommation();
         this.loadMouvements();
         this.loadAlertes();
+        this.loadVentes();
+    }
+
+    loadVentes(): void {
+        this.loadingVentes = true;
+        const from = this.rangeDates[0]?.toISOString();
+        const until = this.rangeDates[1]?.toISOString();
+        this.http.get<any>(`${environment.baseUrl}/api/reports/ventes?depuis=${from}&jusqu=${until}`).subscribe({
+            next: (data) => {
+                this.ventesData = data;
+                this.caTotalVentes = Number(data.caTotalGlobal ?? 0);
+                this.buildVentesChart(data.parPlateforme ?? []);
+                this.loadingVentes = false;
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.loadingVentes = false;
+                this.cdr.markForCheck();
+            }
+        });
+    }
+
+    private buildVentesChart(parPlateforme: any[]): void {
+        const style = getComputedStyle(document.documentElement);
+        const textColor = style.getPropertyValue('--text-color');
+
+        const bg = parPlateforme.map((p) => style.getPropertyValue(this.PLATFORM_COLORS[p.source] ?? '--p-primary-500'));
+        const hoverBg = parPlateforme.map((p) => style.getPropertyValue((this.PLATFORM_COLORS[p.source] ?? '--p-primary-500').replace('-500', '-400')));
+
+        this.ventesChartData = {
+            labels: parPlateforme.map((p) => this.PLATFORM_LABELS[p.source] ?? p.source),
+            datasets: [
+                {
+                    data: parPlateforme.map((p) => Number(p.caTotal)),
+                    backgroundColor: bg,
+                    hoverBackgroundColor: hoverBg,
+                    borderWidth: 0
+                }
+            ]
+        };
+
+        this.ventesChartOptions = {
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: textColor,
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx: any) => {
+                            const val: number = ctx.parsed;
+                            const total: number = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                            const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0';
+                            return ` ${val.toLocaleString('fr-FR', {
+                                style: 'currency',
+                                currency: this.appCurrency
+                            })} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    get nbTotalCommandes(): number {
+        return (this.ventesData?.parPlateforme ?? []).reduce((sum: number, p: any) => sum + Number(p.nbCommandes), 0);
+    }
+
+    getPlatformLabel(source: string): string {
+        return this.PLATFORM_LABELS[source] ?? source;
     }
 
     loadValeurStock(): void {
@@ -325,4 +441,7 @@ export class RapportsComponent implements OnInit {
             detail: `Export ${type} en cours de développement`
         });
     }
+}
+function toObservable(layoutConfig: WritableSignal<LayoutConfig>, arg1: { injector: any }) {
+    throw new Error('Function not implemented.');
 }

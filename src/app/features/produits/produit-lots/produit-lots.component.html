@@ -42,7 +42,18 @@
         (onClick)="openEntree()"
       />
 
-      <!-- Stock total -->
+      <!-- Réservé -->
+      @if (nbLotsReserves > 0) {
+        <div class="surface-100 border-round px-3 py-2 text-center">
+          <div class="text-400 text-xs">Réservé</div>
+          <div class="font-bold text-orange-500 text-lg flex align-items-center gap-1">
+            <i class="pi pi-lock text-sm"></i>
+            {{ nbLotsReserves }}
+          </div>
+        </div>
+      }
+
+      <!-- Stock disponible -->
       <div class="surface-100 border-round px-3 py-2 text-center">
         <div class="text-400 text-xs">{{ 'produit_lots.total_stock' | transloco }}</div>
         <div class="font-bold text-900 text-lg">
@@ -60,6 +71,16 @@
     <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
     <span class="text-red-800 font-medium">
       {{ nbLotsExpires }} {{ 'lots.expired_count' | transloco }}
+    </span>
+  </div>
+}
+
+<!-- Banner lots réservés -->
+@if (nbLotsReserves > 0) {
+  <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-3">
+    <i class="pi pi-lock text-orange-500 text-xl"></i>
+    <span class="text-orange-800 font-medium">
+      {{ nbLotsReserves }} lot(s) avec du stock réservé par des commandes en cours
     </span>
   </div>
 }
@@ -83,10 +104,22 @@
         <th style="width:150px" pSortableColumn="expiresAt">
           {{ 'lots.dlc' | transloco }} <p-sortIcon field="expiresAt" />
         </th>
-        <th style="width:180px" class="text-right" pSortableColumn="quantiteRestante">
+        <th style="width:160px" class="text-right" pSortableColumn="quantiteRestante">
           {{ 'lots.remaining' | transloco }} <p-sortIcon field="quantiteRestante" />
         </th>
-        <th style="width:150px" class="text-right" pSortableColumn="quantiteInitiale">
+        <th style="width:130px" class="text-right">
+          <div class="flex align-items-center justify-content-end gap-1">
+            <i class="pi pi-lock text-orange-500 text-xs"></i>
+            Réservé
+          </div>
+        </th>
+        <th style="width:130px" class="text-right">
+          <div class="flex align-items-center justify-content-end gap-1">
+            <i class="pi pi-check-circle text-green-500 text-xs"></i>
+            Disponible
+          </div>
+        </th>
+        <th style="width:130px" class="text-right" pSortableColumn="quantiteInitiale">
           {{ 'lots.initial' | transloco }} <p-sortIcon field="quantiteInitiale" />
         </th>
         <th style="width:130px" class="text-right">{{ 'lots.unit_cost' | transloco }}</th>
@@ -98,22 +131,32 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-lot>
-      <tr [class.opacity-60]="lot.estExpire">
+      <tr [class.opacity-60]="lot.estExpire"
+          [class.bg-orange-50]="(lot.quantiteReservee ?? 0) > 0 && !lot.estExpire">
 
+        <!-- N° lot -->
         <td>
-          @if (lot.numeroLot) {
-            <span class="font-mono text-sm bg-gray-100 px-2 py-1 border-round text-700">
-              {{ lot.numeroLot }}
-            </span>
-          } @else {
-            <span class="text-400 text-sm font-italic">{{ 'lots.no_lot_number' | transloco }}</span>
-          }
+          <div class="flex align-items-center gap-2">
+            @if ((lot.quantiteReservee ?? 0) > 0) {
+              <i class="pi pi-lock text-orange-500 text-xs"
+                pTooltip="Stock partiellement ou totalement réservé"></i>
+            }
+            @if (lot.numeroLot) {
+              <span class="font-mono text-sm bg-gray-100 px-2 py-1 border-round text-700">
+                {{ lot.numeroLot }}
+              </span>
+            } @else {
+              <span class="text-400 text-sm font-italic">{{ 'lots.no_lot_number' | transloco }}</span>
+            }
+          </div>
         </td>
 
+        <!-- Entrepôt -->
         <td>
           <span class="text-sm text-900">{{ lot.entrepotNom }}</span>
         </td>
 
+        <!-- DLC -->
         <td>
           @if (lot.expiresAt) {
             <div class="flex align-items-center gap-2">
@@ -131,29 +174,69 @@
           }
         </td>
 
+        <!-- Quantité restante + barres -->
         <td class="text-right">
           <div class="flex align-items-center justify-content-end gap-2">
             <span class="font-mono font-semibold text-900 text-sm">
               {{ lot.quantiteRestante | number:'1.0-4' }}
             </span>
           </div>
-          <div class="mt-1 bg-gray-200 border-round" style="height:4px">
+          <!-- Barre disponible (verte) -->
+          <div class="mt-1 bg-gray-200 border-round overflow-hidden" style="height:5px">
             <div class="border-round"
-              [style.width.%]="lot.quantiteInitiale > 0
-                ? (lot.quantiteRestante / lot.quantiteInitiale * 100) : 0"
+              [style.width.%]="(lot.quantiteInitiale ?? 0) > 0
+                ? ((lot.quantiteDisponible ?? 0) / (lot.quantiteInitiale ?? 1) * 100) : 0"
               [style.background]="lot.estExpire ? '#ef4444'
                 : lot.dlcProche ? '#f97316' : '#22c55e'"
-              style="height:4px; transition:width 0.3s">
+              style="height:5px; transition:width 0.3s">
             </div>
           </div>
+          <!-- Barre réservé (orange) -->
+          @if ((lot.quantiteReservee ?? 0) > 0) {
+            <div class="mt-1 bg-orange-100 border-round overflow-hidden" style="height:5px">
+              <div class="bg-orange-400 border-round"
+                [style.width.%]="(lot.quantiteInitiale ?? 0) > 0
+                  ? ((lot.quantiteReservee ?? 0) / (lot.quantiteInitiale ?? 1) * 100) : 0"
+                style="height:5px; transition:width 0.3s">
+              </div>
+            </div>
+          }
         </td>
 
+        <!-- Réservé -->
+        <td class="text-right">
+          @if ((lot.quantiteReservee ?? 0) > 0) {
+            <div class="flex align-items-center justify-content-end gap-1">
+              <i class="pi pi-lock text-orange-500 text-xs"></i>
+              <span class="font-mono font-semibold text-orange-500 text-sm">
+                {{ lot.quantiteReservee | number:'1.0-4' }}
+              </span>
+            </div>
+          } @else {
+            <span class="text-400 text-sm">—</span>
+          }
+        </td>
+
+        <!-- Disponible -->
+        <td class="text-right">
+          <span class="font-mono font-semibold text-sm"
+            [class.text-green-600]="(lot.quantiteDisponible ?? 0) > 0"
+            [class.text-red-500]="(lot.quantiteDisponible ?? 0) <= 0">
+            {{ lot.quantiteDisponible | number:'1.0-4' }}
+          </span>
+          @if ((lot.quantiteDisponible ?? 0) <= 0 && (lot.quantiteReservee ?? 0) > 0) {
+            <div class="text-orange-500 text-xs mt-1">Tout réservé</div>
+          }
+        </td>
+
+        <!-- Quantité initiale -->
         <td class="text-right">
           <span class="font-mono text-sm text-500">
             {{ lot.quantiteInitiale | number:'1.0-4' }}
           </span>
         </td>
 
+        <!-- Coût unitaire -->
         <td class="text-right">
           @if (lot.coutUnitaire != null) {
             <span class="font-mono text-sm text-900">
@@ -164,10 +247,12 @@
           }
         </td>
 
+        <!-- Date entrée -->
         <td>
           <span class="text-sm text-500">{{ lot.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
         </td>
 
+        <!-- Actions -->
         <td class="text-center">
           <div class="flex justify-content-center gap-1">
             <p-button
@@ -176,7 +261,7 @@
               [text]="true"
               size="small"
               [pTooltip]="'produit_lots.transfer_tooltip' | transloco"
-              [disabled]="lot.estExpire || lot.quantiteRestante <= 0"
+              [disabled]="lot.estExpire || (lot.quantiteDisponible ?? 0) <= 0"
               (onClick)="openTransfert(lot)"
             />
             <p-button
@@ -185,7 +270,7 @@
               [text]="true"
               size="small"
               [pTooltip]="'lots.degrever_tooltip' | transloco"
-              [disabled]="lot.estExpire || lot.quantiteRestante <= 0"
+              [disabled]="lot.estExpire || (lot.quantiteDisponible ?? 0) <= 0"
               (onClick)="openDegrever(lot)"
             />
           </div>
@@ -196,7 +281,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="8" class="text-center py-6 text-400">
+        <td colspan="10" class="text-center py-6 text-400">
           <i class="pi pi-box text-4xl block mb-3 opacity-30"></i>
           {{ 'produit_lots.no_lots' | transloco }}
         </td>

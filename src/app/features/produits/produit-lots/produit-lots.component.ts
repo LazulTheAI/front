@@ -5,24 +5,18 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { TranslocoModule } from '@jsverse/transloco';
 import { APP_CURRENCY } from '@/app/core/currency.config';
+import { TranslocoModule } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
-import { Tag } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
+import { Tag } from 'primeng/tag';
 import { Toast } from 'primeng/toast';
 import { Toolbar } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 
-import {
-    EntrepotControllerService,
-    EntrepotResponse,
-    LotResponse,
-    ProduitControllerService,
-    ProduitResponse
-} from '@/app/modules/openapi';
+import { EntrepotControllerService, EntrepotResponse, LotResponse, ProduitControllerService, ProduitResponse } from '@/app/modules/openapi';
 import { DegreverLotProduitDialogComponent } from '../degrever-lot-produit-dialog/degrever-lot-produit-dialog.component';
 import { EntreeProduitDialogComponent } from '../entree-produit-dialog/entree-produit-dialog.component';
 import { TransfererLotProduitDialogComponent } from '../transferer-lot-produit-dialog/transferer-lot-produit-dialog.component';
@@ -37,22 +31,7 @@ interface SelectOption {
     templateUrl: './produit-lots.component.html',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        TranslocoModule,
-        Toast,
-        Button,
-        Tag,
-        Select,
-        TableModule,
-        Toolbar,
-        Tooltip,
-        DegreverLotProduitDialogComponent,
-        EntreeProduitDialogComponent,
-        TransfererLotProduitDialogComponent
-    ],
+    imports: [CommonModule, FormsModule, RouterModule, TranslocoModule, Toast, Button, Tag, Select, TableModule, Toolbar, Tooltip, DegreverLotProduitDialogComponent, EntreeProduitDialogComponent, TransfererLotProduitDialogComponent],
     providers: [MessageService]
 })
 export class ProduitLotsComponent implements OnInit, OnDestroy {
@@ -103,10 +82,7 @@ export class ProduitLotsComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (list) => {
                     this.entrepots = list;
-                    this.entrepotOptions = [
-                        { label: 'Tous les entrepôts', value: null },
-                        ...list.map((e) => ({ label: e.nom!, value: e.id! }))
-                    ];
+                    this.entrepotOptions = [{ label: 'Tous les entrepôts', value: null }, ...list.map((e) => ({ label: e.nom!, value: e.id! }))];
                     this.cdr.markForCheck();
                 }
             });
@@ -149,6 +125,14 @@ export class ProduitLotsComponent implements OnInit, OnDestroy {
         this.applyFiltre();
     }
 
+    get nbLotsReserves(): number {
+        return this.lotsFiltres.filter((l) => (l.quantiteReservee ?? 0) > 0).length;
+    }
+
+    getTotalStock(): number {
+        return this.lotsFiltres.reduce((sum, l) => sum + (l.quantiteDisponible ?? 0), 0);
+    }
+
     private applyFiltre(): void {
         if (this.filtreEntrepotId === null) {
             this.lotsFiltres = this.lots;
@@ -156,10 +140,6 @@ export class ProduitLotsComponent implements OnInit, OnDestroy {
             this.lotsFiltres = this.lots.filter((l) => l.entrepotId === this.filtreEntrepotId);
         }
         this.cdr.markForCheck();
-    }
-
-    getTotalStock(): number {
-        return this.lotsFiltres.reduce((sum, l) => sum + (l.quantiteRestante ?? 0), 0);
     }
 
     get nbLotsExpires(): number {
