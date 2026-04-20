@@ -649,6 +649,15 @@
     "erreur_charger": "Failed to load orders",
     "commande_saved": "Order saved",
     "aucune_commande": "No orders found",
+    "changer_lots_titre": "Edit lots — {{numero}}",
+    "changer_lots_lot_actuel": "Current lot",
+    "changer_lots_choisir_lot": "Choose a lot",
+    "changer_lots_choisir_autre_lot": "Choose a different lot",
+    "changer_lots_conserver_lot": "Keep current lot",
+    "changer_lots_aucun_disponible": "No lot available for this product",
+    "changer_lots_aucune_ligne": "No products in this order",
+    "changer_lots_succes": "Lots updated",
+    "changer_lots_erreur": "Error while updating lots"
     "page_report": "{first}-{last} of {totalRecords} orders"
   },
   "commande_detail": {

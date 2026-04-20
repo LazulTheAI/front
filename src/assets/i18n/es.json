@@ -650,6 +650,15 @@
     "erreur_charger": "Error al cargar pedidos",
     "commande_saved": "Pedido guardado",
     "aucune_commande": "No hay pedidos",
+    "changer_lots_titre": "Editar lotes — {{numero}}",
+    "changer_lots_lot_actuel": "Lote actual",
+    "changer_lots_choisir_lot": "Elegir un lote",
+    "changer_lots_choisir_autre_lot": "Elegir otro lote",
+    "changer_lots_conserver_lot": "Conservar el lote actual",
+    "changer_lots_aucun_disponible": "Sin lote disponible para este producto",
+    "changer_lots_aucune_ligne": "Sin productos en este pedido",
+    "changer_lots_succes": "Lotes actualizados",
+    "changer_lots_erreur": "Error al modificar los lotes"
     "page_report": "{first}-{last} de {totalRecords} pedidos"
   },
   "commande_detail": {

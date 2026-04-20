@@ -79,17 +79,34 @@
 >
     <form #lancerForm="ngForm" (ngSubmit)="lancerRun(lancerForm)" class="dialog-form">
         <div class="form-field">
-            <label class="field-label">Recette <span class="required">*</span></label>
-            <p-autoComplete
-                [(ngModel)]="newRun.recette"
-                name="recette"
-                [suggestions]="filteredRecettes"
-                (completeMethod)="searchRecette($event)"
-                field="nom"
-                placeholder="Rechercher une recette..."
+            <label class="field-label">Produit <span class="required">*</span></label>
+            <p-select
+                [(ngModel)]="newRun.produitId"
+                name="produitId"
+                [options]="produitOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Sélectionner un produit"
                 [required]="true"
+                [filter]="true"
+                (onChange)="onProduitChange()"
                 [style]="{ width: '100%' }"
-                [inputStyle]="{ width: '100%', 'font-size': '16px', padding: '12px' }"
+            />
+        </div>
+
+        <div class="form-field">
+            <label class="field-label">Recette <span class="required">*</span></label>
+            <p-select
+                [(ngModel)]="newRun.recetteId"
+                name="recetteId"
+                [options]="recetteOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Sélectionner une recette"
+                [required]="true"
+                [disabled]="!newRun.produitId"
+                (onChange)="onRecetteChange()"
+                [style]="{ width: '100%' }"
             />
         </div>
 
@@ -104,9 +121,9 @@
                 [style]="{ width: '100%' }"
                 [inputStyle]="{ width: '100%', 'font-size': '18px', padding: '12px' }"
             />
-            @if (newRun.recette?.quantiteProduite) {
+            @if (selectedRecette?.quantiteProduite) {
                 <span class="field-hint">
-                    Soit {{ (newRun.batches ?? 0) * newRun.recette!.quantiteProduite! }} {{ newRun.recette!.uniteProduite }}
+                    Soit {{ (newRun.batches ?? 0) * selectedRecette!.quantiteProduite! }} {{ selectedRecette!.uniteProduite }}
                 </span>
             }
         </div>
@@ -143,7 +160,7 @@
                 label="Lancer"
                 icon="pi pi-play"
                 [loading]="launching"
-                [disabled]="lancerForm.invalid || !newRun.recette || !newRun.batches || !newRun.entrepotId"
+                [disabled]="lancerForm.invalid || !newRun.recetteId || !newRun.batches || !newRun.entrepotId"
             ></button>
         </div>
     </form>

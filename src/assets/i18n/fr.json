@@ -651,7 +651,16 @@
     "erreur_charger": "Impossible de charger les commandes",
     "commande_saved": "Commande enregistrée",
     "aucune_commande": "Aucune commande",
-    "page_report": "{first}-{last} sur {totalRecords} commandes"
+    "page_report": "{first}-{last} sur {totalRecords} commandes",
+    "changer_lots_titre": "Modifier les lots — {{numero}}",
+    "changer_lots_lot_actuel": "Lot actuel",
+    "changer_lots_choisir_lot": "Choisir un lot",
+    "changer_lots_choisir_autre_lot": "Choisir un autre lot",
+    "changer_lots_conserver_lot": "Conserver le lot actuel",
+    "changer_lots_aucun_disponible": "Aucun lot disponible pour ce produit",
+    "changer_lots_aucune_ligne": "Aucun produit dans cette commande",
+    "changer_lots_succes": "Lots mis à jour",
+    "changer_lots_erreur": "Erreur lors de la modification"
   },
   "commande_detail": {
     "title": "Bon de livraison",

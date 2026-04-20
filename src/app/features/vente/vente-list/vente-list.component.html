@@ -271,7 +271,7 @@
                 pTooltip="Modifier les lots"
                 (onClick)="openChangerLot(c, $event)" />
             }
-            @if (getNextStatut(c.statut!) && c.source === 'B2B_MANUEL') {
+            @if (getNextStatut(c.statut!)) {
               <p-button icon="pi pi-arrow-right" severity="info" [text]="true"
                 [rounded]="true" size="small"
                 [pTooltip]="'commandes.avancer_statut' | transloco"

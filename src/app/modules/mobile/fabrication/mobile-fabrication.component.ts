@@ -7,12 +7,13 @@ import {
     EntrepotResponse,
     LancerRunRequest,
     ProductionControllerService,
+    ProduitControllerService,
+    ProduitResponse,
     RecetteControllerService,
     RecetteResponse,
     RunProductionResponse
 } from '@/app/modules/openapi';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
@@ -35,7 +36,6 @@ import { ToastModule } from 'primeng/toast';
         ButtonModule,
         InputTextModule,
         InputNumberModule,
-        AutoCompleteModule,
         SelectModule,
         DialogModule,
         TagModule,
@@ -53,20 +53,24 @@ export class MobileFabricationComponent implements OnInit {
     runs: RunProductionResponse[] = [];
     loadingRuns = false;
 
+    produits: ProduitResponse[] = [];
     allRecettes: RecetteResponse[] = [];
-    filteredRecettes: RecetteResponse[] = [];
     entrepots: EntrepotResponse[] = [];
+
+    produitOptions: { label: string; value: number }[] = [];
+    recetteOptions: { label: string; value: number }[] = [];
+    selectedRecette: RecetteResponse | null = null;
 
     showLancerDialog = false;
     launching = false;
 
     showCloturerDialog = false;
-    selectedRun: RunProductionResponse | null = null;
     closingRun: RunProductionResponse | null = null;
     closing = false;
 
     newRun = {
-        recette: null as RecetteResponse | null,
+        produitId: null as number | null,
+        recetteId: null as number | null,
         batches: null as number | null,
         entrepotId: null as number | null,
         notes: ''
@@ -74,6 +78,7 @@ export class MobileFabricationComponent implements OnInit {
 
     constructor(
         private productionService: ProductionControllerService,
+        private produitService: ProduitControllerService,
         private recetteService: RecetteControllerService,
         private entrepotService: EntrepotControllerService,
         private messageService: MessageService,
@@ -102,9 +107,21 @@ export class MobileFabricationComponent implements OnInit {
     }
 
     private loadReferentials(): void {
+        this.produitService.listerProduit(0, 500, 'nom', 'asc', undefined).subscribe({
+            next: (data: any) => {
+                this.produits = (data.content ?? (Array.isArray(data) ? data : [])).filter(
+                    (p: ProduitResponse) => p.actif !== false && p.recettes && (p.recettes as any[]).length > 0
+                );
+                this.produitOptions = this.produits.map((p) => ({
+                    label: p.sku ? `${p.nom} (${p.sku})` : p.nom!,
+                    value: p.id!
+                }));
+                this.cdr.markForCheck();
+            }
+        });
         this.recetteService.listerRecetteResponse(false).subscribe({
             next: (data) => {
-                this.allRecettes = Array.isArray(data) ? data : [];
+                this.allRecettes = (Array.isArray(data) ? data : []).filter((r: RecetteResponse) => !r.archive);
                 this.cdr.markForCheck();
             }
         });
@@ -117,9 +134,31 @@ export class MobileFabricationComponent implements OnInit {
         });
     }
 
-    searchRecette(event: { query: string }): void {
-        const q = event.query.toLowerCase();
-        this.filteredRecettes = this.allRecettes.filter((r) => r.nom?.toLowerCase().includes(q));
+    onProduitChange(): void {
+        this.newRun.recetteId = null;
+        this.selectedRecette = null;
+        const produit = this.produits.find((p) => p.id === this.newRun.produitId) ?? null;
+        if (!produit) {
+            this.recetteOptions = [];
+            this.cdr.markForCheck();
+            return;
+        }
+        const produitRecettes: any[] = (produit as any).recettes ?? [];
+        this.recetteOptions = produitRecettes.map((pr: any) => ({
+            label: pr.recetteNom + (pr.estPrincipale ? ' ★' : ''),
+            value: pr.recetteId
+        }));
+        const principale = produitRecettes.find((pr: any) => pr.estPrincipale) ?? produitRecettes[0];
+        if (principale) {
+            this.newRun.recetteId = principale.recetteId;
+            this.selectedRecette = this.allRecettes.find((r) => r.id === principale.recetteId) ?? null;
+        }
+        this.cdr.markForCheck();
+    }
+
+    onRecetteChange(): void {
+        this.selectedRecette = this.allRecettes.find((r) => r.id === this.newRun.recetteId) ?? null;
+        this.cdr.markForCheck();
     }
 
     get entrepotOptions() {
@@ -127,18 +166,20 @@ export class MobileFabricationComponent implements OnInit {
     }
 
     openLancer(): void {
-        this.newRun = { recette: null, batches: null, entrepotId: null, notes: '' };
+        this.newRun = { produitId: null, recetteId: null, batches: null, entrepotId: null, notes: '' };
+        this.selectedRecette = null;
+        this.recetteOptions = [];
         this.showLancerDialog = true;
         this.cdr.markForCheck();
     }
 
     lancerRun(ngForm: NgForm): void {
-        if (ngForm.invalid || !this.newRun.recette?.id || !this.newRun.batches || !this.newRun.entrepotId) return;
+        if (ngForm.invalid || !this.newRun.recetteId || !this.newRun.batches || !this.newRun.entrepotId) return;
         this.launching = true;
         this.cdr.markForCheck();
 
         const req: LancerRunRequest = {
-            recetteId: this.newRun.recette.id,
+            recetteId: this.newRun.recetteId,
             batches: this.newRun.batches,
             entrepotId: this.newRun.entrepotId,
             notes: this.newRun.notes || undefined
