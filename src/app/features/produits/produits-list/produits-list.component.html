@@ -1,7 +1,5 @@
-<!-- produits-list.component.html -->
 <p-toast />
 <p-confirmDialog />
-
 
 <p-toolbar styleClass="mb-4">
   <ng-template pTemplate="start">
@@ -20,13 +18,11 @@
         <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
           [placeholder]="'produits.search_placeholder' | transloco" class="w-14rem" />
       </p-iconfield>
-
       <p-iconfield>
         <p-inputicon styleClass="pi pi-barcode" />
         <input pInputText [ngModel]="skuFilter" (ngModelChange)="onSkuInput($event)"
           [placeholder]="'produits.sku_placeholder' | transloco" class="w-10rem" />
       </p-iconfield>
-
       @if (search || skuFilter) {
         <p-button icon="pi pi-times" severity="secondary" [text]="true" [rounded]="true"
           size="small" [pTooltip]="'common.clear_filters' | transloco"
@@ -55,8 +51,12 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="nom">{{ 'produits.product' | transloco }} <p-sortIcon field="nom" /></th>
-        <th style="width:130px" pSortableColumn="sku">{{ 'produits.sku' | transloco }} <p-sortIcon field="sku" /></th>
+        <th pSortableColumn="nom">
+          {{ 'produits.product' | transloco }} <p-sortIcon field="nom" />
+        </th>
+        <th style="width:130px" pSortableColumn="sku">
+          {{ 'produits.sku' | transloco }} <p-sortIcon field="sku" />
+        </th>
         <th style="width:130px" class="text-right" pSortableColumn="prixCents">
           Prix <p-sortIcon field="prixCents" />
         </th>
@@ -69,6 +69,8 @@
 
     <ng-template pTemplate="body" let-produit>
       <tr class="cursor-pointer">
+
+        <!-- Nom -->
         <td>
           <div class="font-semibold text-900">{{ produit.nom }}</div>
           @if (produit.platformProductId) {
@@ -76,6 +78,7 @@
           }
         </td>
 
+        <!-- SKU -->
         <td>
           @if (produit.sku) {
             <span class="font-mono text-sm text-700 bg-gray-100 px-2 py-1 border-round">
@@ -86,6 +89,7 @@
           }
         </td>
 
+        <!-- Prix -->
         <td class="text-right">
           @if (produit.prixCents != null) {
             <span class="text-sm font-mono text-900">
@@ -96,7 +100,7 @@
           }
         </td>
 
-        <!-- Stock interne -->
+        <!-- Stock interne total tous entrepôts -->
         <td (click)="$event.stopPropagation()">
           <div class="flex align-items-center gap-2">
             @if (isEnAlerteProduit(produit)) {
@@ -114,34 +118,29 @@
           </div>
         </td>
 
-        <!-- Seuil alerte -->
+        <!-- Seuil alerte global -->
         <td (click)="$event.stopPropagation()">
           <div class="flex align-items-center gap-2">
-            @if (produit.seuils && produit.seuils.length > 0) {
-              <div class="flex flex-column gap-1">
-                @for (s of produit.seuils; track s.entrepotId) {
-                  <div class="flex align-items-center gap-1">
-                    @if (s.enAlerte) {
-                      <i class="pi pi-exclamation-circle text-red-500 text-xs"></i>
-                    }
-                    <span class="text-xs text-400">{{ s.entrepotNom }}:</span>
-                    <span class="text-sm font-semibold"
-                      [class.text-red-500]="s.enAlerte"
-                      [class.text-900]="!s.enAlerte">
-                      {{ s.seuilAlerte | number:'1.0-2' }}
-                    </span>
-                  </div>
-                }
-              </div>
+            @if (produit.seuilAlerte != null) {
+              <span class="text-sm font-semibold"
+                [class.text-red-500]="isEnAlerteProduit(produit)"
+                [class.text-900]="!isEnAlerteProduit(produit)">
+                {{ produit.seuilAlerte | number:'1.0-2' }}
+              </span>
+              @if (isEnAlerteProduit(produit)) {
+                <i class="pi pi-exclamation-circle text-red-500 text-xs"
+                  [pTooltip]="'produits.under_alert' | transloco"></i>
+              }
             } @else {
               <span class="text-400 text-sm">—</span>
             }
             <p-button icon="pi pi-pencil" [text]="true" [rounded]="true"
               severity="info" size="small" [pTooltip]="'produits.edit_threshold' | transloco"
-              (onClick)="openStockDialog(produit, $event)" />
+              (onClick)="openSeuilDialog(produit, $event)" />
           </div>
         </td>
 
+        <!-- Recette liée -->
         <td>
           @if (produit.recettes && produit.recettes.length > 0) {
             <div class="flex align-items-center gap-2">
@@ -159,6 +158,7 @@
           }
         </td>
 
+        <!-- Actions -->
         <td class="text-center">
           <div class="flex justify-content-center gap-1" (click)="$event.stopPropagation()">
             <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true"
@@ -188,13 +188,12 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="9" class="text-center py-6 text-400">
+        <td colspan="7" class="text-center py-6 text-400">
           <i class="pi pi-shopping-bag text-4xl block mb-3 opacity-30"></i>
           {{ 'produits.no_products' | transloco }}
         </td>
       </tr>
     </ng-template>
-
   </p-table>
 </div>
 
@@ -218,113 +217,142 @@
       <p-skeleton height="3rem" />
       <p-skeleton height="3rem" />
     </div>
-  } @else if (stocksProduit.length === 0) {
-    <div class="text-center py-6 text-400">
-      <i class="pi pi-warehouse text-4xl mb-3 block"></i>
-      <div>{{ 'produits.no_products' | transloco }}</div>
-      <div class="text-sm mt-1">
-        {{ 'produits.auto_stock_creation' | transloco }}
-      </div>
-    </div>
   } @else {
     <div class="flex flex-column gap-3 pt-2">
-      @for (stock of stocksProduit; track stock.entrepotId) {
-        <div class="surface-50 border-round-lg border-1 surface-border p-3">
 
-          <!-- Header entrepôt + stock -->
-          <div class="flex align-items-center justify-content-between mb-3">
-            <div class="flex align-items-center gap-2">
-              <i class="pi pi-warehouse text-primary"></i>
-              <span class="font-semibold text-900">{{ stock.entrepotNom }}</span>
-              @if (stock.enAlerte) {
-                <p-tag value="Alerte" severity="danger" styleClass="text-xs" />
-              }
-            </div>
-            <span class="text-2xl font-bold"
-              [class.text-red-500]="stock.enAlerte"
-              [class.text-primary]="!stock.enAlerte">
-              {{ stock.stockActuel | number:'1.0-2' }}
-            </span>
-          </div>
 
-          <!-- Infos DLC + dernière prod -->
-          @if (stock.dlcProchaine || stock.derniereProductionAt) {
-            <div class="grid text-sm mb-3">
-              @if (stock.dlcProchaine) {
-                <div class="col-6">
-                  <div class="text-400 text-xs mb-1">{{ 'produits.dlc_next' | transloco }}</div>
-                  <div class="font-semibold"
-                    [class.text-orange-500]="isDlcProche(stock.dlcProchaine)"
-                    [class.text-900]="!isDlcProche(stock.dlcProchaine)">
-                    {{ stock.dlcProchaine | date:'dd/MM/yyyy' }}
-                    @if (isDlcProche(stock.dlcProchaine)) {
-                      <i class="pi pi-exclamation-triangle ml-1 text-xs"></i>
-                    }
-                  </div>
-                </div>
-              }
-              @if (stock.derniereProductionAt) {
-                <div class="col-6">
-                  <div class="text-400 text-xs mb-1">{{ 'produits.last_production' | transloco }}</div>
-                  <div class="font-semibold text-900">
-                    {{ stock.derniereProductionAt | date:'dd/MM/yyyy HH:mm' }}
-                  </div>
-                </div>
-              }
-            </div>
-          }
-
-          <p-divider styleClass="my-2" />
-
-          <!-- Seuil éditable -->
-          <div class="flex align-items-center justify-content-between">
-            <span class="text-400 text-sm">{{ 'produits.alert_threshold' | transloco }}</span>
-
-            @if (stockProduitSelectionne?.entrepotId === stock.entrepotId) {
+      <!-- Stock par entrepôt -->
+      @if (stocksProduit.length === 0) {
+        <div class="text-center py-4 text-400">
+          <i class="pi pi-warehouse text-3xl mb-2 block"></i>
+          <div>{{ 'produits.no_products' | transloco }}</div>
+          <div class="text-sm mt-1">{{ 'produits.auto_stock_creation' | transloco }}</div>
+        </div>
+      } @else {
+        @for (stock of stocksProduit; track stock.entrepotId) {
+          <div class="surface-50 border-round-lg border-1 surface-border p-3">
+            <div class="flex align-items-center justify-content-between">
               <div class="flex align-items-center gap-2">
-                <p-inputNumber
-                  [(ngModel)]="editingSeuil"
-                  [min]="0"
-                  [minFractionDigits]="0"
-                  [maxFractionDigits]="2"
-                  placeholder="Ex : 10"
-                  styleClass="w-8rem"
-                />
-                <p-button icon="pi pi-check" severity="success" [text]="true"
-                  [rounded]="true" size="small" [pTooltip]="'common.save' | transloco"
-                  [loading]="stockDialogSaving" (onClick)="saveSeuil()" />
-                <p-button icon="pi pi-times" severity="secondary" [text]="true"
-                  [rounded]="true" size="small" [pTooltip]="'common.cancel' | transloco"
-                  (onClick)="cancelEditSeuil()" />
+                <i class="pi pi-warehouse text-primary"></i>
+                <span class="font-semibold text-900">{{ stock.entrepotNom }}</span>
               </div>
-            } @else {
-              <div class="flex align-items-center gap-2">
-                @if (stock.seuilAlerte != null) {
-                  <span class="font-semibold text-900">
-                    {{ stock.seuilAlerte | number:'1.0-2' }}
-                  </span>
-                } @else {
-                  <span class="text-400 text-sm font-italic">{{ 'produits.undefined_threshold' | transloco }}</span>
+              <span class="text-2xl font-bold text-primary">
+                {{ stock.stockActuel | number:'1.0-2' }}
+              </span>
+            </div>
+            @if (stock.dlcProchaine || stock.derniereProductionAt) {
+              <div class="grid text-sm mt-2">
+                @if (stock.dlcProchaine) {
+                  <div class="col-6">
+                    <div class="text-400 text-xs mb-1">{{ 'produits.dlc_next' | transloco }}</div>
+                    <div class="font-semibold"
+                      [class.text-orange-500]="isDlcProche(stock.dlcProchaine)"
+                      [class.text-900]="!isDlcProche(stock.dlcProchaine)">
+                      {{ stock.dlcProchaine | date:'dd/MM/yyyy' }}
+                      @if (isDlcProche(stock.dlcProchaine)) {
+                        <i class="pi pi-exclamation-triangle ml-1 text-xs"></i>
+                      }
+                    </div>
+                  </div>
                 }
-                <p-button icon="pi pi-pencil" severity="info" [text]="true"
-                  [rounded]="true" size="small" [pTooltip]="'produits.edit_threshold' | transloco"
-                  (onClick)="startEditSeuil(stock)" />
+                @if (stock.derniereProductionAt) {
+                  <div class="col-6">
+                    <div class="text-400 text-xs mb-1">{{ 'produits.last_production' | transloco }}</div>
+                    <div class="font-semibold text-900">
+                      {{ stock.derniereProductionAt | date:'dd/MM/yyyy HH:mm' }}
+                    </div>
+                  </div>
+                }
               </div>
             }
           </div>
-
-        </div>
+        }
       }
     </div>
   }
 
   <ng-template pTemplate="footer">
-    <div class="flex justify-content-between align-items-center w-full">
-      <p-button [label]="'common.close' | transloco" severity="secondary"
-        (onClick)="showStockDialog = false" />
+    <p-button [label]="'common.close' | transloco" severity="secondary"
+      (onClick)="showStockDialog = false" />
+  </ng-template>
+</p-dialog>
+
+<!-- ═══ Modal seuil alerte global ═══════════════════════════ -->
+<p-dialog
+  [(visible)]="showSeuilDialog"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '420px' }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-bell text-primary"></i>
+      <span class="font-bold text-900">
+        {{ 'produits.alert_threshold' | transloco }} — {{ selectedProduit?.nom }}
+      </span>
     </div>
   </ng-template>
 
+  <div class="flex flex-column gap-3 pt-2">
+    <div class="text-500 text-sm line-height-3">
+      Le seuil est comparé au stock total tous entrepôts confondus.
+      Une alerte sera déclenchée si le stock passe sous cette valeur.
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <label class="text-900 font-semibold text-sm">
+        {{ 'produits.alert_threshold' | transloco }}
+      </label>
+      <p-inputNumber
+        [(ngModel)]="editingSeuilValeur"
+        [min]="0"
+        [minFractionDigits]="0"
+        [maxFractionDigits]="2"
+        placeholder="Ex : 10"
+        styleClass="w-full"
+      />
+      @if (selectedProduit?.seuilAlerte != null) {
+        <div class="text-400 text-xs">
+          Seuil actuel : {{ selectedProduit?.seuilAlerte | number:'1.0-2' }}
+        </div>
+      }
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between align-items-center w-full">
+      <!-- Bouton supprimer à gauche, visible seulement si un seuil existe -->
+      <div>
+        @if (selectedProduit?.seuilAlerte != null) {
+          <p-button
+            label="Supprimer le seuil"
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [loading]="stockDialogSaving"
+            (onClick)="supprimerSeuil()"
+          />
+        }
+      </div>
+      <!-- Annuler + Enregistrer à droite -->
+      <div class="flex gap-2">
+        <p-button
+          [label]="'common.cancel' | transloco"
+          severity="secondary"
+          [disabled]="stockDialogSaving"
+          (onClick)="showSeuilDialog = false"
+        />
+        <p-button
+          [label]="'common.save' | transloco"
+          icon="pi pi-check"
+          severity="success"
+          [loading]="stockDialogSaving"
+          (onClick)="saveSeuilGlobal()"
+        />
+      </div>
+    </div>
+  </ng-template>
 </p-dialog>
 
 <!-- Dialog détail -->
@@ -350,10 +378,4 @@
 <app-historique-produit-dialog
   [(visible)]="showHistoriqueProduitDialog"
   [produit]="selectedProduit"
-/>
-
-<app-ajustement-produit-dialog
-  [(visible)]="showAjustementProduitDialog"
-  [produit]="selectedProduit"
-  (saved)="onStockUpdated($event)"
 />

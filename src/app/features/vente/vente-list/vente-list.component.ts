@@ -18,6 +18,8 @@ import { Tooltip } from 'primeng/tooltip';
 
 import { APP_CURRENCY } from '@/app/core/currency.config';
 import { CommandeControllerService, CommandeResponse, RevendeurControllerService, RevendeurResponse } from '@/app/modules/openapi';
+import { environment } from '@/environments/environment';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { CommandeChangerLotDialogComponent } from '../vente-changer-lot-dialog/vente-changer-lot-dialog.component';
 import { CommandeDetailDialogComponent } from '../vente-detail-dialog/vente-detail-dialog.component';
@@ -82,6 +84,9 @@ export class CommandesListComponent implements OnInit, OnDestroy {
     private searchSubject = new Subject<void>();
     private destroy$ = new Subject<void>();
 
+    sortBy = 'dateCommande';
+    sortDir = 'desc';
+
     showChangerLotDialog = false;
     constructor(
         @Inject(CommandeControllerService)
@@ -89,7 +94,8 @@ export class CommandesListComponent implements OnInit, OnDestroy {
         private revendeurService: RevendeurControllerService,
         private messageService: MessageService,
         private cdr: ChangeDetectorRef,
-        private transloco: TranslocoService
+        private transloco: TranslocoService,
+        private http: HttpClient
     ) {}
 
     ngOnInit(): void {
@@ -154,19 +160,22 @@ export class CommandesListComponent implements OnInit, OnDestroy {
 
     loadCommandes(): void {
         this.loading = true;
-        this.commandeService.listerCommande(this.filtreRevendeurId ?? undefined, this.filtreStatut ?? undefined, this.filtreSource ?? undefined, this.filtreNumeroLot || undefined, this.filtreProduitSku || undefined, this.page, this.size).subscribe({
-            next: (data: any) => {
-                this.commandes = data.content;
-                this.totalRecords = data.totalElements;
+        let params = new HttpParams().set('page', this.page).set('size', this.size).set('sortBy', this.sortBy).set('sortDir', this.sortDir);
+
+        if (this.filtreRevendeurId) params = params.set('revendeurId', this.filtreRevendeurId);
+        if (this.filtreStatut) params = params.set('statut', this.filtreStatut);
+        if (this.filtreSource) params = params.set('source', this.filtreSource);
+        if (this.filtreNumeroLot) params = params.set('numeroLot', this.filtreNumeroLot);
+        if (this.filtreProduitSku) params = params.set('produitSku', this.filtreProduitSku);
+
+        this.http.get<any>(`${environment.baseUrl}/api/commandes-b2b`, { params }).subscribe({
+            next: (data) => {
+                this.commandes = data.content ?? [];
+                this.totalRecords = data.totalElements ?? 0;
                 this.loading = false;
                 this.cdr.markForCheck();
             },
             error: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: this.transloco.translate('common.error'),
-                    detail: this.transloco.translate('commandes.erreur_charger')
-                });
                 this.loading = false;
                 this.cdr.markForCheck();
             }
@@ -176,6 +185,10 @@ export class CommandesListComponent implements OnInit, OnDestroy {
     onLazyLoad(event: TableLazyLoadEvent): void {
         this.page = Math.floor((event.first ?? 0) / (event.rows ?? this.size));
         this.size = event.rows ?? this.size;
+        if (event.sortField) {
+            this.sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+            this.sortDir = event.sortOrder === 1 ? 'asc' : 'desc';
+        }
         this.loadCommandes();
     }
 

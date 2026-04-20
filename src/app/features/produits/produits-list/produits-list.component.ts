@@ -1,4 +1,3 @@
-// produits-list.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -21,14 +20,13 @@ import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { ProduitControllerService, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { APP_CURRENCY } from '@/app/core/currency.config';
+import { ProduitControllerService, ProduitResponse, StockProduitControllerService } from '@/app/modules/openapi';
 import { Router } from '@angular/router';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { AjustementProduitDialogComponent } from '../ajustement-produit/ajustement-produit-dialog.component';
 import { EntreeProduitDialogComponent } from '../entree-produit-dialog/entree-produit-dialog.component';
 import { HistoriqueProduitDialogComponent } from '../historique-produit-dialog/historique-produit-dialog.component';
 import { LierRecetteDialogComponent } from '../lier-recette-dialog/lier-recette-dialog.component';
@@ -40,8 +38,6 @@ interface StockProduitResponse {
     entrepotId: number;
     entrepotNom: string;
     stockActuel: number;
-    seuilAlerte: number | null;
-    enAlerte: boolean;
     dlcProchaine: string | null;
     derniereProductionAt: string | null;
 }
@@ -76,7 +72,6 @@ interface StockProduitResponse {
         LierRecetteDialogComponent,
         EntreeProduitDialogComponent,
         HistoriqueProduitDialogComponent,
-        AjustementProduitDialogComponent,
         TranslocoModule
     ],
     templateUrl: './produits-list.component.html'
@@ -107,12 +102,14 @@ export class ProduitsListComponent implements OnInit {
     stockDialogLoading = false;
     stockDialogSaving = false;
     stocksProduit: StockProduitResponse[] = [];
-    stockProduitSelectionne: StockProduitResponse | null = null;
-    editingSeuil: number | null = null;
     showEntreeProduitDialog = false;
     showTransfertProduitDialog = false;
     showHistoriqueProduitDialog = false;
     showAjustementProduitDialog = false;
+
+    // Seuil global
+    editingSeuilGlobal = false;
+    editingSeuilValeur: number | null = null;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -138,6 +135,26 @@ export class ProduitsListComponent implements OnInit {
         });
     }
 
+    // ─── Stock total dialog ────────────────────────────────────
+
+    getStockTotalFromDialog(): number {
+        return this.stocksProduit.reduce((sum, s) => sum + Number(s.stockActuel ?? 0), 0);
+    }
+
+    // ─── Alerte globale ────────────────────────────────────────
+
+    isEnAlerteProduit(produit: any): boolean {
+        if (produit?.seuilAlerte == null) return false;
+        return this.getStockTotalProduit(produit) < Number(produit.seuilAlerte);
+    }
+
+    startEditSeuilGlobal(): void {
+        this.editingSeuilValeur = this.selectedProduit?.seuilAlerte ?? null;
+        this.editingSeuilGlobal = true;
+    }
+
+    // ─── Filtres ───────────────────────────────────────────────
+
     onSkuInput(value: string): void {
         this.skuSubject.next(value);
     }
@@ -153,6 +170,8 @@ export class ProduitsListComponent implements OnInit {
         this.search$.next(value);
     }
 
+    // ─── Navigation ────────────────────────────────────────────
+
     openLots(produit: ProduitResponse): void {
         this.router.navigate(['/produits', produit.id, 'lots']);
     }
@@ -164,8 +183,6 @@ export class ProduitsListComponent implements OnInit {
 
     openTransfertProduit(produit: ProduitResponse): void {
         this.selectedProduit = produit;
-        // Réutilise stocksProduit déjà chargé par openStockDialog.
-        // Si pas encore chargé, on charge via le service existant.
         if (!this.stocksProduit.some((s) => s.produitId === produit.id)) {
             this.stockProduitService.listerStockProduit(0, 100, undefined).subscribe({
                 next: (data: any) => {
@@ -195,6 +212,9 @@ export class ProduitsListComponent implements OnInit {
         this.selectedProduit = produit;
         this.showHistoriqueProduitDialog = true;
     }
+
+    // ─── Chargement ────────────────────────────────────────────
+
     loadProduits(): void {
         this.loading = true;
         this.produitService.listerProduit(this.page, this.size, this.sortBy, this.sortDir, this.search, this.skuFilter || undefined).subscribe({
@@ -228,9 +248,8 @@ export class ProduitsListComponent implements OnInit {
         this.selectedProduit = produit;
         this.showStockDialog = true;
         this.stockDialogLoading = true;
+        this.editingSeuilGlobal = false;
         this.stocksProduit = [];
-        this.stockProduitSelectionne = null;
-        this.editingSeuil = null;
         this.cdr.markForCheck();
 
         this.stockProduitService.listerStockProduit(0, 100, undefined).subscribe({
@@ -246,57 +265,10 @@ export class ProduitsListComponent implements OnInit {
         });
     }
 
-    startEditSeuil(stock: StockProduitResponse): void {
-        this.stockProduitSelectionne = stock;
-        this.editingSeuil = stock.seuilAlerte ?? null;
-    }
-
-    cancelEditSeuil(): void {
-        this.stockProduitSelectionne = null;
-        this.editingSeuil = null;
-    }
-
-    saveSeuil(): void {
-        if (!this.stockProduitSelectionne || this.editingSeuil == null) return;
-        this.stockDialogSaving = true;
-        this.cdr.markForCheck();
-
-        this.stockProduitService.definirSeuil(this.stockProduitSelectionne.produitId, this.stockProduitSelectionne.entrepotId, { seuil: this.editingSeuil }).subscribe({
-            next: (updated: any) => {
-                const idx = this.stocksProduit.findIndex((s) => s.entrepotId === this.stockProduitSelectionne!.entrepotId);
-                if (idx >= 0) this.stocksProduit[idx] = updated;
-                this.stocksProduit = [...this.stocksProduit];
-                this.stockDialogSaving = false;
-                this.stockProduitSelectionne = null;
-                this.editingSeuil = null;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Seuil mis à jour',
-                    detail: `Seuil défini à ${updated.seuilAlerte}`
-                });
-                this.loadProduits();
-                this.cdr.markForCheck();
-            },
-            error: () => {
-                this.stockDialogSaving = false;
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erreur',
-                    detail: 'Impossible de mettre à jour le seuil'
-                });
-                this.cdr.markForCheck();
-            }
-        });
-    }
-
     // ─── Helpers stock ─────────────────────────────────────────
 
     getStockTotalProduit(produit: ProduitResponse): number {
         return (produit as any).stockReel ?? 0;
-    }
-
-    isEnAlerteProduit(produit: ProduitResponse): boolean {
-        return (produit as any).enAlerteProduit ?? false;
     }
 
     isDlcProche(dlc: string | null | undefined): boolean {
@@ -426,6 +398,94 @@ export class ProduitsListComponent implements OnInit {
                     summary: 'Erreur',
                     detail: 'Impossible de restaurer ce produit.'
                 });
+            }
+        });
+    }
+
+    // Propriétés
+    showSeuilDialog = false;
+
+    openSeuilDialog(produit: ProduitResponse, event: Event): void {
+        event.stopPropagation();
+        this.selectedProduit = produit;
+        this.editingSeuilValeur = produit.seuilAlerte ?? null;
+        this.showSeuilDialog = true;
+    }
+
+    openSeuilDialogFromStock(): void {
+        this.editingSeuilValeur = this.selectedProduit?.seuilAlerte ?? null;
+        this.showSeuilDialog = true;
+    }
+
+    saveSeuilGlobal(): void {
+        if (!this.selectedProduit?.id) return;
+        this.stockDialogSaving = true;
+        this.cdr.markForCheck();
+
+        this.stockProduitService.definirSeuil(this.selectedProduit.id, { seuil: this.editingSeuilValeur ?? 0 }).subscribe({
+            next: () => {
+                if (this.selectedProduit) {
+                    this.selectedProduit = {
+                        ...this.selectedProduit,
+                        seuilAlerte: this.editingSeuilValeur ?? undefined
+                    };
+                    const idx = this.produits.findIndex((p) => p.id === this.selectedProduit!.id);
+                    if (idx >= 0) {
+                        this.produits[idx] = {
+                            ...this.produits[idx],
+                            seuilAlerte: this.editingSeuilValeur ?? undefined
+                        };
+                        this.produits = [...this.produits];
+                    }
+                }
+                this.showSeuilDialog = false;
+                this.stockDialogSaving = false;
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Seuil mis à jour',
+                    detail: "Le seuil d'alerte global a été enregistré"
+                });
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.stockDialogSaving = false;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: 'Impossible de mettre à jour le seuil'
+                });
+                this.cdr.markForCheck();
+            }
+        });
+    }
+
+    supprimerSeuil(): void {
+        if (!this.selectedProduit?.id) return;
+        this.stockDialogSaving = true;
+        this.cdr.markForCheck();
+
+        this.stockProduitService.definirSeuil(this.selectedProduit.id, { seuil: null as any }).subscribe({
+            next: () => {
+                if (this.selectedProduit) {
+                    this.selectedProduit = { ...this.selectedProduit, seuilAlerte: undefined };
+                    const idx = this.produits.findIndex((p) => p.id === this.selectedProduit!.id);
+                    if (idx >= 0) {
+                        this.produits[idx] = { ...this.produits[idx], seuilAlerte: undefined };
+                        this.produits = [...this.produits];
+                    }
+                }
+                this.showSeuilDialog = false;
+                this.stockDialogSaving = false;
+                this.editingSeuilValeur = null;
+                this.messageService.add({
+                    severity: 'info',
+                    summary: 'Seuil supprimé'
+                });
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.stockDialogSaving = false;
+                this.cdr.markForCheck();
             }
         });
     }
