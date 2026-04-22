@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
@@ -118,7 +118,8 @@ export class ProduitsListComponent implements OnInit {
         private stockProduitService: StockProduitControllerService,
         private messageService: MessageService,
         private cdr: ChangeDetectorRef,
-        private router: Router
+        private router: Router,
+        private transloco: TranslocoService
     ) {}
 
     ngOnInit(): void {
@@ -296,8 +297,8 @@ export class ProduitsListComponent implements OnInit {
         this.loadProduits();
         this.messageService.add({
             severity: 'success',
-            summary: 'Recette liée',
-            detail: 'La recette a été associée au produit.'
+            summary: this.transloco.translate('produits.recipe_linked'),
+            detail: this.transloco.translate('produits.recipe_linked_success')
         });
     }
 
@@ -354,7 +355,7 @@ export class ProduitsListComponent implements OnInit {
     confirmArchiver(produit: ProduitResponse): void {
         this.confirmationService.confirm({
             message: `Archiver « ${produit.nom} » ? Le produit ne sera plus visible dans la liste.`,
-            header: "Confirmer l'archivage",
+            header: this.transloco.translate('produits.confirm_archive'),
             icon: 'pi pi-inbox',
             accept: () => this.archiverProduit(produit)
         });
@@ -365,7 +366,7 @@ export class ProduitsListComponent implements OnInit {
             next: () => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Archivé',
+                    summary: this.transloco.translate('produits.archived_msg'),
                     detail: `${produit.nom} a été archivé.`
                 });
                 this.loadProduits();
@@ -374,8 +375,8 @@ export class ProduitsListComponent implements OnInit {
             error: () => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erreur',
-                    detail: "Impossible d'archiver ce produit."
+                    summary: this.transloco.translate('common.error'),
+                    detail: this.transloco.translate('produits.archive_error')
                 });
             }
         });
@@ -386,7 +387,7 @@ export class ProduitsListComponent implements OnInit {
             next: () => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Restauré',
+                    summary: this.transloco.translate('produits.restored_msg'),
                     detail: `${produit.nom} a été restauré.`
                 });
                 this.loadProduits();
@@ -395,8 +396,8 @@ export class ProduitsListComponent implements OnInit {
             error: () => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erreur',
-                    detail: 'Impossible de restaurer ce produit.'
+                    summary: this.transloco.translate('common.error'),
+                    detail: this.transloco.translate('produits.restore_error')
                 });
             }
         });
@@ -442,8 +443,8 @@ export class ProduitsListComponent implements OnInit {
                 this.stockDialogSaving = false;
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Seuil mis à jour',
-                    detail: "Le seuil d'alerte global a été enregistré"
+                    summary: this.transloco.translate('produits.threshold_updated'),
+                    detail: this.transloco.translate('produits.threshold_update_success')
                 });
                 this.cdr.markForCheck();
             },
@@ -451,8 +452,8 @@ export class ProduitsListComponent implements OnInit {
                 this.stockDialogSaving = false;
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erreur',
-                    detail: 'Impossible de mettre à jour le seuil'
+                    summary: this.transloco.translate('common.error'),
+                    detail: this.transloco.translate('produits.threshold_update_error')
                 });
                 this.cdr.markForCheck();
             }
@@ -479,7 +480,7 @@ export class ProduitsListComponent implements OnInit {
                 this.editingSeuilValeur = null;
                 this.messageService.add({
                     severity: 'info',
-                    summary: 'Seuil supprimé'
+                    summary: this.transloco.translate('produits.threshold_deleted')
                 });
                 this.cdr.markForCheck();
             },

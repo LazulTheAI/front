@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { FormsModule, NgForm } from '@angular/forms';
 
 import {
-    EntrepotControllerService,
     EntrepotResponse,
     LancerRunRequest,
     ProductionControllerService,
@@ -13,6 +12,7 @@ import {
     RecetteResponse,
     RunProductionResponse
 } from '@/app/modules/openapi';
+import { MobileEntrepotService } from '@/app/modules/mobile/services/mobile-entrepot.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -80,7 +80,7 @@ export class MobileFabricationComponent implements OnInit {
         private productionService: ProductionControllerService,
         private produitService: ProduitControllerService,
         private recetteService: RecetteControllerService,
-        private entrepotService: EntrepotControllerService,
+        private mobileEntrepotService: MobileEntrepotService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private cdr: ChangeDetectorRef
@@ -93,7 +93,8 @@ export class MobileFabricationComponent implements OnInit {
 
     loadRuns(): void {
         this.loadingRuns = true;
-        this.productionService.listerProductions(0, 50, 'createdAt', 'desc', 'EN_COURS').subscribe({
+        const entrepotId = this.mobileEntrepotService.selected?.id ?? undefined;
+        this.productionService.listerProductions(0, 50, 'createdAt', 'desc', 'EN_COURS', entrepotId).subscribe({
             next: (data: any) => {
                 this.runs = data.content ?? [];
                 this.loadingRuns = false;
@@ -125,12 +126,9 @@ export class MobileFabricationComponent implements OnInit {
                 this.cdr.markForCheck();
             }
         });
-        this.entrepotService.listerEntrepot().subscribe({
-            next: (data: any) => {
-                const items = Array.isArray(data) ? data : (data.content ?? data.items ?? []);
-                this.entrepots = items.filter((e: EntrepotResponse) => e.actif);
-                this.cdr.markForCheck();
-            }
+        this.mobileEntrepotService.entrepots$.subscribe((list) => {
+            this.entrepots = list;
+            this.cdr.markForCheck();
         });
     }
 
@@ -166,7 +164,8 @@ export class MobileFabricationComponent implements OnInit {
     }
 
     openLancer(): void {
-        this.newRun = { produitId: null, recetteId: null, batches: null, entrepotId: null, notes: '' };
+        const defaultEntrepot = this.mobileEntrepotService.selected?.id ?? null;
+        this.newRun = { produitId: null, recetteId: null, batches: null, entrepotId: defaultEntrepot, notes: '' };
         this.selectedRecette = null;
         this.recetteOptions = [];
         this.showLancerDialog = true;

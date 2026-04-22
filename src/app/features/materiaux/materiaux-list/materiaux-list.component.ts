@@ -26,7 +26,7 @@ import { EntrepotControllerService, EntrepotResponse, MateriauControllerService,
 import { APP_CURRENCY } from '@/app/core/currency.config';
 
 // Dialogs
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
 import { HistoriqueDialogComponent } from '../historique-dialog/historique-dialog.component';
 import { MateriauFormComponent } from '../materiau-form/materiau-form.component';
@@ -140,7 +140,8 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private cdr: ChangeDetectorRef,
-        public router: Router
+        public router: Router,
+        private transloco: TranslocoService
     ) {
         this.filters = this.fb.group({
             search: [''],
@@ -187,7 +188,7 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
                     this.cdr.markForCheck();
                 },
                 error: () => {
-                    this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les matériaux.' });
+                    this.messageService.add({ severity: 'error', summary: this.transloco.translate('common.error'), detail: this.transloco.translate('materiaux.load_error') });
                     this.loading = false;
                     this.cdr.markForCheck();
                 }
@@ -326,7 +327,7 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
     }
 
     onFormSaved(): void {
-        this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Matériau enregistré.' });
+        this.messageService.add({ severity: 'success', summary: this.transloco.translate('common.success'), detail: this.transloco.translate('materiaux.save_success') });
         this.reload();
     }
 
@@ -369,11 +370,11 @@ export class StockMateriauxComponent implements OnInit, OnDestroy {
     private archiver(id: number): void {
         this.materiauService.archiverMateriau(id).subscribe({
             next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Archivé', detail: 'Matériau archivé.' });
+                this.messageService.add({ severity: 'success', summary: this.transloco.translate('common.archived'), detail: this.transloco.translate('materiaux.archive_success') });
                 this.reload();
             },
             error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: "Impossible d'archiver." });
+                this.messageService.add({ severity: 'error', summary: this.transloco.translate('common.error'), detail: this.transloco.translate('materiaux.archive_error') });
             }
         });
     }

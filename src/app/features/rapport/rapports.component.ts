@@ -20,7 +20,7 @@ import { UpgradeBannerComponent } from '@/app/shared/plan-gating.components';
 import { RequiresFeatureDirective } from '@/app/shared/requires-plan.directive';
 import { environment } from '@/environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ChartModule } from 'primeng/chart';
 import { ToolbarModule } from 'primeng/toolbar';
 
@@ -109,7 +109,8 @@ export class RapportsComponent implements OnInit {
         private alerteService: AlerteControllerService,
         private messageService: MessageService,
         private cdr: ChangeDetectorRef,
-        private http: HttpClient
+        private http: HttpClient,
+        private transloco: TranslocoService
     ) {}
 
     ngOnInit(): void {
@@ -184,8 +185,8 @@ export class RapportsComponent implements OnInit {
                 error: () => {
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'Erreur',
-                        detail: 'Impossible de générer le rapport financier'
+                        summary: this.transloco.translate('common.error'),
+                        detail: this.transloco.translate('rapports.generate_error')
                     });
                     this.loadingRapportFinancier = false;
                     this.cdr.markForCheck();
@@ -437,7 +438,7 @@ export class RapportsComponent implements OnInit {
     exportCsv(type: string): void {
         this.messageService.add({
             severity: 'info',
-            summary: 'Export',
+            summary: this.transloco.translate('rapports.export'),
             detail: `Export ${type} en cours de développement`
         });
     }

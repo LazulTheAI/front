@@ -3,6 +3,25 @@
         <app-alerte-widget />
     </div>
 
+    @if (entrepots.length > 0) {
+        <div class="mobile-entrepot-bar">
+            <i class="pi pi-warehouse"></i>
+            @if (entrepots.length === 1) {
+                <span class="entrepot-label">{{ selectedEntrepot?.nom }}</span>
+            } @else {
+                <p-select
+                    [ngModel]="selectedEntrepot"
+                    [options]="entrepotOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    [showClear]="false"
+                    styleClass="entrepot-select"
+                    (onChange)="onEntrepotChange($event.value)"
+                />
+            }
+        </div>
+    }
+
     <main class="mobile-content">
         <router-outlet></router-outlet>
     </main>

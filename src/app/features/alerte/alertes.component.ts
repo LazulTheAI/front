@@ -14,7 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { AlerteControllerService, AlerteResponse } from '@/app/modules/openapi';
-import { TranslocoModule } from '@jsverse/transloco';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { ToolbarModule } from 'primeng/toolbar';
 import { AlerteService } from './alerte.service';
 
@@ -34,14 +34,7 @@ export class AlertesComponent implements OnInit, OnDestroy {
 
     filtreType: string | null = null;
 
-    typeOptions = [
-        { label: 'Tous les types', value: null },
-        { label: 'Stock bas matériau', value: 'stock_bas' },
-        { label: 'Stock bas produit', value: 'stock_bas_produit' },
-        { label: 'Stock prévisionnel', value: 'stock_previsionnel' },
-        { label: 'Annulation commande', value: 'annulation_commande' },
-        { label: 'Rupture produit', value: 'stock_produit_insuffisant' }
-    ];
+    typeOptions: { label: string; value: string | null }[] = [];
 
     acquittementEnCours = new Set<number>();
 
@@ -50,7 +43,8 @@ export class AlertesComponent implements OnInit, OnDestroy {
         private alerteController: AlerteControllerService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private transloco: TranslocoService
     ) {
         this.alertes$ = this.alerteService.alertes$;
 
@@ -65,6 +59,14 @@ export class AlertesComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.alerteService.startPolling();
+        this.typeOptions = [
+            { label: this.transloco.translate('alerte.filter_types'), value: null },
+            { label: this.transloco.translate('alerte.type_low_stock_material'), value: 'stock_bas' },
+            { label: this.transloco.translate('alerte.type_low_stock_product'), value: 'stock_bas_produit' },
+            { label: this.transloco.translate('alerte.type_forecast'), value: 'stock_previsionnel' },
+            { label: this.transloco.translate('alerte.type_cancellation'), value: 'annulation_commande' },
+            { label: this.transloco.translate('alerte.type_out_of_stock'), value: 'stock_produit_insuffisant' }
+        ];
     }
 
     ngOnDestroy(): void {}
@@ -80,11 +82,11 @@ export class AlertesComponent implements OnInit, OnDestroy {
 
     confirmerAcquittement(alerte: AlerteResponse): void {
         this.confirmationService.confirm({
-            message: `Acquitter cette alerte ?\n\n${alerte.message}`,
-            header: "Confirmer l'acquittement",
+            message: `${this.transloco.translate('alerte.acknowledge_message')}\n\n${alerte.message}`,
+            header: this.transloco.translate('alerte.confirm_acknowledge'),
             icon: 'pi pi-check-circle',
-            acceptLabel: 'Acquitter',
-            rejectLabel: 'Annuler',
+            acceptLabel: this.transloco.translate('alerte.acknowledge'),
+            rejectLabel: this.transloco.translate('common.cancel'),
             accept: () => this.acquitter(alerte)
         });
     }
@@ -99,8 +101,8 @@ export class AlertesComponent implements OnInit, OnDestroy {
                 this.acquittementEnCours.delete(alerte.id!);
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Acquittée',
-                    detail: 'Alerte acquittée avec succès'
+                    summary: this.transloco.translate('alerte.acknowledged'),
+                    detail: this.transloco.translate('alerte.acknowledged_success')
                 });
                 this.alerteService.refresh();
                 this.cdr.markForCheck();
@@ -109,8 +111,8 @@ export class AlertesComponent implements OnInit, OnDestroy {
                 this.acquittementEnCours.delete(alerte.id!);
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erreur',
-                    detail: "Impossible d'acquitter cette alerte"
+                    summary: this.transloco.translate('common.error'),
+                    detail: this.transloco.translate('alerte.acknowledge_error')
                 });
                 this.cdr.markForCheck();
             }
@@ -123,11 +125,11 @@ export class AlertesComponent implements OnInit, OnDestroy {
 
     getTypeLabel(type: string | undefined): string {
         const labels: Record<string, string> = {
-            stock_bas: 'Stock bas',
-            stock_bas_produit: 'Stock produit',
-            stock_previsionnel: 'Prévisionnel',
-            annulation_commande: 'Annulation',
-            stock_produit_insuffisant: 'Rupture produit'
+            stock_bas: this.transloco.translate('alerte.label_low_stock'),
+            stock_bas_produit: this.transloco.translate('alerte.label_product_stock'),
+            stock_previsionnel: this.transloco.translate('alerte.label_forecast'),
+            annulation_commande: this.transloco.translate('alerte.label_cancellation'),
+            stock_produit_insuffisant: this.transloco.translate('alerte.label_out_of_stock')
         };
         return labels[type ?? ''] ?? type ?? '—';
     }

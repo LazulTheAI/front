@@ -92,7 +92,10 @@
     "password_placeholder": "Mot de passe",
     "remember_me": "Se souvenir de moi",
     "forgot_password": "Mot de passe oublié ?",
-    "sign_in_button": "Se connecter"
+    "sign_in_button": "Se connecter",
+    "validation_error_title": "Erreur de validation",
+    "required_fields": "L'email et le mot de passe sont requis.",
+    "login_failed": "Connexion échouée"
   },
   "alerte": {
     "urgent_banner": "alerte(s) de stock bas — action immédiate requise",
@@ -111,7 +114,22 @@
     "acknowledge": "Acquitter",
     "no_alerts": "Aucune alerte active",
     "column_date": "Date",
-    "days_30": "30 derniers jours"
+    "days_30": "30 derniers jours",
+    "type_low_stock_material": "Stock bas matériau",
+    "type_low_stock_product": "Stock bas produit",
+    "type_forecast": "Stock prévisionnel",
+    "type_cancellation": "Annulation commande",
+    "type_out_of_stock": "Rupture produit",
+    "confirm_acknowledge": "Confirmer l'acquittement",
+    "acknowledge_message": "Acquitter cette alerte ?",
+    "acknowledged": "Acquittée",
+    "acknowledged_success": "Alerte acquittée avec succès",
+    "acknowledge_error": "Impossible d'acquitter cette alerte",
+    "label_low_stock": "Stock bas",
+    "label_product_stock": "Stock produit",
+    "label_forecast": "Prévisionnel",
+    "label_cancellation": "Annulation",
+    "label_out_of_stock": "Rupture produit"
   },
   "materiaux": {
     "lots_button": "Lots",
@@ -141,7 +159,11 @@
     "edit_tooltip": "Modifier",
     "archive_tooltip": "Archiver",
     "in_alert": "en alerte de stock",
-    "lots_tooltip": "Voir les lots — ajustements, pertes et traçabilité DLC"
+    "lots_tooltip": "Voir les lots — ajustements, pertes et traçabilité DLC",
+    "load_error": "Impossible de charger les matériaux.",
+    "save_success": "Matériau enregistré.",
+    "archive_success": "Matériau archivé.",
+    "archive_error": "Impossible d'archiver."
   },
   
   "materiaux_form": {
@@ -161,7 +183,8 @@
     "dlc_required_description": "Exige une date d'expiration à chaque entrée en stock",
     "sku": "SKU / Référence",
     "sku_placeholder": "Ex: MAT-001, REF-FARINE...",
-    "sku_description": "Identifiant unique optionnel pour ce matériau"
+    "sku_description": "Identifiant unique optionnel pour ce matériau",
+    "error": "Une erreur est survenue"
   },
   "run": {
     "launch_failed": "Run impossible à lancer",
@@ -202,7 +225,11 @@
     "transfer_destination": "Entrepôt destination",
     "transfer_select_destination": "Sélectionner un entrepôt...",
     "transfer_notes_placeholder": "Notes optionnelles...",
-    "confirm_transfer": "Confirmer le transfert"
+    "confirm_transfer": "Confirmer le transfert",
+    "load_error": "Impossible de charger les lots.",
+    "degrever_success": "Lot dégrevé avec succès.",
+    "transfer_success": "Lot transféré avec succès.",
+    "entry_success": "Entrée en stock enregistrée."
   },
   "entree_stock": {
     "title": "Entrée de stock",
@@ -260,7 +287,8 @@
     "same_warehouse_error": "Source et destination identiques",
     "quantity_required": "Quantité requise",
     "insufficient": "Insuffisant — disponible :",
-    "transfer": "Transférer"
+    "transfer": "Transférer",
+    "quantity_error": "Quantité max : {{max}}"
   },
   "recettes": {
     "title": "Recettes",
@@ -384,7 +412,12 @@
     "quantite_ex": "Ex : 0.5",
     "unite": "Unité",
     "unite_hint": "Modifiez si l'unité recette diffère de l'unité stock",
-    "cout_unitaire": "Coût unitaire"
+    "cout_unitaire": "Coût unitaire",
+    "duplicated": "Recette dupliquée",
+    "created_msg": "Recette créée",
+    "abandon_confirm": "Abandonner la création de cette recette ?",
+    "yes_abandon": "Oui, abandonner",
+    "continue_btn": "Continuer"
   },
   "recette_form": {
     "edit_mode": "MODE ÉDITION",
@@ -422,7 +455,11 @@
     "duree_ex_placeholder": "Ex: 120 min",
     "duree_hint": "Utilisée pour la planification des runs de production",
     "notes": "Notes",
-    "notes_placeholder_court": "Instructions de fabrication, précautions..."
+    "notes_placeholder_court": "Instructions de fabrication, précautions...",
+    "required_fields_warning": "Renseignez les champs obligatoires",
+    "select_ingredient_warning": "Sélectionnez au moins un ingrédient",
+    "fill_quantities_warning": "Renseignez toutes les quantités",
+    "error": "Une erreur est survenue"
   },
   "recette_detail": {
     "production": "PRODUCTION",
@@ -509,7 +546,12 @@
     "transfer_destination": "Entrepôt destination",
     "transfer_select_destination": "Sélectionner un entrepôt...",
     "transfer_notes_placeholder": "Notes optionnelles...",
-    "confirm_transfer": "Confirmer le transfert"
+    "confirm_transfer": "Confirmer le transfert",
+    "reserved": "Réservé",
+    "all_reserved": "Tout réservé",
+    "load_error": "Impossible de charger les lots.",
+    "degrever_success": "Lot dégrevé avec succès.",
+    "transfer_success": "Lot transféré avec succès."
   },
   "produits": {
     "title": "Produits BigCommerce",
@@ -536,7 +578,21 @@
     "alert_threshold_label": "Seuil d'alerte",
     "auto_stock_creation": "Le stock se crée automatiquement après un run de production",
     "dlc_next": "DLC prochaine",
-    "last_production": "Dernière production"
+    "last_production": "Dernière production",
+    "delete_threshold": "Supprimer le seuil",
+    "threshold_placeholder": "Ex : 10",
+    "select_lot": "Sélectionner un lot",
+    "recipe_linked": "Recette liée",
+    "recipe_linked_success": "La recette a été associée au produit.",
+    "confirm_archive": "Confirmer l'archivage",
+    "archived_msg": "Archivé",
+    "archive_error": "Impossible d'archiver ce produit.",
+    "restored_msg": "Restauré",
+    "restore_error": "Impossible de restaurer ce produit.",
+    "threshold_updated": "Seuil mis à jour",
+    "threshold_update_success": "Le seuil d'alerte global a été enregistré",
+    "threshold_update_error": "Impossible de mettre à jour le seuil",
+    "threshold_deleted": "Seuil supprimé"
   },
   "produit_detail": {
     "information": "Informations",
@@ -614,7 +670,8 @@
     "source_warehouse": "Entrepôt source",
     "dest_warehouse": "Entrepôt destination",
     "insufficient": "Insuffisant — disponible : ",
-    "transfer": "Transférer"
+    "transfer": "Transférer",
+    "quantity_error": "Quantité max : {{max}}"
   },
   "commandes": {
     "title": "Commandes",
@@ -733,7 +790,11 @@
     "col_prix_ht": "Prix HT (cts)",
     "col_remise": "Remise %",
     "sous_total": "Sous-total",
-    "creer_commande": "Créer la commande"
+    "creer_commande": "Créer la commande",
+    "reseller_required": "Le revendeur est obligatoire",
+    "warehouse_required": "L'entrepôt est obligatoire",
+    "required": "Obligatoire",
+    "order_created": "Commande créée"
   },
   "bons_commande": {
     "title": "Approvisionnements",
@@ -758,7 +819,10 @@
     "marquer_envoye": "Marquer comme envoyé",
     "receptionner": "Réceptionner",
     "supprimer_brouillon": "Supprimer le brouillon",
-    "aucun_bon": "Aucun bon de commande"
+    "aucun_bon": "Aucun bon de commande",
+    "cancelled_msg": "Annulé",
+    "deleted_msg": "Supprimé",
+    "sent_msg": "Envoyé"
   },
   "bon_detail": {
     "title": "Approvisionnement #",
@@ -798,7 +862,12 @@
     "info_reception": "Les quantités saisies seront ajoutées au stock de l'entrepôt sélectionné.",
     "partiel": "Partiel",
     "marquer_envoye": "Marquer comme envoyé",
-    "receptionner": "Réceptionner"
+    "receptionner": "Réceptionner",
+    "sent_msg": "Envoyé",
+    "marked_sent": "Bon de commande marqué comme envoyé",
+    "reception_saved": "Réception enregistrée",
+    "stock_updated": "Le stock a été mis à jour",
+    "reception_error": "Impossible d'enregistrer la réception"
   },
   "bon_form": {
     "title": "Nouvel approvisionnement",
@@ -855,7 +924,9 @@
     "detail": "Détail",
     "execute": "Exécuter ce run",
     "export_csv": "Export CSV traçabilité",
-    "cancel_run": "Annuler ce run"
+    "cancel_run": "Annuler ce run",
+    "run_executed": "Run exécuté",
+    "load_error": "Impossible de charger les runs"
   },
   "lancer_run": {
     "title": "Lancer un run de production",
@@ -938,7 +1009,8 @@
     "shortage": "Manque",
     "coverage": "Couverture",
     "no_shortage": "Aucun manque de stock — toutes les matières étaient disponibles.",
-    "export_csv": "Exporter CSV traçabilité"
+    "export_csv": "Exporter CSV traçabilité",
+    "export_error": "Export CSV impossible"
   },
   "revendeurs": {
     "title": "Revendeurs",
@@ -955,7 +1027,13 @@
     "orders": "Commandes",
     "active": "Actif",
     "archived": "Archivé",
-    "no_resellers": "Aucun revendeur trouvé"
+    "no_resellers": "Aucun revendeur trouvé",
+    "load_error": "Impossible de charger les revendeurs",
+    "confirm_archive": "Confirmer l'archivage",
+    "archived_msg": "Archivé",
+    "archive_success_detail": "{{name}} archivé.",
+    "archive_error": "Impossible d'archiver.",
+    "save_success": "Revendeur enregistré."
   },
   "revendeur_form": {
     "title_new": "Nouveau revendeur",
@@ -975,7 +1053,13 @@
     "notes": "Notes",
     "notes_placeholder": "Conditions particulières, contacts, remarques...",
     "create": "Créer",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "postal_code": "Code postal",
+    "city": "Ville",
+    "country": "Pays",
+    "postal_code_placeholder": "75001",
+    "city_placeholder": "Paris",
+    "country_placeholder": "France"
   },
   "revendeur_detail": {
     "contact": "Contact",
@@ -1000,7 +1084,10 @@
     "new_order": "Nouvelle commande",
     "edit": "Modifier",
     "see_detail": "Voir le détail",
-    "close": "Fermer"
+    "close": "Fermer",
+    "name": "Nom",
+    "no_reseller_selected": "Aucun revendeur sélectionné.",
+    "pdf_error": "Impossible de générer le PDF"
   },
   "fournisseurs": {
     "title": "Fournisseurs",
@@ -1026,7 +1113,13 @@
     "delivery_label": "Délai de livraison",
     "delivery_placeholder": "Ex: 5",
     "delivery_desc": "Délai moyen en jours ouvrés",
-    "notes_placeholder": "Conditions particulières, contacts, remarques..."
+    "notes_placeholder": "Conditions particulières, contacts, remarques...",
+    "updated": "Modifié",
+    "update_success": "{{name}} mis à jour",
+    "created": "Créé",
+    "create_success": "{{name}} ajouté",
+    "archive_confirm": "Archiver ce fournisseur",
+    "archived_msg": "Archivé"
   },
   "lieux_production": {
     "financial_params": "Paramètres financiers",
@@ -1086,7 +1179,18 @@
     "place_name": "Nom du lieu",
     "place_name_placeholder": "Ex: Atelier Principal, Stock Nord, Cuisine...",
     "address_label": "Adresse",
-    "address_placeholder": "Adresse complète..."
+    "address_placeholder": "Adresse complète...",
+    "charge_updated": "Charge modifiée",
+    "charge_added": "Charge ajoutée",
+    "confirm_delete": "Confirmer la suppression",
+    "deleted_msg": "Supprimé",
+    "taux_updated": "Taux modifié",
+    "taux_added": "Taux ajouté",
+    "lieu_updated": "{{name}} mis à jour",
+    "lieu_added": "{{name}} ajouté",
+    "deactivate_confirm": "Désactiver ce lieu",
+    "deactivated": "Désactivé",
+    "action_impossible": "Action impossible"
   },
   "mon_equipe": {
     "title": "Mon équipe",
@@ -1112,7 +1216,13 @@
     "operator_desc": "L'opérateur peut consulter et exécuter des runs de production.",
     "password": "Mot de passe",
     "leave_empty": "(laisser vide pour ne pas changer)",
-    "invite": "Inviter"
+    "invite": "Inviter",
+    "updated": "Modifié",
+    "update_success": "{{name}} mis à jour",
+    "invited": "Invité",
+    "invite_success": "{{name}} ajouté à l'équipe",
+    "deactivate_confirm": "Désactiver ce membre",
+    "deactivated": "Désactivé"
   },
   "import_data": {
     "title": "Import de données",
@@ -1159,6 +1269,13 @@
     "no_history": "Aucun import effectué",
     "ignore": "— Ignorer —",
     "cancel_import": "Annuler cet import",
+    "validate_mapping": "Valider le mapping",
+    "upload_error": "Erreur upload",
+    "invalid_file": "Fichier invalide",
+    "mapping_save_error": "Sauvegarde mapping impossible",
+    "process_error": "Erreur traitement",
+    "cancelled_msg": "Import annulé",
+    "cancel_error": "Impossible d'annuler cet import",
     "cols": {
       "nom": "Nom",
       "unite": "Unité",
@@ -1219,6 +1336,36 @@
     "legal_mention": "Mention légale incluse",
     "period": "Période",
     "custom_range": "Plage personnalisée",
-    "export": "Exporter"
+    "export": "Exporter",
+    "ventes": "Ventes",
+    "ca_total": "CA total",
+    "commandes_count": "Commandes",
+    "cout_matieres_ca": "Coût matières / CA",
+    "repartition_plateforme": "Répartition par plateforme",
+    "no_sales": "Aucune vente sur la période",
+    "detail_plateforme": "Détail par plateforme",
+    "col_plateforme": "Plateforme",
+    "col_commandes": "Commandes",
+    "col_ca": "CA",
+    "col_pct": "%",
+    "no_consumption": "Aucune consommation sur la période",
+    "no_movements_period": "Aucun mouvement sur la période",
+    "generate_error": "Impossible de générer le rapport financier"
+  },
+
+  "onboarding_plan": {
+    "trial_days": "jours d'essai gratuit",
+    "no_card_required": "Aucune carte bancaire requise. Annulation possible à tout moment.",
+    "app_name": "MakerStock",
+    "choose_plan": "Choisissez votre plan",
+    "description": "Gérez votre production artisanale et synchronisez votre boutique BigCommerce",
+    "per_month": "/mois",
+    "annual_price": "€/mois en annuel",
+    "free_days": "jours gratuits",
+    "redirecting": "Redirection...",
+    "start_trial": "Commencer l'essai",
+    "secure_payment": "Paiement sécurisé via BigCommerce",
+    "no_commitment": "Sans engagement",
+    "change_plan": "Changement de plan à tout moment"
   }
 }

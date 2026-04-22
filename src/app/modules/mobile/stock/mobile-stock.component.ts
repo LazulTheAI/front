@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 
 import { MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
+import { MobileEntrepotService } from '@/app/modules/mobile/services/mobile-entrepot.service';
 
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -42,6 +43,7 @@ export class MobileStockComponent implements OnInit, OnDestroy {
     searchQuery = '';
     page = 0;
     size = 20;
+    private entrepotId: number | undefined = undefined;
 
     selectedMateriau: MateriauResponse | null = null;
     showDetail = false;
@@ -52,6 +54,7 @@ export class MobileStockComponent implements OnInit, OnDestroy {
     constructor(
         private materiauService: MateriauControllerService,
         private messageService: MessageService,
+        private mobileEntrepotService: MobileEntrepotService,
         private cdr: ChangeDetectorRef
     ) {}
 
@@ -63,7 +66,14 @@ export class MobileStockComponent implements OnInit, OnDestroy {
                 this.page = 0;
                 this.loadMateriaux();
             });
-        this.loadMateriaux();
+
+        this.mobileEntrepotService.selected$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((e) => {
+                this.entrepotId = e?.id ?? undefined;
+                this.page = 0;
+                this.loadMateriaux();
+            });
     }
 
     ngOnDestroy(): void {
@@ -78,7 +88,7 @@ export class MobileStockComponent implements OnInit, OnDestroy {
     loadMateriaux(): void {
         this.loading = true;
         this.materiauService
-            .listerMateriau(false, this.page, this.size, 'nom', 'asc', this.searchQuery || undefined)
+            .listerMateriau(false, this.page, this.size, 'nom', 'asc', this.searchQuery || undefined, this.entrepotId)
             .subscribe({
                 next: (data: any) => {
                     this.materiaux = data.content ?? [];
@@ -97,7 +107,7 @@ export class MobileStockComponent implements OnInit, OnDestroy {
     loadMore(): void {
         this.page++;
         this.materiauService
-            .listerMateriau(false, this.page, this.size, 'nom', 'asc', this.searchQuery || undefined)
+            .listerMateriau(false, this.page, this.size, 'nom', 'asc', this.searchQuery || undefined, this.entrepotId)
             .subscribe({
                 next: (data: any) => {
                     this.materiaux = [...this.materiaux, ...(data.content ?? [])];

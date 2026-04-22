@@ -7,13 +7,13 @@ import {
     BonCommandeControllerService,
     BonCommandeResponse,
     EntreeStockRequest,
-    EntrepotControllerService,
     EntrepotResponse,
     FournisseurControllerService,
     FournisseurResponse,
     MateriauControllerService,
     MateriauResponse
 } from '@/app/modules/openapi';
+import { MobileEntrepotService } from '@/app/modules/mobile/services/mobile-entrepot.service';
 import { MessageService } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
@@ -53,6 +53,10 @@ export class MobileReceptionComponent implements OnInit {
     fournisseurs: FournisseurResponse[] = [];
     entrepots: EntrepotResponse[] = [];
 
+    get entrepotOptions() {
+        return this.entrepots.map((e) => ({ label: e.nom!, value: e.id! }));
+    }
+
     form = {
         materiau: null as MateriauResponse | null,
         fournisseurId: null as number | null,
@@ -66,7 +70,7 @@ export class MobileReceptionComponent implements OnInit {
     constructor(
         private materiauService: MateriauControllerService,
         private fournisseurService: FournisseurControllerService,
-        private entrepotService: EntrepotControllerService,
+        private mobileEntrepotService: MobileEntrepotService,
         private bonCommandeService: BonCommandeControllerService,
         private messageService: MessageService,
         private route: ActivatedRoute,
@@ -106,12 +110,11 @@ export class MobileReceptionComponent implements OnInit {
                 this.cdr.markForCheck();
             }
         });
-        this.entrepotService.listerEntrepot().subscribe({
-            next: (data: any) => {
-                const items = Array.isArray(data) ? data : (data.content ?? data.items ?? []);
-                this.entrepots = items.filter((e: EntrepotResponse) => e.actif);
-                this.cdr.markForCheck();
-            }
+        this.mobileEntrepotService.entrepots$.subscribe((list) => {
+            this.entrepots = list;
+            const selected = this.mobileEntrepotService.selected;
+            if (selected?.id && !this.form.entrepotId) this.form.entrepotId = selected.id;
+            this.cdr.markForCheck();
         });
     }
 
@@ -144,10 +147,6 @@ export class MobileReceptionComponent implements OnInit {
 
     get fournisseurOptions() {
         return this.fournisseurs.map((f) => ({ label: f.nom!, value: f.id! }));
-    }
-
-    get entrepotOptions() {
-        return this.entrepots.map((e) => ({ label: e.nom!, value: e.id! }));
     }
 
     submit(ngForm: NgForm): void {

@@ -45,14 +45,14 @@
 
 <div class="flex align-items-center gap-2 mb-3">
   <i class="pi pi-shopping-cart text-primary"></i>
-  <h2 class="text-900 font-semibold text-lg m-0">Ventes</h2>
+  <h2 class="text-900 font-semibold text-lg m-0">{{ 'rapports.ventes' | transloco }}</h2>
 </div>
 
 <!-- KPIs -->
 <div class="grid mb-4">
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">CA total</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.ca_total' | transloco }}</div>
       @if (loadingVentes) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-primary">
@@ -63,7 +63,7 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Commandes</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.commandes_count' | transloco }}</div>
       @if (loadingVentes) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-900">{{ nbTotalCommandes }}</div>
@@ -72,7 +72,7 @@
   </div>
   <div class="col-12 md:col-4">
     <div class="surface-card border-round-xl border-1 surface-border p-4">
-      <div class="text-400 text-xs font-semibold uppercase mb-2">Coût matières / CA</div>
+      <div class="text-400 text-xs font-semibold uppercase mb-2">{{ 'rapports.cout_matieres_ca' | transloco }}</div>
       @if (loadingConso || loadingVentes) { <p-skeleton height="2.5rem" /> }
       @else {
         <div class="text-3xl font-bold text-900">
@@ -90,7 +90,7 @@
 <div class="grid mb-4">
   <div class="col-12 md:col-5">
     <div class="card flex flex-column align-items-center">
-      <div class="font-semibold text-xl mb-4 align-self-start">Répartition par plateforme</div>
+      <div class="font-semibold text-xl mb-4 align-self-start">{{ 'rapports.repartition_plateforme' | transloco }}</div>
       @if (loadingVentes) {
         <p-skeleton shape="circle" size="220px" />
       } @else if (ventesChartData && (ventesData?.parPlateforme?.length ?? 0) > 0) {
@@ -103,7 +103,7 @@
       } @else {
         <div class="flex justify-content-center align-items-center text-400 text-sm"
              style="height:260px">
-          Aucune vente sur la période
+          {{ 'rapports.no_sales' | transloco }}
         </div>
       }
     </div>
@@ -111,7 +111,7 @@
 
   <div class="col-12 md:col-7">
     <div class="card h-full">
-      <div class="font-semibold text-xl mb-4">Détail par plateforme</div>
+      <div class="font-semibold text-xl mb-4">{{ 'rapports.detail_plateforme' | transloco }}</div>
       @if (loadingVentes) {
         <p-skeleton height="200px" />
       } @else {
@@ -122,10 +122,10 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th>Plateforme</th>
-              <th style="width:110px" class="text-center">Commandes</th>
-              <th style="width:150px" class="text-right">CA</th>
-              <th style="width:90px" class="text-right">%</th>
+              <th>{{ 'rapports.col_plateforme' | transloco }}</th>
+              <th style="width:110px" class="text-center">{{ 'rapports.col_commandes' | transloco }}</th>
+              <th style="width:150px" class="text-right">{{ 'rapports.col_ca' | transloco }}</th>
+              <th style="width:90px" class="text-right">{{ 'rapports.col_pct' | transloco }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-p>
@@ -146,7 +146,7 @@
           </ng-template>
           <ng-template pTemplate="footer">
             <tr>
-              <td class="font-semibold">Total</td>
+              <td class="font-semibold">{{ 'common.total' | transloco }}</td>
               <td class="text-center font-semibold font-mono text-sm">{{ nbTotalCommandes }}</td>
               <td class="text-right font-semibold text-primary font-mono text-sm">
                 {{ caTotalVentes | currency:appCurrency:'symbol':'1.2-2' }}
@@ -157,7 +157,7 @@
           <ng-template pTemplate="emptymessage">
             <tr>
               <td colspan="4" class="text-center text-400 py-4">
-                Aucune vente sur la période
+                {{ 'rapports.no_sales' | transloco }}
               </td>
             </tr>
           </ng-template>
@@ -255,7 +255,7 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="4" class="text-center text-400 py-4">Aucune consommation sur la période</td>
+        <td colspan="4" class="text-center text-400 py-4">{{ 'rapports.no_consumption' | transloco }}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -370,7 +370,7 @@
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="6" class="text-center text-400 py-4">Aucun mouvement sur la période</td>
+        <td colspan="6" class="text-center text-400 py-4">{{ 'rapports.no_movements_period' | transloco }}</td>
       </tr>
     </ng-template>
   </p-table>

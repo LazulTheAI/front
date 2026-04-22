@@ -5,11 +5,11 @@ import { ActivatedRoute } from '@angular/router';
 
 import {
     AjustementStockRequest,
-    EntrepotControllerService,
     EntrepotResponse,
     MateriauControllerService,
     MateriauResponse
 } from '@/app/modules/openapi';
+import { MobileEntrepotService } from '@/app/modules/mobile/services/mobile-entrepot.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
@@ -72,7 +72,7 @@ export class MobileAjustementComponent implements OnInit {
 
     constructor(
         private materiauService: MateriauControllerService,
-        private entrepotService: EntrepotControllerService,
+        private mobileEntrepotService: MobileEntrepotService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
         private route: ActivatedRoute,
@@ -101,12 +101,11 @@ export class MobileAjustementComponent implements OnInit {
                 this.cdr.markForCheck();
             }
         });
-        this.entrepotService.listerEntrepot().subscribe({
-            next: (data: any) => {
-                const items = Array.isArray(data) ? data : (data.content ?? data.items ?? []);
-                this.entrepots = items.filter((e: EntrepotResponse) => e.actif);
-                this.cdr.markForCheck();
-            }
+        this.mobileEntrepotService.entrepots$.subscribe((list) => {
+            this.entrepots = list;
+            const selected = this.mobileEntrepotService.selected;
+            if (selected?.id && !this.form.entrepotId) this.form.entrepotId = selected.id;
+            this.cdr.markForCheck();
         });
     }
 
