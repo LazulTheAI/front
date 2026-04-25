@@ -1,68 +1,241 @@
-<div class="mobile-page">
-    <p-toast />
+<p-toast />
 
+<!-- ── Dialog détail commande ───────────────────────────── -->
+<p-dialog
+    [(visible)]="showDetail"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '100vw', maxWidth: '480px', margin: '0' }"
+    [contentStyle]="{ padding: '0' }"
+    [showHeader]="false"
+    position="bottom"
+    styleClass="detail-dialog">
+
+    @if (selectedCommande) {
+        <div class="detail-panel">
+
+            <!-- En-tête dialog -->
+            <div class="detail-header">
+                <div class="detail-header__info">
+                    <span class="detail-numero">{{ selectedCommande.numero }}</span>
+                    <p-tag
+                        [value]="getStatutLabel(selectedCommande.statut)"
+                        [severity]="getStatutSeverity(selectedCommande.statut)" />
+                </div>
+                <button class="detail-close" (click)="fermerDetail()">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
+
+            <p-divider styleClass="my-0" />
+
+            <!-- Corps dialog -->
+            <div class="detail-body">
+
+                <!-- Revendeur -->
+                <div class="detail-row">
+                    <span class="detail-label">
+                        {{ 'mobile.commandes.detail.revendeur' | transloco }}
+                    </span>
+                    <span class="detail-value">{{ selectedCommande.revendeurNom ?? '—' }}</span>
+                </div>
+
+                <!-- Date commande -->
+                @if (selectedCommande.dateCommande) {
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            {{ 'mobile.commandes.detail.date_commande' | transloco }}
+                        </span>
+                        <span class="detail-value">
+                            {{ selectedCommande.dateCommande | date:'dd/MM/yyyy HH:mm' }}
+                        </span>
+                    </div>
+                }
+
+                <!-- Date livraison souhaitée -->
+                @if (selectedCommande.dateLivraisonSouhaitee) {
+                    <div class="detail-row">
+                        <span class="detail-label">
+                            {{ 'mobile.commandes.detail.livraison_souhaitee' | transloco }}
+                        </span>
+                        <span class="detail-value">
+                            {{ selectedCommande.dateLivraisonSouhaitee | date:'dd/MM/yyyy' }}
+                        </span>
+                    </div>
+                }
+
+                <!-- Notes -->
+                @if (selectedCommande.notes) {
+                    <div class="detail-row detail-row--col">
+                        <span class="detail-label">
+                            {{ 'mobile.commandes.detail.notes' | transloco }}
+                        </span>
+                        <span class="detail-value detail-notes">{{ selectedCommande.notes }}</span>
+                    </div>
+                }
+
+                <p-divider />
+
+                <!-- Lignes -->
+                <p class="detail-section-title">
+                    {{ 'mobile.commandes.detail.lignes' | transloco }}
+                    ({{ selectedCommande.lignes?.length ?? 0 }})
+                </p>
+
+                @for (ligne of selectedCommande.lignes; track ligne.id) {
+                    <div class="detail-ligne">
+                        <div class="detail-ligne__info">
+                            <span class="detail-ligne__nom">{{ ligne.produitNom }}</span>
+                            <span class="detail-ligne__sku">{{ ligne.produitSku }}</span>
+                        </div>
+                        <div class="detail-ligne__qte">
+                            <span class="detail-ligne__quantite">× {{ ligne.quantite }}</span>
+                            @if (ligne.prixUnitaireCents) {
+                                <span class="detail-ligne__prix">
+                                    {{ (ligne.prixUnitaireCents / 100) | number:'1.2-2' }} €
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <p-divider />
+
+                <!-- Total -->
+                <div class="detail-total">
+                    <span>{{ 'mobile.commandes.detail.total_ht' | transloco }}</span>
+                    <span class="detail-total__montant">
+                        {{ getTotalHT(selectedCommande) | number:'1.2-2' }} €
+                    </span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="detail-footer">
+                <button pButton
+                    [label]="'mobile.commandes.detail.fermer' | transloco"
+                    class="p-button-outlined w-full"
+                    (click)="fermerDetail()">
+                </button>
+            </div>
+        </div>
+    }
+</p-dialog>
+
+<div class="mobile-page">
+
+    <!-- ── Header ──────────────────────────────────────────── -->
     <div class="mobile-page-header">
         <h2 class="mobile-page-title">
-            <i class="pi pi-shopping-cart"></i>
-            Approvisionnements
+            <i class="pi pi-shopping-bag"></i>
+            {{ 'mobile.commandes.title' | transloco }}
         </h2>
         <button class="refresh-btn" (click)="loadCommandes()" [disabled]="loading">
             <i class="pi pi-refresh" [class.spin]="loading"></i>
         </button>
     </div>
 
+    <!-- ── Onglets ──────────────────────────────────────────── -->
+    <div class="onglets">
+        <button
+            class="onglet-btn"
+            [class.active]="ongletActif === 'brouillons'"
+            (click)="setOnglet('brouillons')">
+            <i class="pi pi-file-edit"></i>
+            {{ 'mobile.commandes.onglet_brouillons' | transloco }}
+            @if (commandesBrouillons.length > 0) {
+                <span class="onglet-badge">{{ commandesBrouillons.length }}</span>
+            }
+        </button>
+        <button
+            class="onglet-btn"
+            [class.active]="ongletActif === 'confirmees'"
+            (click)="setOnglet('confirmees')">
+            <i class="pi pi-check-circle"></i>
+            {{ 'mobile.commandes.onglet_confirmees' | transloco }}
+            @if (commandesConfirmees.length > 0) {
+                <span class="onglet-badge badge--alert">{{ commandesConfirmees.length }}</span>
+            }
+        </button>
+    </div>
+
+    <!-- ── Hint entrepôt (onglet confirmées sans entrepôt) ── -->
+    @if (ongletActif === 'confirmees' && !entrepotId) {
+        <div class="entrepot-hint">
+            <i class="pi pi-warehouse"></i>
+            {{ 'mobile.commandes.hint_entrepot' | transloco }}
+        </div>
+    }
+
+    <!-- ── Skeleton ─────────────────────────────────────────── -->
     @if (loading) {
         <div class="card-list">
-            @for (i of [1, 2, 3, 4]; track i) {
-                <p-skeleton height="130px" borderRadius="12px" />
+            @for (i of [1, 2, 3]; track i) {
+                <p-skeleton height="130px" borderRadius="14px" />
             }
         </div>
-    } @else if (commandes.length === 0) {
+    }
+
+    <!-- ── Vide ─────────────────────────────────────────────── -->
+    @else if (commandesActives.length === 0) {
         <div class="empty-state">
-            <i class="pi pi-check-circle"></i>
-            <p>Aucune commande en attente</p>
-            <p class="empty-hint">Toutes les commandes ont été réceptionnées ou annulées.</p>
+            <i class="pi pi-inbox"></i>
+            @if (ongletActif === 'brouillons') {
+                <p>{{ 'mobile.commandes.empty_brouillons' | transloco }}</p>
+            } @else {
+                <p>{{ 'mobile.commandes.empty_confirmees' | transloco }}</p>
+            }
         </div>
-    } @else {
+    }
+
+    <!-- ── Liste des commandes ──────────────────────────────── -->
+    @else {
         <div class="card-list">
-            @for (cmd of commandes; track cmd.id) {
-                <div class="commande-card">
+            @for (cmd of commandesActives; track trackById($index, cmd)) {
+                <div class="commande-card" (click)="voirDetail(cmd)">
+
+                    <!-- En-tête -->
                     <div class="cmd-header">
-                        <div class="cmd-fournisseur">{{ cmd.fournisseurNom ?? 'Fournisseur inconnu' }}</div>
-                        <p-tag [value]="getStatutLabel(cmd.statut)" [severity]="getStatutSeverity(cmd.statut)" />
-                    </div>
-
-                    <div class="cmd-ref">
-                        @if (cmd.numeroReference) {
-                            <span><i class="pi pi-hashtag"></i> {{ cmd.numeroReference }}</span>
-                        }
-                        @if (cmd.dateCommande) {
-                            <span><i class="pi pi-calendar"></i> {{ cmd.dateCommande | date:'dd/MM/yyyy' }}</span>
-                        }
-                    </div>
-
-                    @if (cmd.dateLivraisonPrevue) {
-                        <div class="cmd-livraison">
-                            <i class="pi pi-truck"></i>
-                            Livraison prévue le {{ cmd.dateLivraisonPrevue | date:'dd/MM/yyyy' }}
+                        <div class="cmd-client">
+                            <span class="cmd-nom">{{ cmd.revendeurNom ?? '—' }}</span>
+                            @if (cmd.numero) {
+                                <span class="cmd-ref">{{ cmd.numero }}</span>
+                            }
                         </div>
-                    }
-
-                    <div class="cmd-lignes">
-                        <span>{{ getLignesCount(cmd) }} article(s) — {{ getTotalQte(cmd) | number:'1.0-2' }} unités commandées</span>
+                        <p-tag
+                            [value]="getStatutLabel(cmd.statut)"
+                            [severity]="getStatutSeverity(cmd.statut)" />
                     </div>
 
-                    @if (canReceive(cmd)) {
-                        <button
-                            pButton
-                            label="Réceptionner"
-                            icon="pi pi-check-circle"
-                            class="receive-btn"
-                            (click)="goReception(cmd)"
-                        ></button>
-                    }
+                    <!-- Méta -->
+                    <div class="cmd-meta">
+                        @if (cmd.dateCommande) {
+                            <span>
+                                <i class="pi pi-calendar"></i>
+                                {{ cmd.dateCommande | date:'dd/MM/yyyy' }}
+                            </span>
+                        }
+                        <span>
+                            <i class="pi pi-list"></i>
+                            {{ getNombreArticles(cmd) }}&nbsp;{{ 'mobile.commandes.articles' | transloco }}
+                        </span>
+                        @if (getTotalHT(cmd) > 0) {
+                            <span>
+                                <i class="pi pi-euro"></i>
+                                {{ getTotalHT(cmd) | number:'1.2-2' }}&nbsp;€&nbsp;HT
+                            </span>
+                        }
+                    </div>
+
+                    <!-- Flèche -->
+                    <div class="cmd-arrow">
+                        <i class="pi pi-chevron-right"></i>
+                    </div>
+
                 </div>
             }
         </div>
     }
+
 </div>

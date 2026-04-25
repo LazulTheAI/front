@@ -1367,5 +1367,68 @@
     "secure_payment": "Pago seguro a través de BigCommerce",
     "no_commitment": "Sin compromiso",
     "change_plan": "Cambio de plan en cualquier momento"
+  },
+  "mobile": {
+    "statuts": {
+      "BROUILLON": "Creado",
+      "ENVOYE": "Enviado",
+      "PARTIELLEMENT_RECU": "Parcial",
+      "EN_COURS": "En curso",
+      "RECU": "Recibido",
+      "ANNULE": "Cancelado"
+    },
+    "reception": {
+      "title": "Recepción",
+      "select_hint": "Toca un pedido para iniciar la recepción.",
+      "empty": "No hay pedidos para recepcionar",
+      "articles": "artículo(s)",
+      "toutes_recues": "Todas las líneas han sido recepcionadas.",
+      "lines_hint": "Marca las líneas recibidas y completa los detalles.",
+      "commande": "Pedido",
+      "deja_recu": "Ya recibido",
+      "lot": "Lote",
+      "quantite_recue": "Cantidad recibida",
+      "entrepot": "Almacén destino",
+      "choisir_entrepot": "Elegir almacén...",
+      "numero_lot": "N.º de lote proveedor",
+      "lot_placeholder": "Ej: LOT-2024-001",
+      "dlc": "Fecha caducidad",
+      "ajouter_lot": "Añadir un lote",
+      "valider": "Validar la recepción",
+      "total_saisi": "Total introducido",
+      "sur_reception": "Exceso de recepción",
+      "dlc_requise": "Fecha de caducidad requerida",
+      "succes": "Recepción registrada con éxito",
+      "erreur_envoi": "Error al registrar la recepción"
+    },
+    "approvisionnements": {
+      "title": "Aprovisionamientos",
+      "empty": "Sin pedidos pendientes",
+      "empty_hint": "Todos los pedidos han sido recibidos o cancelados.",
+      "fournisseur_inconnu": "Proveedor desconocido",
+      "livraison_prevue": "Entrega prevista el",
+      "articles": "artículo(s)",
+      "unites": "unidades pedidas",
+      "receptionner": "Recepcionar",
+      "erreur_chargement": "No se pueden cargar los aprovisionamientos"
+    },
+    "commandes": {
+      "title": "Envío de pedidos",
+      "empty": "Sin borradores pendientes",
+      "empty_hint": "Crea un aprovisionamiento para enviarlo a tu proveedor.",
+      "fournisseur_inconnu": "Proveedor desconocido",
+      "livraison_prevue": "Entrega prevista el",
+      "articles": "artículo(s)",
+      "unites": "unidades",
+      "envoyer": "Enviar al proveedor",
+      "erreur_chargement": "No se pueden cargar los pedidos",
+      "confirm_envoi": "¿Enviar este pedido al proveedor?",
+      "envoi_success": "Pedido enviado con éxito",
+      "envoi_error": "Error al enviar el pedido",
+      "assembler": "Ensamblar pedido",
+      "assembler_hint": "Marca cada artículo para confirmar su preparación",
+      "cocher_tout": "Marca todos los artículos para enviar",
+      "no_lignes": "No hay artículos en este pedido"
+    }
   }
 }

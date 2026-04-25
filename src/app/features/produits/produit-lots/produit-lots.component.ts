@@ -130,7 +130,11 @@ export class ProduitLotsComponent implements OnInit, OnDestroy {
     }
 
     getTotalStock(): number {
-        return this.lotsFiltres.reduce((sum, l) => sum + (l.quantiteDisponible ?? 0), 0);
+        return this.lotsFiltres.reduce((sum, l) => sum + (l.quantiteDisponible ?? l.quantiteRestante ?? 0), 0);
+    }
+
+    get nbLotsAvecReservations(): number {
+        return this.lotsFiltres.filter((l) => (l.reservations?.length ?? 0) > 0).length;
     }
 
     private applyFiltre(): void {

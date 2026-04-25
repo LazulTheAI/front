@@ -5,19 +5,35 @@
 
     @if (entrepots.length > 0) {
         <div class="mobile-entrepot-bar">
-            <i class="pi pi-warehouse"></i>
             @if (entrepots.length === 1) {
-                <span class="entrepot-label">{{ selectedEntrepot?.nom }}</span>
+                <div class="entrepot-single">
+                    <i class="pi pi-warehouse"></i>
+                    <span>{{ selectedEntrepot?.nom }}</span>
+                </div>
             } @else {
-                <p-select
-                    [ngModel]="selectedEntrepot"
-                    [options]="entrepotOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    [showClear]="false"
-                    styleClass="entrepot-select"
-                    (onChange)="onEntrepotChange($event.value)"
-                />
+                <div class="entrepot-selector" [class.is-open]="entrepotOpen">
+                    <button type="button" class="entrepot-trigger" (click)="toggleEntrepot()">
+                        <i class="pi pi-warehouse"></i>
+                        <span class="entrepot-trigger-name">{{ selectedEntrepot?.nom ?? 'Choisir un entrepôt' }}</span>
+                        <i class="pi pi-chevron-down entrepot-chevron"></i>
+                    </button>
+                    <div class="entrepot-dropdown">
+                        @for (e of entrepots; track e.id) {
+                            <button
+                                type="button"
+                                class="entrepot-option"
+                                [class.is-selected]="e.id === selectedEntrepot?.id"
+                                (click)="selectEntrepot(e)"
+                            >
+                                <i class="pi pi-warehouse"></i>
+                                <span>{{ e.nom }}</span>
+                                @if (e.id === selectedEntrepot?.id) {
+                                    <i class="pi pi-check entrepot-check"></i>
+                                }
+                            </button>
+                        }
+                    </div>
+                </div>
             }
         </div>
     }
@@ -43,8 +59,12 @@
             <i class="pi pi-cog"></i>
             <span>Fabrication</span>
         </a>
-        <a routerLink="commandes" routerLinkActive="active" class="nav-item">
+        <a routerLink="approvisionnements" routerLinkActive="active" class="nav-item">
             <i class="pi pi-shopping-cart"></i>
+            <span>Appro.</span>
+        </a>
+        <a routerLink="commandes" routerLinkActive="active" class="nav-item">
+            <i class="pi pi-send"></i>
             <span>Commandes</span>
         </a>
     </nav>

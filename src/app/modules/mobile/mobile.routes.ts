@@ -38,9 +38,14 @@ export const MOBILE_ROUTES: Routes = [
                 title: 'Ajustement'
             },
             {
+                path: 'approvisionnements',
+                loadComponent: () => import('./approvisionnements/mobile-approvisionnements.component').then((m) => m.MobileApprovisionnementsComponent),
+                title: 'Approvisionnements'
+            },
+            {
                 path: 'commandes',
                 loadComponent: () => import('./commandes/mobile-commandes.component').then((m) => m.MobileCommandesComponent),
-                title: 'Commandes'
+                title: 'Envoi de commandes'
             }
         ]
     }

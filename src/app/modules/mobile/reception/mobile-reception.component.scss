@@ -1,27 +1,250 @@
-.mobile-page { padding: 16px; }
+.mobile-page {
+    padding: 16px;
+    // réserve de l'espace pour le footer sticky (≈76px) + nav bar (≈60px)
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));
+}
 
 .mobile-page-header {
-    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .mobile-page-title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 10px;
     color: var(--p-text-color);
-    i { font-size: 20px; color: var(--p-primary-color); }
+    flex: 1;
+    i { font-size: 18px; color: var(--p-primary-color); }
 }
 
-.reception-form {
+.refresh-btn, .back-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    color: var(--p-text-muted-color);
+    font-size: 18px;
+    flex-shrink: 0;
+    &:hover { background: var(--p-surface-hover); }
+    &:disabled { opacity: 0.5; }
+}
+
+.back-btn { color: var(--p-text-color); font-size: 20px; }
+
+.commande-ref {
+    font-size: 13px;
+    color: var(--p-text-muted-color);
+    margin: 0 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.step-hint {
+    font-size: 13px;
+    color: var(--p-text-muted-color);
+    margin: 0 0 14px;
+}
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Étape 1 : liste des commandes ────────────────────────────────────────
+
+.card-list {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 12px;
 }
 
-.form-field {
+.commande-card {
+    background: var(--p-surface-card);
+    border: 1px solid var(--p-surface-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+
+    &:active { background: var(--p-surface-hover); }
+}
+
+.cmd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.cmd-fournisseur {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--p-text-color);
+    flex: 1;
+}
+
+.cmd-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--p-text-muted-color);
+    span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        i { font-size: 11px; }
+    }
+}
+
+.cmd-chevron {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--p-text-muted-color);
+    font-size: 12px;
+}
+
+// ── Étape 2 : lignes ─────────────────────────────────────────────────────
+
+.ligne-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ligne-card {
+    background: var(--p-surface-card);
+    border: 2px solid var(--p-surface-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+
+    &.ligne-card--active {
+        border-color: var(--p-primary-color);
+    }
+}
+
+.ligne-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.check-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--p-surface-border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+
+    i { color: #fff; font-size: 13px; }
+
+    &.check-circle--on {
+        background: var(--p-primary-color);
+        border-color: var(--p-primary-color);
+    }
+}
+
+.ligne-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ligne-nom {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--p-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ligne-meta {
+    display: block;
+    font-size: 13px;
+    color: var(--p-text-muted-color);
+    margin-top: 3px;
+}
+
+// ── Transition expand des champs de lot ──────────────────────────────────
+
+.lot-details {
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none; // empêche les champs cachés de capturer les clics
+    transition: max-height 0.35s ease;
+
+    &.lot-details--expanded {
+        max-height: 2000px;
+        pointer-events: auto;
+    }
+}
+
+.lot-details-inner {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-top: 1px solid var(--p-surface-border);
+}
+
+.lot-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    &.lot-block--numbered {
+        padding: 12px;
+        background: var(--p-surface-ground);
+        border-radius: 10px;
+    }
+}
+
+.lot-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.lot-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--p-primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.remove-lot-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--p-text-muted-color);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    &:hover { background: var(--p-surface-hover); color: var(--p-red-500); }
+}
+
+.lot-field {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -31,7 +254,7 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--p-text-color);
-    .required { color: var(--p-red-500); }
+    .required { color: var(--p-red-500); margin-left: 2px; }
 }
 
 .text-input {
@@ -41,22 +264,94 @@
     border-radius: 8px;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.form-actions {
+.entrepot-readonly {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-bottom: 16px;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: var(--p-surface-ground);
+    border: 1px solid var(--p-surface-border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--p-text-color);
+    i { color: var(--p-primary-color); }
 }
 
-.submit-btn, .secondary-btn {
+.add-lot-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1.5px dashed var(--p-primary-color);
+    border-radius: 10px;
+    color: var(--p-primary-color);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    transition: background 0.15s;
+    &:hover { background: var(--p-primary-50); }
+}
+
+// ── Résumé quantité ──────────────────────────────────────────────────────
+
+.qty-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--p-surface-ground);
+    gap: 8px;
+
+    .qty-label { color: var(--p-text-muted-color); }
+
+    .qty-value {
+        font-weight: 700;
+        color: var(--p-primary-color);
+        &.over { color: var(--p-orange-500); }
+    }
+
+    .qty-warn {
+        font-size: 12px;
+        color: var(--p-orange-500);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+}
+
+// ── Footer sticky ────────────────────────────────────────────────────────
+
+.sticky-footer {
+    position: fixed;
+    // positionné au-dessus de la barre de navigation mobile (~60px)
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    left: 0;
+    right: 0;
+    padding: 10px 16px;
+    background: var(--p-surface-card);
+    border-top: 1px solid var(--p-surface-border);
+    z-index: 200;
+}
+
+.valider-btn {
     width: 100%;
     min-height: 52px;
     font-size: 16px;
     justify-content: center;
+}
+
+// ── État vide ────────────────────────────────────────────────────────────
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--p-text-muted-color);
+    i { font-size: 48px; display: block; margin-bottom: 12px; color: var(--p-green-400); }
+    p { font-size: 16px; margin: 0; }
 }

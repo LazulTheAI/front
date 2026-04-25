@@ -1,201 +1,282 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
-import {
-    BonCommandeControllerService,
-    BonCommandeResponse,
-    EntreeStockRequest,
-    EntrepotResponse,
-    FournisseurControllerService,
-    FournisseurResponse,
-    MateriauControllerService,
-    MateriauResponse
-} from '@/app/modules/openapi';
 import { MobileEntrepotService } from '@/app/modules/mobile/services/mobile-entrepot.service';
+import { BonCommandeControllerService, BonCommandeResponse, EntreeStockRequest, LigneCommandeFournisseurResponse, MateriauControllerService, MateriauResponse, ReceptionControllerService, ReceptionRequest } from '@/app/modules/openapi';
+import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
-import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
-import { DividerModule } from 'primeng/divider';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
+
+interface LotEntry {
+    quantite: number;
+    numeroLot: string;
+    dlc: Date | null;
+}
+
+interface LigneReception {
+    ligne: LigneCommandeFournisseurResponse;
+    dlcObligatoire: boolean;
+    checked: boolean;
+    lots: LotEntry[];
+}
+
+type ReceptionStep = 'select' | 'lines';
 
 @Component({
     selector: 'app-mobile-reception',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ButtonModule,
-        InputTextModule,
-        InputNumberModule,
-        AutoCompleteModule,
-        SelectModule,
-        DatePickerModule,
-        DividerModule,
-        ToastModule
-    ],
+    imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, InputNumberModule, DatePickerModule, SkeletonModule, TagModule, ToastModule, TranslocoModule],
     providers: [MessageService],
     templateUrl: './mobile-reception.component.html',
     styleUrl: './mobile-reception.component.scss'
 })
 export class MobileReceptionComponent implements OnInit {
-    saving = false;
+    step: ReceptionStep = 'select';
     today = new Date();
 
-    allMateriaux: MateriauResponse[] = [];
-    filteredMateriaux: MateriauResponse[] = [];
-    fournisseurs: FournisseurResponse[] = [];
-    entrepots: EntrepotResponse[] = [];
+    // Étape 1 — sélection
+    commandes: BonCommandeResponse[] = [];
+    loadingCommandes = false;
 
-    get entrepotOptions() {
-        return this.entrepots.map((e) => ({ label: e.nom!, value: e.id! }));
+    // Étape 2 — lignes
+    selectedCommande: BonCommandeResponse | null = null;
+    lignes: LigneReception[] = [];
+    loadingCommande = false;
+
+    submitting = false;
+
+    get selectedEntrepotNom(): string {
+        return this.mobileEntrepotService.selected?.nom ?? '—';
     }
 
-    form = {
-        materiau: null as MateriauResponse | null,
-        fournisseurId: null as number | null,
-        quantite: null as number | null,
-        coutUnitaire: null as number | null,
-        numeroLot: '',
-        dlc: null as Date | null,
-        entrepotId: null as number | null
-    };
+    get checkedLignes(): LigneReception[] {
+        return this.lignes.filter((l) => l.checked);
+    }
+
+    get canSubmit(): boolean {
+        const checked = this.checkedLignes;
+        return !!this.mobileEntrepotService.selected?.id && checked.length > 0 && checked.every((l) => l.lots.every((lot) => (lot.quantite ?? 0) > 0 && (!l.dlcObligatoire || lot.dlc !== null)));
+    }
+
+    getTotalLots(entry: LigneReception): number {
+        return entry.lots.reduce((s, l) => s + (l.quantite ?? 0), 0);
+    }
+
+    getQteRestante(entry: LigneReception): number {
+        return Math.max(0, (entry.ligne.quantiteCommandee ?? 0) - (entry.ligne.quantiteRecue ?? 0));
+    }
+
+    isOverReceiving(entry: LigneReception): boolean {
+        return this.getTotalLots(entry) > this.getQteRestante(entry);
+    }
 
     constructor(
-        private materiauService: MateriauControllerService,
-        private fournisseurService: FournisseurControllerService,
-        private mobileEntrepotService: MobileEntrepotService,
-        private bonCommandeService: BonCommandeControllerService,
-        private messageService: MessageService,
         private route: ActivatedRoute,
         private router: Router,
+        private bonCommandeService: BonCommandeControllerService,
+        private receptionService: ReceptionControllerService,
+        private materiauService: MateriauControllerService,
+        private mobileEntrepotService: MobileEntrepotService,
+        private messageService: MessageService,
+        private transloco: TranslocoService,
         private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
-        this.loadReferentials();
-        this.route.queryParamMap.subscribe((params) => {
-            const materiauId = params.get('materiauId');
-            if (materiauId) {
-                this.materiauService.detailMateriau(+materiauId).subscribe({
-                    next: (m) => {
-                        this.form.materiau = m;
-                        this.cdr.markForCheck();
-                    }
-                });
-            }
-            const commandeId = params.get('commandeId');
-            if (commandeId) {
-                this.prefillFromCommande(+commandeId);
-            }
-        });
+        const commandeId = this.route.snapshot.queryParamMap.get('commandeId');
+        if (commandeId) {
+            this.loadCommande(+commandeId);
+        } else {
+            this.loadCommandes();
+        }
     }
 
-    private loadReferentials(): void {
-        this.materiauService.tousLesMateriaux().subscribe({
+    // ── Étape 1 ────────────────────────────────────────────────────────────
+
+    loadCommandes(): void {
+        this.step = 'select';
+        this.loadingCommandes = true;
+        this.bonCommandeService.listerBonCommande(0, 50, 'dateCommande', 'desc').subscribe({
             next: (data: any) => {
-                this.allMateriaux = Array.isArray(data) ? data : (data.content ?? []);
-                this.cdr.markForCheck();
-            }
-        });
-        this.fournisseurService.listerFournisseur().subscribe({
-            next: (data) => {
-                this.fournisseurs = Array.isArray(data) ? data : [];
-                this.cdr.markForCheck();
-            }
-        });
-        this.mobileEntrepotService.entrepots$.subscribe((list) => {
-            this.entrepots = list;
-            const selected = this.mobileEntrepotService.selected;
-            if (selected?.id && !this.form.entrepotId) this.form.entrepotId = selected.id;
-            this.cdr.markForCheck();
-        });
-    }
-
-    private prefillFromCommande(commandeId: number): void {
-        this.bonCommandeService.getBonCommandeById(commandeId).subscribe({
-            next: (commande: BonCommandeResponse) => {
-                if (commande.fournisseurId) {
-                    this.form.fournisseurId = commande.fournisseurId;
-                }
-                // Pre-fill first undelivered line
-                const ligne = commande.lignes?.find((l) => l.statut !== 'RECU');
-                if (ligne?.materiauId) {
-                    this.materiauService.detailMateriau(ligne.materiauId).subscribe({
-                        next: (m) => {
-                            this.form.materiau = m;
-                            this.form.quantite = ligne.quantiteCommandee ?? null;
-                            this.cdr.markForCheck();
-                        }
-                    });
-                }
-                this.cdr.markForCheck();
-            }
-        });
-    }
-
-    searchMateriau(event: { query: string }): void {
-        const q = event.query.toLowerCase();
-        this.filteredMateriaux = this.allMateriaux.filter((m) => m.nom?.toLowerCase().includes(q));
-    }
-
-    get fournisseurOptions() {
-        return this.fournisseurs.map((f) => ({ label: f.nom!, value: f.id! }));
-    }
-
-    submit(ngForm: NgForm): void {
-        if (ngForm.invalid || !this.form.materiau?.id || !this.form.entrepotId || !this.form.quantite) return;
-        this.saving = true;
-        this.cdr.markForCheck();
-
-        const req: EntreeStockRequest = {
-            quantite: this.form.quantite,
-            coutUnitaire: this.form.coutUnitaire ?? undefined,
-            entrepotId: this.form.entrepotId,
-            numeroLot: this.form.numeroLot || undefined,
-            expiresAt: this.form.dlc?.toISOString() ?? undefined,
-            referenceId: this.form.fournisseurId ? String(this.form.fournisseurId) : undefined
-        };
-
-        this.materiauService.entreeMouvementStock(this.form.materiau.id, req).subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Réception enregistrée',
-                    detail: `${this.form.quantite} ${this.form.materiau?.unite} de ${this.form.materiau?.nom} reçu(s)`
-                });
-                this.saving = false;
-                this.resetForm(ngForm);
+                const all: BonCommandeResponse[] = data.content ?? data ?? [];
+                this.commandes = all.filter((c) => c.statut === 'ENVOYE' || c.statut === 'PARTIELLEMENT_RECU');
+                this.loadingCommandes = false;
                 this.cdr.markForCheck();
             },
             error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible d\'enregistrer la réception' });
-                this.saving = false;
+                this.loadingCommandes = false;
                 this.cdr.markForCheck();
             }
         });
     }
 
-    private resetForm(ngForm: NgForm): void {
-        ngForm.resetForm();
-        this.form = {
-            materiau: null,
-            fournisseurId: null,
-            quantite: null,
-            coutUnitaire: null,
-            numeroLot: '',
-            dlc: null,
-            entrepotId: null
-        };
+    selectCommande(commande: BonCommandeResponse): void {
+        this.loadCommande(commande.id!);
     }
 
-    scanAnother(): void {
-        this.router.navigate(['/mobile/scanner']);
+    // ── Étape 2 ────────────────────────────────────────────────────────────
+
+    private loadCommande(id: number): void {
+        this.step = 'lines';
+        this.loadingCommande = true;
+        this.bonCommandeService.getBonCommandeById(id).subscribe({
+            next: (commande) => {
+                this.selectedCommande = commande;
+                this.buildLignes(commande);
+                this.loadingCommande = false;
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.loadingCommande = false;
+                this.cdr.markForCheck();
+            }
+        });
+    }
+
+    private buildLignes(commande: BonCommandeResponse): void {
+        const pending = (commande.lignes ?? []).filter((l) => l.statut !== 'RECU');
+        if (pending.length === 0) {
+            this.lignes = [];
+            this.cdr.markForCheck();
+            return;
+        }
+
+        const ids = [...new Set(pending.map((l) => l.materiauId).filter(Boolean) as number[])];
+        const requests = ids.length > 0 ? ids.map((id) => this.materiauService.detailMateriau(id)) : [of(null)];
+
+        forkJoin(requests).subscribe({
+            next: (materiaux) => {
+                const map = new Map<number, MateriauResponse>();
+                (materiaux as (MateriauResponse | null)[]).forEach((m) => m?.id && map.set(m.id, m));
+                this.lignes = pending.map((l) => {
+                    const dlc = l.materiauId ? (map.get(l.materiauId)?.dlcObligatoire ?? false) : false;
+                    return this.makeLigneEntry(l, dlc);
+                });
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.lignes = pending.map((l) => this.makeLigneEntry(l, false));
+                this.cdr.markForCheck();
+            }
+        });
+    }
+
+    private makeLigneEntry(ligne: LigneCommandeFournisseurResponse, dlcObligatoire: boolean): LigneReception {
+        const restant = Math.max(0, (ligne.quantiteCommandee ?? 0) - (ligne.quantiteRecue ?? 0));
+        return { ligne, dlcObligatoire, checked: false, lots: [this.makeDefaultLot(restant)] };
+    }
+
+    private makeDefaultLot(quantite: number): LotEntry {
+        return { quantite, numeroLot: '', dlc: null };
+    }
+
+    // ── Interactions ────────────────────────────────────────────────────────
+
+    backToSelect(): void {
+        this.step = 'select';
+        this.selectedCommande = null;
+        this.lignes = [];
+        this.cdr.markForCheck();
+    }
+
+    toggleLigne(entry: LigneReception): void {
+        entry.checked = !entry.checked;
+        this.cdr.markForCheck();
+    }
+
+    addLot(entry: LigneReception): void {
+        entry.lots.push(this.makeDefaultLot(0));
+        this.cdr.markForCheck();
+    }
+
+    removeLot(entry: LigneReception, index: number): void {
+        entry.lots.splice(index, 1);
+        this.cdr.markForCheck();
+    }
+
+    // ── Soumission ──────────────────────────────────────────────────────────
+
+    submit(): void {
+        if (!this.canSubmit || !this.selectedCommande?.id || this.submitting) return;
+
+        const entrepotId = this.mobileEntrepotService.selected!.id!;
+        this.submitting = true;
+        this.cdr.markForCheck();
+
+        const checked = this.checkedLignes;
+
+        const stockCalls = checked.flatMap((entry) =>
+            entry.lots.map((lot) => {
+                const req: EntreeStockRequest = {
+                    quantite: lot.quantite,
+                    entrepotId,
+                    numeroLot: lot.numeroLot || undefined,
+                    expiresAt: lot.dlc ? lot.dlc.toISOString() : undefined
+                };
+                return this.materiauService.entreeMouvementStock(entry.ligne.materiauId!, req);
+            })
+        );
+
+        forkJoin(stockCalls)
+            .pipe(
+                switchMap(() => {
+                    const receptionReq: ReceptionRequest = {
+                        entrepotId,
+                        lignes: checked.map((entry) => ({
+                            ligneId: entry.ligne.id!,
+                            quantiteRecue: entry.lots.reduce((s, l) => s + (l.quantite ?? 0), 0)
+                        }))
+                    };
+                    return this.receptionService.reception(this.selectedCommande!.id!, receptionReq);
+                })
+            )
+            .subscribe({
+                next: () => {
+                    this.submitting = false;
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: this.transloco.translate('common.success'),
+                        detail: this.transloco.translate('mobile.reception.succes')
+                    });
+                    setTimeout(() => this.router.navigate(['/mobile/approvisionnements']), 1500);
+                },
+                error: () => {
+                    this.submitting = false;
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: this.transloco.translate('common.error'),
+                        detail: this.transloco.translate('mobile.reception.erreur_envoi')
+                    });
+                    this.cdr.markForCheck();
+                }
+            });
+    }
+
+    // ── Utilitaires ─────────────────────────────────────────────────────────
+
+    getStatutLabel(statut: string | undefined): string {
+        return this.transloco.translate(`mobile.statuts.${statut ?? ''}`, {}, statut ?? '—');
+    }
+
+    getStatutSeverity(statut: string | undefined): 'secondary' | 'info' | 'warn' | 'success' | 'danger' {
+        const map: Record<string, 'secondary' | 'info' | 'warn' | 'success' | 'danger'> = {
+            BROUILLON: 'secondary',
+            ENVOYE: 'info',
+            PARTIELLEMENT_RECU: 'warn',
+            RECU: 'success',
+            ANNULE: 'danger'
+        };
+        return map[statut ?? ''] ?? 'secondary';
     }
 }

@@ -68,10 +68,15 @@ export class MobileStockComponent implements OnInit, OnDestroy {
             });
 
         this.mobileEntrepotService.selected$
-            .pipe(takeUntil(this.destroy$))
+            .pipe(
+                distinctUntilChanged((a, b) => a?.id === b?.id),
+                takeUntil(this.destroy$)
+            )
             .subscribe((e) => {
                 this.entrepotId = e?.id ?? undefined;
                 this.page = 0;
+                this.loading = true;
+                this.cdr.markForCheck(); // affiche le skeleton immédiatement
                 this.loadMateriaux();
             });
     }

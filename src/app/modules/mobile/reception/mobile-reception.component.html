@@ -1,128 +1,257 @@
 <div class="mobile-page">
     <p-toast />
 
-    <div class="mobile-page-header">
-        <h2 class="mobile-page-title">
-            <i class="pi pi-plus-circle"></i>
-            Réception matière
-        </h2>
-    </div>
-
-    <form #receptionForm="ngForm" (ngSubmit)="submit(receptionForm)" class="reception-form">
-
-        <div class="form-field">
-            <label class="field-label">Matière <span class="required">*</span></label>
-            <p-autoComplete
-                [(ngModel)]="form.materiau"
-                name="materiau"
-                [suggestions]="filteredMateriaux"
-                (completeMethod)="searchMateriau($event)"
-                field="nom"
-                placeholder="Rechercher une matière..."
-                [required]="true"
-                [style]="{ width: '100%' }"
-                [inputStyle]="{ width: '100%', 'font-size': '16px', padding: '12px' }"
-            />
+    <!-- ═══════════════════════════════════════════════════════════════
+         Étape 1 — Sélection de la commande
+    ════════════════════════════════════════════════════════════════════ -->
+    @if (step === 'select') {
+        <div class="mobile-page-header">
+            <h2 class="mobile-page-title">
+                <i class="pi pi-inbox"></i>
+                {{ 'mobile.reception.title' | transloco }}
+            </h2>
+            <button class="refresh-btn" (click)="loadCommandes()" [disabled]="loadingCommandes">
+                <i class="pi pi-refresh" [class.spin]="loadingCommandes"></i>
+            </button>
         </div>
 
-        <div class="form-field">
-            <label class="field-label">Fournisseur</label>
-            <p-select
-                [(ngModel)]="form.fournisseurId"
-                name="fournisseurId"
-                [options]="fournisseurOptions"
-                placeholder="Sélectionner un fournisseur"
-                [style]="{ width: '100%' }"
-                [showClear]="true"
-            />
-        </div>
-
-        <div class="form-row">
-            <div class="form-field">
-                <label class="field-label">Quantité reçue <span class="required">*</span></label>
-                <p-inputNumber
-                    [(ngModel)]="form.quantite"
-                    name="quantite"
-                    [required]="true"
-                    [min]="0.001"
-                    [minFractionDigits]="0"
-                    [maxFractionDigits]="4"
-                    placeholder="0"
-                    [style]="{ width: '100%' }"
-                    [inputStyle]="{ width: '100%', 'font-size': '18px', padding: '12px' }"
-                />
+        @if (loadingCommandes) {
+            <div class="card-list">
+                @for (i of [1, 2, 3]; track i) {
+                    <p-skeleton height="100px" borderRadius="12px" />
+                }
             </div>
-            <div class="form-field">
-                <label class="field-label">Prix unitaire</label>
-                <p-inputNumber
-                    [(ngModel)]="form.coutUnitaire"
-                    name="coutUnitaire"
-                    [minFractionDigits]="2"
-                    [maxFractionDigits]="4"
-                    placeholder="0.00"
-                    [style]="{ width: '100%' }"
-                    [inputStyle]="{ width: '100%', 'font-size': '18px', padding: '12px' }"
-                />
+        } @else if (commandes.length === 0) {
+            <div class="empty-state">
+                <i class="pi pi-check-circle"></i>
+                <p>{{ 'mobile.reception.empty' | transloco }}</p>
             </div>
+        } @else {
+            <p class="step-hint">{{ 'mobile.reception.select_hint' | transloco }}</p>
+            <div class="card-list">
+                @for (cmd of commandes; track cmd.id) {
+                    <div class="commande-card" (click)="selectCommande(cmd)">
+                        <div class="cmd-header">
+                            <span class="cmd-fournisseur">
+                                {{ cmd.fournisseurNom ?? ('mobile.approvisionnements.fournisseur_inconnu' | transloco) }}
+                            </span>
+                            <p-tag
+                                [value]="getStatutLabel(cmd.statut)"
+                                [severity]="getStatutSeverity(cmd.statut)"
+                            />
+                        </div>
+                        <div class="cmd-meta">
+                            @if (cmd.numeroReference) {
+                                <span><i class="pi pi-hashtag"></i> {{ cmd.numeroReference }}</span>
+                            }
+                            @if (cmd.dateCommande) {
+                                <span>
+                                    <i class="pi pi-calendar"></i>
+                                    {{ cmd.dateCommande | date:'dd/MM/yyyy' }}
+                                </span>
+                            }
+                            <span>
+                                <i class="pi pi-list"></i>
+                                {{ cmd.lignes?.length ?? 0 }} {{ 'mobile.reception.articles' | transloco }}
+                            </span>
+                        </div>
+                        <i class="pi pi-chevron-right cmd-chevron"></i>
+                    </div>
+                }
+            </div>
+        }
+    }
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Étape 2 — Lignes à réceptionner
+    ════════════════════════════════════════════════════════════════════ -->
+    @if (step === 'lines') {
+        <div class="mobile-page-header">
+            <button class="back-btn" (click)="backToSelect()">
+                <i class="pi pi-arrow-left"></i>
+            </button>
+            <h2 class="mobile-page-title">
+                {{ selectedCommande?.fournisseurNom ?? ('mobile.reception.title' | transloco) }}
+            </h2>
         </div>
 
-        <div class="form-field">
-            <label class="field-label">Entrepôt de destination <span class="required">*</span></label>
-            <p-select
-                [(ngModel)]="form.entrepotId"
-                name="entrepotId"
-                [options]="entrepotOptions"
-                placeholder="Sélectionner un entrepôt"
-                [required]="true"
-                [style]="{ width: '100%' }"
-            />
-        </div>
+        @if (selectedCommande?.numeroReference) {
+            <p class="commande-ref">
+                <i class="pi pi-hashtag"></i> {{ selectedCommande!.numeroReference }}
+            </p>
+        }
 
-        <div class="form-field">
-            <label class="field-label">Numéro de lot fournisseur</label>
-            <input
-                pInputText
-                type="text"
-                [(ngModel)]="form.numeroLot"
-                name="numeroLot"
-                placeholder="Ex: LOT-2024-001"
-                class="text-input"
-            />
-        </div>
+        @if (loadingCommande) {
+            <div class="card-list">
+                @for (i of [1, 2, 3]; track i) {
+                    <p-skeleton height="120px" borderRadius="12px" />
+                }
+            </div>
+        } @else if (lignes.length === 0) {
+            <div class="empty-state">
+                <i class="pi pi-check-circle"></i>
+                <p>{{ 'mobile.reception.toutes_recues' | transloco }}</p>
+            </div>
+        } @else {
+            <p class="step-hint">{{ 'mobile.reception.lines_hint' | transloco }}</p>
 
-        <div class="form-field">
-            <label class="field-label">DLC</label>
-            <p-datePicker
-                [(ngModel)]="form.dlc"
-                name="dlc"
-                [minDate]="today"
-                placeholder="JJ/MM/AAAA"
-                dateFormat="dd/mm/yy"
-                [style]="{ width: '100%' }"
-                [inputStyle]="{ width: '100%', 'font-size': '16px', padding: '12px' }"
-            />
-        </div>
+            <div class="ligne-list">
+                @for (entry of lignes; track entry.ligne.id) {
+                    <div class="ligne-card" [class.ligne-card--active]="entry.checked">
 
-        <p-divider />
+                        <!-- En-tête toujours visible — clic pour cocher -->
+                        <div class="ligne-header" (click)="toggleLigne(entry)">
+                            <div class="check-circle" [class.check-circle--on]="entry.checked">
+                                @if (entry.checked) {
+                                    <i class="pi pi-check"></i>
+                                }
+                            </div>
+                            <div class="ligne-info">
+                                <span class="ligne-nom">{{ entry.ligne.materiauNom }}</span>
+                                <span class="ligne-meta">
+                                    {{ 'mobile.reception.commande' | transloco }} :
+                                    <strong>{{ entry.ligne.quantiteCommandee | number:'1.0-2' }} {{ entry.ligne.unite }}</strong>
+                                    @if ((entry.ligne.quantiteRecue ?? 0) > 0) {
+                                        &nbsp;·&nbsp;
+                                        {{ 'mobile.reception.deja_recu' | transloco }} :
+                                        {{ entry.ligne.quantiteRecue | number:'1.0-2' }}
+                                    }
+                                </span>
+                            </div>
+                        </div>
 
-        <div class="form-actions">
-            <button
-                pButton
-                type="submit"
-                label="Enregistrer la réception"
-                icon="pi pi-check"
-                [loading]="saving"
-                [disabled]="receptionForm.invalid || !form.materiau || !form.entrepotId || !form.quantite"
-                class="submit-btn"
-            ></button>
-            <button
-                pButton
-                type="button"
-                label="Scanner une autre matière"
-                icon="pi pi-qrcode"
-                class="p-button-outlined secondary-btn"
-                (click)="scanAnother()"
-            ></button>
-        </div>
-    </form>
+                        <!-- Champs de lot — transition CSS douce, toujours dans le DOM -->
+                        <div class="lot-details" [class.lot-details--expanded]="entry.checked">
+                            <div class="lot-details-inner">
+
+                                @for (lot of entry.lots; track $index; let i = $index) {
+                                    <div class="lot-block" [class.lot-block--numbered]="entry.lots.length > 1">
+
+                                        @if (entry.lots.length > 1) {
+                                            <div class="lot-label-row">
+                                                <span class="lot-label">
+                                                    {{ 'mobile.reception.lot' | transloco }} {{ i + 1 }}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    class="remove-lot-btn"
+                                                    (click)="removeLot(entry, i)"
+                                                >
+                                                    <i class="pi pi-times"></i>
+                                                </button>
+                                            </div>
+                                        }
+
+                                        <!-- Quantité reçue -->
+                                        <div class="lot-field">
+                                            <label class="field-label">
+                                                {{ 'mobile.reception.quantite_recue' | transloco }}
+                                                <span class="required">*</span>
+                                            </label>
+                                            <p-inputNumber
+                                                [(ngModel)]="lot.quantite"
+                                                [min]="0.001"
+                                                [minFractionDigits]="0"
+                                                [maxFractionDigits]="4"
+                                                placeholder="0"
+                                                [style]="{ width: '100%' }"
+                                                [inputStyle]="{ width: '100%', fontSize: '17px', padding: '12px' }"
+                                            />
+                                        </div>
+
+                                        <!-- Entrepôt destination (pré-rempli depuis l'en-tête) -->
+                                        <div class="lot-field">
+                                            <label class="field-label">
+                                                {{ 'mobile.reception.entrepot' | transloco }}
+                                            </label>
+                                            <div class="entrepot-readonly">
+                                                <i class="pi pi-warehouse"></i>
+                                                {{ selectedEntrepotNom }}
+                                            </div>
+                                        </div>
+
+                                        <!-- Numéro de lot -->
+                                        <div class="lot-field">
+                                            <label class="field-label">
+                                                {{ 'mobile.reception.numero_lot' | transloco }}
+                                            </label>
+                                            <input
+                                                pInputText
+                                                type="text"
+                                                [(ngModel)]="lot.numeroLot"
+                                                [placeholder]="'mobile.reception.lot_placeholder' | transloco"
+                                                class="text-input"
+                                            />
+                                        </div>
+
+                                        <!-- DLC — uniquement si materiau.dlcObligatoire -->
+                                        @if (entry.dlcObligatoire) {
+                                            <div class="lot-field">
+                                                <label class="field-label">
+                                                    {{ 'mobile.reception.dlc' | transloco }}
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <p-datePicker
+                                                    [(ngModel)]="lot.dlc"
+                                                    [minDate]="today"
+                                                    dateFormat="dd/mm/yy"
+                                                    placeholder="JJ/MM/AAAA"
+                                                    appendTo="body"
+                                                    [style]="{ width: '100%' }"
+                                                    [inputStyle]="{ width: '100%', fontSize: '16px', padding: '12px' }"
+                                                />
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                <!-- Résumé quantité totale vs restante -->
+                                <div class="qty-summary">
+                                    <span class="qty-label">
+                                        {{ 'mobile.reception.total_saisi' | transloco }}
+                                    </span>
+                                    <span class="qty-value" [class.over]="isOverReceiving(entry)">
+                                        {{ getTotalLots(entry) | number:'1.0-2' }}
+                                        / {{ getQteRestante(entry) | number:'1.0-2' }}
+                                        {{ entry.ligne.unite }}
+                                    </span>
+                                    @if (isOverReceiving(entry)) {
+                                        <span class="qty-warn">
+                                            <i class="pi pi-exclamation-triangle"></i>
+                                            {{ 'mobile.reception.sur_reception' | transloco }}
+                                        </span>
+                                    }
+                                </div>
+
+                                <!-- Bouton ajouter un lot -->
+                                <button
+                                    type="button"
+                                    class="add-lot-btn"
+                                    (click)="addLot(entry)"
+                                >
+                                    <i class="pi pi-plus"></i>
+                                    {{ 'mobile.reception.ajouter_lot' | transloco }}
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+
+            <!-- Bouton sticky en bas -->
+            <div class="sticky-footer">
+                <button
+                    pButton
+                    type="button"
+                    [label]="'mobile.reception.valider' | transloco"
+                    icon="pi pi-check-circle"
+                    class="valider-btn"
+                    [loading]="submitting"
+                    [disabled]="!canSubmit"
+                    (click)="submit()"
+                ></button>
+            </div>
+        }
+    }
 </div>

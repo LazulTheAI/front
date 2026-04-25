@@ -1,28 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 
-import {
-    EntrepotResponse,
-    LancerRunRequest,
-    ProductionControllerService,
-    ProduitControllerService,
-    ProduitResponse,
-    RecetteControllerService,
-    RecetteResponse,
-    RunProductionResponse
-} from '@/app/modules/openapi';
 import { MobileEntrepotService } from '@/app/modules/mobile/services/mobile-entrepot.service';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { EntrepotResponse, ProductionControllerService, ProduitControllerService, ProduitResponse, RecetteControllerService, RecetteResponse, RunProductionResponse } from '@/app/modules/openapi';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
+import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 
@@ -30,28 +21,17 @@ import { ToastModule } from 'primeng/toast';
     selector: 'app-mobile-fabrication',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ButtonModule,
-        InputTextModule,
-        InputNumberModule,
-        SelectModule,
-        DialogModule,
-        TagModule,
-        DividerModule,
-        ProgressSpinnerModule,
-        SkeletonModule,
-        ToastModule,
-        ConfirmDialogModule
-    ],
-    providers: [MessageService, ConfirmationService],
+    imports: [CommonModule, FormsModule, ButtonModule, InputTextModule, InputNumberModule, SelectModule, DialogModule, TagModule, DividerModule, SkeletonModule, ToastModule, TabsModule],
+    providers: [MessageService],
     templateUrl: './mobile-fabrication.component.html',
     styleUrl: './mobile-fabrication.component.scss'
 })
-export class MobileFabricationComponent implements OnInit {
-    runs: RunProductionResponse[] = [];
+export class MobileFabricationComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
+    runsEnCours: RunProductionResponse[] = [];
+    runsPlanifies: RunProductionResponse[] = [];
     loadingRuns = false;
+    activeTab = 0; // 0 = planifiés, 1 = en cours
 
     produits: ProduitResponse[] = [];
     allRecettes: RecetteResponse[] = [];
@@ -61,8 +41,8 @@ export class MobileFabricationComponent implements OnInit {
     recetteOptions: { label: string; value: number }[] = [];
     selectedRecette: RecetteResponse | null = null;
 
-    showLancerDialog = false;
-    launching = false;
+    showPlanifierDialog = false;
+    planning = false;
 
     showCloturerDialog = false;
     closingRun: RunProductionResponse | null = null;
@@ -82,21 +62,52 @@ export class MobileFabricationComponent implements OnInit {
         private recetteService: RecetteControllerService,
         private mobileEntrepotService: MobileEntrepotService,
         private messageService: MessageService,
-        private confirmationService: ConfirmationService,
         private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
-        this.loadRuns();
         this.loadReferentials();
+
+        // Reload dès que l'entrepôt change — BehaviorSubject émet immédiatement
+        // la valeur courante, donc loadRuns() est appelé une première fois ici
+        this.mobileEntrepotService.selected$
+            .pipe(
+                distinctUntilChanged((a, b) => a?.id === b?.id),
+                takeUntil(this.destroy$)
+            )
+            .subscribe(() => {
+                this.loadingRuns = true;
+                this.cdr.markForCheck();
+                this.loadRuns();
+            });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    get entrepotSelectionne() {
+        return this.mobileEntrepotService.selected;
     }
 
     loadRuns(): void {
         this.loadingRuns = true;
+        this.cdr.markForCheck();
         const entrepotId = this.mobileEntrepotService.selected?.id ?? undefined;
+
+        // Charger EN_COURS
         this.productionService.listerProductions(0, 50, 'createdAt', 'desc', 'EN_COURS', entrepotId).subscribe({
             next: (data: any) => {
-                this.runs = data.content ?? [];
+                this.runsEnCours = data.content ?? [];
+                this.cdr.markForCheck();
+            }
+        });
+
+        // Charger PLANIFIE
+        this.productionService.listerProductions(0, 50, 'createdAt', 'asc', 'PLANIFIE', entrepotId).subscribe({
+            next: (data: any) => {
+                this.runsPlanifies = data.content ?? [];
                 this.loadingRuns = false;
                 this.cdr.markForCheck();
             },
@@ -110,9 +121,7 @@ export class MobileFabricationComponent implements OnInit {
     private loadReferentials(): void {
         this.produitService.listerProduit(0, 500, 'nom', 'asc', undefined).subscribe({
             next: (data: any) => {
-                this.produits = (data.content ?? (Array.isArray(data) ? data : [])).filter(
-                    (p: ProduitResponse) => p.actif !== false && p.recettes && (p.recettes as any[]).length > 0
-                );
+                this.produits = (data.content ?? (Array.isArray(data) ? data : [])).filter((p: ProduitResponse) => p.actif !== false && p.recettes && (p.recettes as any[]).length > 0);
                 this.produitOptions = this.produits.map((p) => ({
                     label: p.sku ? `${p.nom} (${p.sku})` : p.nom!,
                     value: p.id!
@@ -163,42 +172,55 @@ export class MobileFabricationComponent implements OnInit {
         return this.entrepots.map((e) => ({ label: e.nom!, value: e.id! }));
     }
 
-    openLancer(): void {
+    openPlanifier(): void {
         const defaultEntrepot = this.mobileEntrepotService.selected?.id ?? null;
         this.newRun = { produitId: null, recetteId: null, batches: null, entrepotId: defaultEntrepot, notes: '' };
         this.selectedRecette = null;
         this.recetteOptions = [];
-        this.showLancerDialog = true;
+        this.showPlanifierDialog = true;
         this.cdr.markForCheck();
     }
 
-    lancerRun(ngForm: NgForm): void {
+    planifierRun(ngForm: NgForm): void {
         if (ngForm.invalid || !this.newRun.recetteId || !this.newRun.batches || !this.newRun.entrepotId) return;
-        this.launching = true;
+        this.planning = true;
         this.cdr.markForCheck();
 
-        const req: LancerRunRequest = {
-            recetteId: this.newRun.recetteId,
-            batches: this.newRun.batches,
-            entrepotId: this.newRun.entrepotId,
-            notes: this.newRun.notes || undefined
-        };
+        this.productionService
+            .planifierRunProduction({
+                recetteId: this.newRun.recetteId,
+                batches: this.newRun.batches,
+                entrepotId: this.newRun.entrepotId,
+                notes: this.newRun.notes || undefined
+            })
+            .subscribe({
+                next: () => {
+                    this.messageService.add({ severity: 'success', summary: 'Planifié', detail: 'Run ajouté à la file' });
+                    this.showPlanifierDialog = false;
+                    this.planning = false;
+                    this.activeTab = 0; // retour onglet planifiés
+                    this.loadRuns();
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de planifier' });
+                    this.planning = false;
+                    this.cdr.markForCheck();
+                }
+            });
+    }
 
-        this.productionService.lancerRunProduction(req).subscribe({
-            next: (result) => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Run lancé',
-                    detail: `${result.recetteNom} — ${result.batchsProduits} batch(s)`
-                });
-                this.showLancerDialog = false;
-                this.launching = false;
+    demarrerRun(run: RunProductionResponse): void {
+        if (!run.id) return;
+        this.productionService.demarrerRunProduction(run.id).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary: 'Démarré', detail: `${run.recetteNom} en cours` });
+                this.activeTab = 1; // switcher sur onglet en cours
                 this.loadRuns();
                 this.cdr.markForCheck();
             },
-            error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de lancer le run' });
-                this.launching = false;
+            error: (err: any) => {
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: err?.error?.message ?? 'Impossible de démarrer' });
                 this.cdr.markForCheck();
             }
         });
@@ -215,12 +237,12 @@ export class MobileFabricationComponent implements OnInit {
         this.closing = true;
         this.cdr.markForCheck();
 
-        this.productionService.executerRunProduction(this.closingRun.id).subscribe({
+        this.productionService.terminerRunProduction(this.closingRun.id).subscribe({
             next: (result) => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Run clôturé',
-                    detail: `${result.recetteNom} — ${result.unitesProduite} unités produites`
+                    summary: 'Clôturé',
+                    detail: `${result.recetteNom} — ${result.unitesProduite} unités`
                 });
                 this.showCloturerDialog = false;
                 this.closing = false;
@@ -229,20 +251,10 @@ export class MobileFabricationComponent implements OnInit {
                 this.cdr.markForCheck();
             },
             error: () => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de clôturer le run' });
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de clôturer' });
                 this.closing = false;
                 this.cdr.markForCheck();
             }
         });
-    }
-
-    getStatutSeverity(statut: string | undefined): 'info' | 'warn' | 'success' | 'danger' {
-        switch (statut) {
-            case 'EN_COURS': return 'info';
-            case 'PLANIFIE': return 'warn';
-            case 'TERMINE': return 'success';
-            case 'ANNULE': return 'danger';
-            default: return 'info';
-        }
     }
 }

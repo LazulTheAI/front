@@ -3,17 +3,15 @@ import { AlerteService } from '@/app/features/alerte/alerte.service';
 import { EntrepotResponse } from '@/app/modules/openapi';
 import { MobileEntrepotService } from '@/app/modules/mobile/services/mobile-entrepot.service';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { SelectModule } from 'primeng/select';
-import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-mobile-shell',
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, FormsModule, RouterModule, AlerteWidgetComponent, SelectModule],
+    imports: [CommonModule, RouterModule, AlerteWidgetComponent],
     templateUrl: './mobile-shell.component.html',
     styleUrl: './mobile-shell.component.scss'
 })
@@ -23,6 +21,7 @@ export class MobileShellComponent implements OnInit, OnDestroy {
 
     entrepots: EntrepotResponse[] = [];
     selectedEntrepot: EntrepotResponse | null = null;
+    entrepotOpen = false;
 
     constructor(
         private alerteService: AlerteService,
@@ -71,11 +70,23 @@ export class MobileShellComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
-    get entrepotOptions() {
-        return this.entrepots.map((e) => ({ label: e.nom!, value: e }));
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: Event): void {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.entrepot-selector')) {
+            this.entrepotOpen = false;
+            this.cdr.markForCheck();
+        }
     }
 
-    onEntrepotChange(entrepot: EntrepotResponse): void {
-        if (entrepot) this.mobileEntrepotService.select(entrepot);
+    toggleEntrepot(): void {
+        this.entrepotOpen = !this.entrepotOpen;
+        this.cdr.markForCheck();
+    }
+
+    selectEntrepot(entrepot: EntrepotResponse): void {
+        this.mobileEntrepotService.select(entrepot);
+        this.entrepotOpen = false;
+        this.cdr.markForCheck();
     }
 }

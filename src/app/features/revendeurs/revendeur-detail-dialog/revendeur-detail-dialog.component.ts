@@ -51,7 +51,7 @@ export class RevendeurDetailDialogComponent implements OnChanges {
         if (!this.revendeur?.id) return;
         this.loadingCommandes = true;
         this.commandeService
-            .listerCommande(
+            .listerCommandes(
                 this.revendeur.id, // revendeurId
                 undefined, // statut
                 undefined, // source

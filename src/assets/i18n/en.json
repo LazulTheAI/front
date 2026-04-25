@@ -1365,5 +1365,68 @@
     "secure_payment": "Secure payment via BigCommerce",
     "no_commitment": "No commitment",
     "change_plan": "Change plan at any time"
+  },
+  "mobile": {
+    "statuts": {
+      "BROUILLON": "Created",
+      "ENVOYE": "Sent",
+      "PARTIELLEMENT_RECU": "Partial",
+      "EN_COURS": "In progress",
+      "RECU": "Received",
+      "ANNULE": "Cancelled"
+    },
+    "reception": {
+      "title": "Reception",
+      "select_hint": "Tap an order to start the reception.",
+      "empty": "No orders to receive",
+      "articles": "item(s)",
+      "toutes_recues": "All lines have been received.",
+      "lines_hint": "Check the received lines, then enter the details.",
+      "commande": "Ordered",
+      "deja_recu": "Already received",
+      "lot": "Lot",
+      "quantite_recue": "Quantity received",
+      "entrepot": "Destination warehouse",
+      "choisir_entrepot": "Choose a warehouse...",
+      "numero_lot": "Supplier lot number",
+      "lot_placeholder": "e.g. LOT-2024-001",
+      "dlc": "Expiry date",
+      "ajouter_lot": "Add a lot",
+      "valider": "Validate reception",
+      "total_saisi": "Total entered",
+      "sur_reception": "Over-receiving",
+      "dlc_requise": "Expiry date required",
+      "succes": "Reception recorded successfully",
+      "erreur_envoi": "Error recording reception"
+    },
+    "approvisionnements": {
+      "title": "Replenishments",
+      "empty": "No pending orders",
+      "empty_hint": "All orders have been received or cancelled.",
+      "fournisseur_inconnu": "Unknown supplier",
+      "livraison_prevue": "Expected delivery on",
+      "articles": "item(s)",
+      "unites": "units ordered",
+      "receptionner": "Receive",
+      "erreur_chargement": "Unable to load replenishments"
+    },
+    "commandes": {
+      "title": "Send orders",
+      "empty": "No drafts pending",
+      "empty_hint": "Create a replenishment to send it to your supplier.",
+      "fournisseur_inconnu": "Unknown supplier",
+      "livraison_prevue": "Expected delivery on",
+      "articles": "item(s)",
+      "unites": "units",
+      "envoyer": "Send to supplier",
+      "erreur_chargement": "Unable to load orders",
+      "confirm_envoi": "Send this order to the supplier?",
+      "envoi_success": "Order sent successfully",
+      "envoi_error": "Error sending the order",
+      "assembler": "Assemble order",
+      "assembler_hint": "Check each item to confirm it has been prepared",
+      "cocher_tout": "Check all items to send",
+      "no_lignes": "No items in this order"
+    }
   }
 }

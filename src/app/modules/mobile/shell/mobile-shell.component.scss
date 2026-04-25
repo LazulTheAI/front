@@ -7,47 +7,99 @@
 }
 
 .mobile-entrepot-bar {
+    flex-shrink: 0;
+    background: var(--p-primary-color);
+}
+
+.entrepot-single {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 16px;
+    gap: 10px;
+    padding: 14px 16px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    i { font-size: 16px; }
+}
+
+// ── Dropdown natif ────────────────────────────────────────────────────────
+
+.entrepot-selector {
+    position: relative;
+}
+
+.entrepot-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+
+    &:active { background: rgba(0, 0, 0, 0.1); }
+
+    .entrepot-trigger-name { flex: 1; }
+
+    i { font-size: 16px; }
+}
+
+.entrepot-chevron {
+    font-size: 13px !important;
+    opacity: 0.8;
+    transition: transform 0.25s ease;
+    .is-open & { transform: rotate(180deg); }
+}
+
+.entrepot-dropdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
     background: var(--p-surface-card);
     border-bottom: 1px solid var(--p-surface-border);
-    flex-shrink: 0;
-    min-height: 40px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 
-    i {
+    .is-open & { max-height: 400px; }
+}
+
+.entrepot-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--p-surface-border);
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    color: var(--p-text-color);
+    -webkit-tap-highlight-color: transparent;
+
+    &:active { background: var(--p-surface-hover); }
+
+    &.is-selected {
         color: var(--p-primary-color);
+        font-weight: 700;
+        background: color-mix(in srgb, var(--p-primary-color) 8%, transparent);
+    }
+
+    i:first-child {
         font-size: 16px;
-        flex-shrink: 0;
+        color: var(--p-primary-color);
     }
 
-    .entrepot-label {
+    .entrepot-check {
+        margin-left: auto;
         font-size: 13px;
-        font-weight: 600;
-        color: var(--p-text-color);
-    }
-
-    ::ng-deep .entrepot-select {
-        .p-select {
-            border: none;
-            background: transparent;
-            box-shadow: none;
-            padding: 0;
-            min-height: unset;
-            height: unset;
-        }
-
-        .p-select-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--p-text-color);
-            padding: 0;
-        }
-
-        .p-select-dropdown {
-            width: 20px;
-        }
+        color: var(--p-primary-color);
     }
 }
 

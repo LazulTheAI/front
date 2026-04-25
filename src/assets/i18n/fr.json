@@ -1367,5 +1367,97 @@
     "secure_payment": "Paiement sécurisé via BigCommerce",
     "no_commitment": "Sans engagement",
     "change_plan": "Changement de plan à tout moment"
+  },
+  "mobile": {
+    "statuts": {
+      "BROUILLON": "Créé",
+      "ENVOYE": "Envoyée",
+      "PARTIELLEMENT_RECU": "Partielle",
+      "EN_COURS": "En cours",
+      "RECU": "Reçue",
+      "ANNULE": "Annulée"
+    },
+    
+   
+    "commandes": {
+      "title": "Commandes",
+      "onglet_brouillons": "Brouillons",
+      "onglet_confirmees": "Confirmées",
+      "articles": "article(s)",
+      "hint_entrepot": "Sélectionnez un entrepôt pour filtrer vos commandes",
+      "empty_brouillons": "Aucune commande en brouillon",
+      "empty_confirmees": "Aucune commande confirmée pour cet entrepôt",
+      "erreur_chargement": "Impossible de charger les commandes",
+      "detail": {
+        "revendeur": "Revendeur",
+        "date_commande": "Date commande",
+        "livraison_souhaitee": "Livraison souhaitée",
+        "notes": "Notes",
+        "lignes": "Articles",
+        "total_ht": "Total HT",
+        "fermer": "Fermer"
+      },
+        "BROUILLON": "Brouillon",
+        "EN_ATTENTE": "En attente",
+        "CONFIRMEE": "Confirmée",
+        "EN_PREPARATION": "En préparation",
+        "EXPEDIEE": "Expédiée",
+        "LIVREE": "Livrée",
+        "ANNULEE": "Annulée",
+        "REMBOURSEE": "Remboursée"
+      },
+    "reception": {
+      "title": "Réception",
+      "select_hint": "Touchez une commande pour commencer la réception.",
+      "empty": "Aucune commande à réceptionner",
+      "articles": "article(s)",
+      "toutes_recues": "Toutes les lignes ont été réceptionnées.",
+      "lines_hint": "Cochez les lignes reçues, puis saisissez les détails.",
+      "commande": "Commandé",
+      "deja_recu": "Déjà reçu",
+      "lot": "Lot",
+      "quantite_recue": "Quantité reçue",
+      "entrepot": "Entrepôt destination",
+      "choisir_entrepot": "Choisir un entrepôt...",
+      "numero_lot": "N° de lot fournisseur",
+      "lot_placeholder": "Ex : LOT-2024-001",
+      "dlc": "DLC",
+      "ajouter_lot": "Ajouter un lot",
+      "valider": "Valider la réception",
+      "total_saisi": "Total saisi",
+      "sur_reception": "Dépassement",
+      "dlc_requise": "DLC requise",
+      "succes": "Réception enregistrée avec succès",
+      "erreur_envoi": "Erreur lors de l'enregistrement de la réception"
+    },
+    "approvisionnements": {
+      "title": "Approvisionnements",
+      "empty": "Aucune commande en attente",
+      "empty_hint": "Toutes les commandes ont été réceptionnées ou annulées.",
+      "fournisseur_inconnu": "Fournisseur inconnu",
+      "livraison_prevue": "Livraison prévue le",
+      "articles": "article(s)",
+      "unites": "unités commandées",
+      "receptionner": "Réceptionner",
+      "erreur_chargement": "Impossible de charger les approvisionnements"
+    },
+    "commandes": {
+      "title": "Envoi de commandes",
+      "empty": "Aucune commande créée",
+      "empty_hint": "Créez un approvisionnement depuis le bureau pour l'envoyer à votre fournisseur.",
+      "fournisseur_inconnu": "Fournisseur inconnu",
+      "livraison_prevue": "Livraison prévue le",
+      "articles": "article(s)",
+      "unites": "unités",
+      "envoyer": "Envoyer au fournisseur",
+      "erreur_chargement": "Impossible de charger les commandes",
+      "confirm_envoi": "Envoyer cette commande au fournisseur ?",
+      "envoi_success": "Commande envoyée avec succès",
+      "envoi_error": "Erreur lors de l'envoi de la commande",
+      "assembler": "Assembler la commande",
+      "assembler_hint": "Cochez chaque article pour confirmer sa préparation",
+      "cocher_tout": "Cochez tous les articles pour envoyer",
+      "no_lignes": "Aucun article dans cette commande"
+    }
   }
 }

@@ -11,40 +11,21 @@
   </ng-template>
   <ng-template pTemplate="end">
     <div class="flex align-items-center gap-3 flex-wrap">
-
-      <p-select
-        [(ngModel)]="filtreEntrepotId"
-        [options]="entrepotOptions"
-        optionLabel="label"
-        optionValue="value"
+      <p-select [(ngModel)]="filtreEntrepotId" [options]="entrepotOptions"
+        optionLabel="label" optionValue="value"
         [placeholder]="'common.all_warehouses' | transloco"
-        [showClear]="true"
-        styleClass="w-12rem"
-        (onChange)="onFiltreChange()"
-      />
-
-      <p-select
-        [(ngModel)]="filtreStatut"
-        [options]="statutOptions"
-        optionLabel="label"
-        optionValue="value"
+        [showClear]="true" styleClass="w-12rem" (onChange)="onFiltreChange()" />
+      <p-select [(ngModel)]="filtreStatut" [options]="statutOptions"
+        optionLabel="label" optionValue="value"
         [placeholder]="'common.all_statuses' | transloco"
-        [showClear]="true"
-        styleClass="w-12rem"
-        (onChange)="onFiltreChange()"
-      />
-
+        [showClear]="true" styleClass="w-12rem" (onChange)="onFiltreChange()" />
       <p-iconfield>
         <p-inputicon styleClass="pi pi-search" />
-        <input pInputText [ngModel]="search"
-          (ngModelChange)="onSearchInput($event)"
-          [placeholder]="'production.search_recipe' | transloco"
-          class="w-12rem" />
+        <input pInputText [ngModel]="search" (ngModelChange)="onSearchInput($event)"
+          [placeholder]="'production.search_recipe' | transloco" class="w-12rem" />
       </p-iconfield>
-
       <p-button [label]="'production.plan' | transloco" icon="pi pi-calendar-plus"
-        severity="secondary" [outlined]="true"
-        (onClick)="showPlanifierDialog = true" />
+        severity="secondary" [outlined]="true" (onClick)="showPlanifierDialog = true" />
       <p-button [label]="'production.launch' | transloco" icon="pi pi-play"
         (onClick)="showLancerDialog = true" />
     </div>
@@ -64,28 +45,19 @@
     @if (search) {
       <p-tag [value]="search" severity="secondary" />
     }
-    <p-button [label]="'production.clear' | transloco" severity="secondary" [text]="true"
-      size="small" (onClick)="resetFiltres()" />
+    <p-button [label]="'production.clear' | transloco" severity="secondary"
+      [text]="true" size="small" (onClick)="resetFiltres()" />
   </div>
 }
 
-<!-- ═══ TABLEAU ══════════════════════════════════════════════ -->
 <div class="card">
   <p-table
-    [value]="runs"
-    [loading]="loading"
-    [paginator]="true"
-    [rows]="size"
-    [rowsPerPageOptions]="[10, 15, 25, 50]"
-    [totalRecords]="totalRecords"
-    [lazy]="true"
-    (onLazyLoad)="onLazyLoad($event)"
-    [showCurrentPageReport]="true"
-    [showGridlines]="true"
+    [value]="runs" [loading]="loading" [paginator]="true" [rows]="size"
+    [rowsPerPageOptions]="[10, 15, 25, 50]" [totalRecords]="totalRecords"
+    [lazy]="true" (onLazyLoad)="onLazyLoad($event)"
+    [showCurrentPageReport]="true" [showGridlines]="true"
     currentPageReportTemplate="{first} &#224; {last} sur {totalRecords}"
-    dataKey="id"
-    [rowHover]="true"
-    (onRowClick)="openDetail($event['data'])"
+    dataKey="id" [rowHover]="true" (onRowClick)="openDetail($event['data'])"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -175,27 +147,42 @@
             <span class="text-400">&#8212;</span>
           }
         </td>
+
+        <!-- Actions -->
         <td>
           <div class="flex gap-1 justify-content-end" (click)="$event.stopPropagation()">
+
             <p-button icon="pi pi-eye" severity="secondary" [text]="true" [rounded]="true"
-              size="small" [pTooltip]="'production.detail' | transloco" (onClick)="openDetail(run)" />
-            @if (canExecuter(run)) {
-              <p-button icon="pi pi-play" severity="success" [text]="true" [rounded]="true"
-                size="small" [pTooltip]="'production.execute' | transloco"
+              size="small" [pTooltip]="'production.detail' | transloco"
+              (onClick)="openDetail(run)" />
+
+            @if (canDemarrer(run)) {
+              <p-button icon="pi pi-play" severity="warn" [text]="true" [rounded]="true"
+                size="small" pTooltip="Démarrer la production"
                 [loading]="executingRunId === run.id"
-                (onClick)="executerRun(run, $event)" />
+                (onClick)="demarrerRun(run, $event)" />
             }
+
+            @if (canTerminer(run)) {
+              <p-button icon="pi pi-check" severity="success" [text]="true" [rounded]="true"
+                size="small" pTooltip="Terminer la production"
+                [loading]="executingRunId === run.id"
+                (onClick)="terminerRun(run, $event)" />
+            }
+
             @if (canExport(run)) {
               <p-button icon="pi pi-download" severity="info" [text]="true" [rounded]="true"
                 size="small" [pTooltip]="'production.export_csv' | transloco"
                 [loading]="exportingRunId === run.id"
                 (onClick)="exportCsv(run, $event)" />
             }
+
             @if (canAnnuler(run)) {
               <p-button icon="pi pi-times" severity="danger" [text]="true" [rounded]="true"
                 size="small" [pTooltip]="'production.cancel_run' | transloco"
                 (onClick)="openAnnuler(run, $event)" />
             }
+
           </div>
         </td>
       </tr>
@@ -205,19 +192,16 @@
       <tr>
         <td colspan="11" class="text-center py-6 text-400">
           <i class="pi pi-cog text-4xl mb-3 block"></i>
+          {{ 'production.no_runs' | transloco }}
           @if (hasFiltresActifs) {
-            {{ 'production.no_runs' | transloco }}
             <div class="mt-2">
               <p-button [label]="'production.clear' | transloco" severity="secondary"
                 size="small" (onClick)="resetFiltres()" />
             </div>
-          } @else {
-            {{ 'production.no_runs' | transloco }}
           }
         </td>
       </tr>
     </ng-template>
-
   </p-table>
 </div>
 

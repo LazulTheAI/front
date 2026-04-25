@@ -1,8 +1,7 @@
-// production-list.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { TranslocoModule } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
+import { TranslocoModule } from '@jsverse/transloco';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -139,11 +138,7 @@ export class ProductionListComponent implements OnInit, OnDestroy {
                 this.cdr.markForCheck();
             },
             error: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erreur',
-                    detail: 'Impossible de charger les runs'
-                });
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les runs' });
                 this.loading = false;
                 this.cdr.markForCheck();
             }
@@ -160,12 +155,10 @@ export class ProductionListComponent implements OnInit, OnDestroy {
     onLazyLoad(event: TableLazyLoadEvent): void {
         this.page = Math.floor((event.first ?? 0) / (event.rows ?? this.size));
         this.size = event.rows ?? this.size;
-
         if (event.sortField) {
             this.sortBy = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
             this.sortDir = event.sortOrder === -1 ? 'desc' : 'asc';
         }
-
         this.loadRuns();
     }
 
@@ -204,18 +197,46 @@ export class ProductionListComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
     }
 
-    executerRun(run: RunProductionResponse, event: Event): void {
+    demarrerRun(run: RunProductionResponse, event: Event): void {
         event.stopPropagation();
         if (!run.id) return;
         this.executingRunId = run.id;
         this.cdr.markForCheck();
 
-        this.productionService.executerRunProduction(run.id).subscribe({
+        this.productionService.demarrerRunProduction(run.id).subscribe({
             next: () => {
                 this.executingRunId = null;
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Run exécuté',
+                    summary: 'Run démarré',
+                    detail: `Run #${run.id} — ${run.recetteNom} en cours`
+                });
+                this.loadRuns();
+            },
+            error: (err: any) => {
+                this.executingRunId = null;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erreur',
+                    detail: err?.error?.message ?? 'Impossible de démarrer ce run'
+                });
+                this.cdr.markForCheck();
+            }
+        });
+    }
+
+    terminerRun(run: RunProductionResponse, event: Event): void {
+        event.stopPropagation();
+        if (!run.id) return;
+        this.executingRunId = run.id;
+        this.cdr.markForCheck();
+
+        this.productionService.terminerRunProduction(run.id).subscribe({
+            next: () => {
+                this.executingRunId = null;
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Run terminé',
                     detail: `Run #${run.id} — ${run.recetteNom} terminé avec succès`
                 });
                 this.loadRuns();
@@ -225,7 +246,7 @@ export class ProductionListComponent implements OnInit, OnDestroy {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erreur',
-                    detail: err?.error?.message ?? "Impossible d'exécuter ce run"
+                    detail: err?.error?.message ?? 'Impossible de terminer ce run'
                 });
                 this.cdr.markForCheck();
             }
@@ -238,31 +259,23 @@ export class ProductionListComponent implements OnInit, OnDestroy {
         this.exportingRunId = run.id;
         this.cdr.markForCheck();
 
-        this.http
-            .get(`${environment.baseUrl}/api/reports/tracabilite/${run.id}/csv`, {
-                responseType: 'blob'
-            })
-            .subscribe({
-                next: (blob) => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `tracabilite-run-${run.id}.csv`;
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    this.exportingRunId = null;
-                    this.cdr.markForCheck();
-                },
-                error: () => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Erreur',
-                        detail: 'Export CSV impossible'
-                    });
-                    this.exportingRunId = null;
-                    this.cdr.markForCheck();
-                }
-            });
+        this.http.get(`${environment.baseUrl}/api/reports/tracabilite/${run.id}/csv`, { responseType: 'blob' }).subscribe({
+            next: (blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tracabilite-run-${run.id}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                this.exportingRunId = null;
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Export CSV impossible' });
+                this.exportingRunId = null;
+                this.cdr.markForCheck();
+            }
+        });
     }
 
     onRunSaved(result: { success: boolean; message: string }): void {
@@ -308,8 +321,11 @@ export class ProductionListComponent implements OnInit, OnDestroy {
         return map[statut] ?? statut;
     }
 
-    canExecuter(run: RunProductionResponse): boolean {
+    canDemarrer(run: RunProductionResponse): boolean {
         return run.statut === 'PLANIFIE';
+    }
+    canTerminer(run: RunProductionResponse): boolean {
+        return run.statut === 'EN_COURS';
     }
     canAnnuler(run: RunProductionResponse): boolean {
         return run.statut === 'PLANIFIE' || run.statut === 'EN_COURS';

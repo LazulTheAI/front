@@ -1,0 +1,73 @@
+<div class="mobile-page">
+    <p-toast />
+
+    <div class="mobile-page-header">
+        <h2 class="mobile-page-title">
+            <i class="pi pi-shopping-cart"></i>
+            {{ 'mobile.approvisionnements.title' | transloco }}
+        </h2>
+        <button class="refresh-btn" (click)="loadCommandes()" [disabled]="loading">
+            <i class="pi pi-refresh" [class.spin]="loading"></i>
+        </button>
+    </div>
+
+    @if (loading) {
+        <div class="card-list">
+            @for (i of [1, 2, 3, 4]; track i) {
+                <p-skeleton height="130px" borderRadius="12px" />
+            }
+        </div>
+    } @else if (commandes.length === 0) {
+        <div class="empty-state">
+            <i class="pi pi-check-circle"></i>
+            <p>{{ 'mobile.approvisionnements.empty' | transloco }}</p>
+            <p class="empty-hint">{{ 'mobile.approvisionnements.empty_hint' | transloco }}</p>
+        </div>
+    } @else {
+        <div class="card-list">
+            @for (cmd of commandes; track cmd.id) {
+                <div class="commande-card">
+                    <div class="cmd-header">
+                        <div class="cmd-fournisseur">
+                            {{ cmd.fournisseurNom ?? ('mobile.approvisionnements.fournisseur_inconnu' | transloco) }}
+                        </div>
+                        <p-tag [value]="getStatutLabel(cmd.statut)" [severity]="getStatutSeverity(cmd.statut)" />
+                    </div>
+
+                    <div class="cmd-ref">
+                        @if (cmd.numeroReference) {
+                            <span><i class="pi pi-hashtag"></i> {{ cmd.numeroReference }}</span>
+                        }
+                        @if (cmd.dateCommande) {
+                            <span><i class="pi pi-calendar"></i> {{ cmd.dateCommande | date:'dd/MM/yyyy' }}</span>
+                        }
+                    </div>
+
+                    @if (cmd.dateLivraisonPrevue) {
+                        <div class="cmd-livraison">
+                            <i class="pi pi-truck"></i>
+                            {{ 'mobile.approvisionnements.livraison_prevue' | transloco }} {{ cmd.dateLivraisonPrevue | date:'dd/MM/yyyy' }}
+                        </div>
+                    }
+
+                    <div class="cmd-lignes">
+                        <span>
+                            {{ getLignesCount(cmd) }} {{ 'mobile.approvisionnements.articles' | transloco }}
+                            — {{ getTotalQte(cmd) | number:'1.0-2' }} {{ 'mobile.approvisionnements.unites' | transloco }}
+                        </span>
+                    </div>
+
+                    @if (canReceive(cmd)) {
+                        <button
+                            pButton
+                            [label]="'mobile.approvisionnements.receptionner' | transloco"
+                            icon="pi pi-check-circle"
+                            class="receive-btn"
+                            (click)="goReception(cmd)"
+                        ></button>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

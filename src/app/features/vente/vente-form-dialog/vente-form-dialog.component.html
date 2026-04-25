@@ -141,9 +141,7 @@
               (onChange)="onProduitChange(ligne)"
               [class.ng-invalid]="submitted && !ligne.produitId"
               [style]="{'width':'100%'}" />
-            @if (submitted && !ligne.produitId) {
-              <small class="text-red-500 text-xs">Obligatoire</small>
-            }
+          
           </div>
 
           <!-- Quantité -->

@@ -75,6 +75,15 @@
   </div>
 }
 
+@if (nbLotsAvecReservations > 0) {
+  <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-3">
+    <i class="pi pi-lock text-orange-500 text-xl"></i>
+    <span class="text-orange-800 font-medium">
+      {{ nbLotsAvecReservations }} lot(s) avec des réservations actives (runs EN_COURS)
+    </span>
+  </div>
+}
+
 <!-- Banner lots réservés -->
 @if (nbLotsReserves > 0) {
   <div class="flex align-items-center gap-2 p-3 bg-orange-50 border-round border-1 border-orange-200 mb-3">

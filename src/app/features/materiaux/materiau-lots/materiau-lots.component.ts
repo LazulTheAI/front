@@ -15,8 +15,8 @@ import { Toast } from 'primeng/toast';
 import { Toolbar } from 'primeng/toolbar';
 import { Tooltip } from 'primeng/tooltip';
 
-import { EntrepotControllerService, EntrepotResponse, LotResponse, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
 import { APP_CURRENCY } from '@/app/core/currency.config';
+import { EntrepotControllerService, EntrepotResponse, LotResponse, MateriauControllerService, MateriauResponse } from '@/app/modules/openapi';
 import { DegreverLotDialogComponent } from '../degrever-lot-dialog/degrever-lot-dialog.component';
 import { EntreeStockDialogComponent } from '../entree-stock-dialog/entree-stock-dialog.component';
 import { TransfererLotDialogComponent } from '../transferer-lot-dialog/transferer-lot-dialog.component';
@@ -200,6 +200,11 @@ export class MateriauLotsComponent implements OnInit, OnDestroy {
 
     getTotalStock(): number {
         return this.lotsFiltres.reduce((sum, l) => sum + (l.quantiteRestante ?? 0), 0);
+    }
+
+    // Ajouter getter pour le banner réservations
+    get nbLotsAvecReservations(): number {
+        return this.lotsFiltres.filter((l) => (l.reservations?.length ?? 0) > 0).length;
     }
 
     get nbLotsExpires(): number {

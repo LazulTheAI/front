@@ -1,53 +1,152 @@
-<div class="mobile-page">
-    <p-toast />
-    <p-confirmDialog />
+<p-toast />
 
+<div class="mobile-page">
+
+    <!-- Header -->
     <div class="mobile-page-header">
         <h2 class="mobile-page-title">
             <i class="pi pi-cog"></i>
             Fabrication
         </h2>
+        @if (entrepotSelectionne) {
+            <span class="entrepot-badge">
+                <i class="pi pi-map-marker"></i>
+                {{ entrepotSelectionne.nom }}
+            </span>
+        }
     </div>
 
+    <!-- Onglets -->
+    <div class="tabs-header">
+        <button class="tab-btn" [class.active]="activeTab === 0" (click)="activeTab = 0">
+            <i class="pi pi-calendar"></i>
+            Planifiés
+            @if (runsPlanifies.length > 0) {
+                <span class="tab-badge">{{ runsPlanifies.length }}</span>
+            }
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 1" (click)="activeTab = 1">
+            <i class="pi pi-spin pi-cog"></i>
+            En cours
+            @if (runsEnCours.length > 0) {
+                <span class="tab-badge tab-badge--info">{{ runsEnCours.length }}</span>
+            }
+        </button>
+    </div>
+
+    <!-- Skeleton -->
     @if (loadingRuns) {
         <div class="card-list">
             @for (i of [1, 2, 3]; track i) {
                 <p-skeleton height="100px" borderRadius="12px" />
             }
         </div>
-    } @else if (runs.length === 0) {
-        <div class="empty-state">
-            <i class="pi pi-cog"></i>
-            <p>Aucun run en cours</p>
-            <p class="empty-hint">Lancez un nouveau run de fabrication avec le bouton ci-dessous.</p>
-        </div>
-    } @else {
-        <div class="card-list">
-            @for (run of runs; track run.id) {
-                <div class="run-card">
-                    <div class="run-card-header">
-                        <div class="run-info">
-                            <span class="run-name">{{ run.recetteNom }}</span>
-                            <p-tag [value]="run.statut ?? 'EN_COURS'" [severity]="getStatutSeverity(run.statut)" />
+
+    <!-- Onglet PLANIFIÉS -->
+    } @else if (activeTab === 0) {
+        @if (runsPlanifies.length === 0) {
+            <div class="empty-state">
+                <i class="pi pi-calendar-plus"></i>
+                <p>Aucun run planifié</p>
+                <p class="empty-hint">Planifiez un run avec le bouton +</p>
+            </div>
+        } @else {
+            <div class="card-list">
+                @for (run of runsPlanifies; track run.id) {
+                    <div class="run-card run-card--planifie">
+                        <div class="run-card-header">
+                            <div class="run-info">
+                                <span class="run-name">{{ run.recetteNom }}</span>
+                                <p-tag value="Planifié" severity="warn" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="run-details">
-                        <span class="run-detail-item">
-                            <i class="pi pi-box"></i>
-                            {{ run.batchsProduits }} batch(s) — {{ run.unitesProduite }} unités
-                        </span>
-                        @if (run.entrepotNom) {
+                        <div class="run-details">
                             <span class="run-detail-item">
-                                <i class="pi pi-map-marker"></i>
-                                {{ run.entrepotNom }}
+                                <i class="pi pi-box"></i>
+                                {{ run.batchsProduits }} batch(s) — {{ run.unitesProduite }} unités
                             </span>
-                        }
-                        <span class="run-detail-item">
-                            <i class="pi pi-clock"></i>
-                            {{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}
-                        </span>
+                            @if (run.entrepotNom) {
+                                <span class="run-detail-item">
+                                    <i class="pi pi-map-marker"></i>
+                                    {{ run.entrepotNom }}
+                                </span>
+                            }
+                            <span class="run-detail-item">
+                                <i class="pi pi-clock"></i>
+                                {{ run.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                            </span>
+                        </div>
+                        <button
+                            pButton
+                            label="Démarrer"
+                            icon="pi pi-play"
+                            class="p-button-warning demarrer-btn"
+                            (click)="demarrerRun(run)"
+                        ></button>
                     </div>
-                    @if (run.statut === 'EN_COURS') {
+                }
+            </div>
+        }
+
+    <!-- Onglet EN COURS -->
+    } @else {
+        @if (runsEnCours.length === 0) {
+            <div class="empty-state">
+                <i class="pi pi-cog"></i>
+                <p>Aucun run en cours</p>
+                <p class="empty-hint">Démarrez un run planifié depuis l'onglet Planifiés</p>
+            </div>
+        } @else {
+            <div class="card-list">
+                @for (run of runsEnCours; track run.id) {
+                    <div class="run-card run-card--encours">
+                        <div class="run-card-header">
+                            <div class="run-info">
+                                <span class="run-name">{{ run.recetteNom }}</span>
+                                <p-tag value="En cours" severity="info" />
+                            </div>
+                        </div>
+
+                        <div class="run-details">
+                            <span class="run-detail-item">
+                                <i class="pi pi-box"></i>
+                                {{ run.batchsProduits }} batch(s) — {{ run.unitesProduite }} unités
+                            </span>
+                            @if (run.entrepotNom) {
+                                <span class="run-detail-item">
+                                    <i class="pi pi-map-marker"></i>
+                                    {{ run.entrepotNom }}
+                                </span>
+                            }
+                            @if (run.startedAt) {
+                                <span class="run-detail-item">
+                                    <i class="pi pi-play"></i>
+                                    Démarré le {{ run.startedAt | date:'dd/MM HH:mm' }}
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Lots / matières réservées -->
+                        @if (run.lots  && run.lots .length > 0) {
+                            <div class="lots-section">
+                                <p class="lots-label">
+                                    <i class="pi pi-lock"></i>
+                                    Matières réservées
+                                </p>
+                                @for (lot of run.lots ; track lot.materiauNom) {
+                                    <div class="lot-row">
+                                        <div class="lot-left">
+                                            <span class="lot-nom">{{ lot.materiauNom }}</span>
+                                            @if (lot.numeroLot) {
+                                                <span class="lot-numero">{{ lot.numeroLot }}</span>
+                                            }
+                                        </div>
+                                        <span class="lot-qty">{{ lot.quantiteConsommee }}</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+
                         <button
                             pButton
                             label="Clôturer ce run"
@@ -55,118 +154,79 @@
                             class="p-button-success cloturer-btn"
                             (click)="openCloturer(run)"
                         ></button>
-                    }
-                </div>
-            }
-        </div>
+                    </div>
+                }
+            </div>
+        }
     }
 
-    <!-- FAB button -->
-    <button class="fab-btn" (click)="openLancer()">
+    <!-- FAB -->
+    <button class="fab-btn" (click)="openPlanifier()">
         <i class="pi pi-plus"></i>
     </button>
 </div>
 
-<!-- Lancer un run dialog -->
+<!-- Dialog Planifier -->
 <p-dialog
-    [(visible)]="showLancerDialog"
-    header="Nouveau run de fabrication"
+    [(visible)]="showPlanifierDialog"
+    header="Planifier un run"
     [modal]="true"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '100vw', maxWidth: '480px', margin: '0', borderRadius: '16px 16px 0 0' }"
     position="bottom"
 >
-    <form #lancerForm="ngForm" (ngSubmit)="lancerRun(lancerForm)" class="dialog-form">
+    <form #planifierForm="ngForm" (ngSubmit)="planifierRun(planifierForm)" class="dialog-form">
         <div class="form-field">
             <label class="field-label">Produit <span class="required">*</span></label>
-            <p-select
-                [(ngModel)]="newRun.produitId"
-                name="produitId"
-                [options]="produitOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Sélectionner un produit"
-                [required]="true"
-                [filter]="true"
-                (onChange)="onProduitChange()"
-                [style]="{ width: '100%' }"
-            />
+            <p-select [(ngModel)]="newRun.produitId" name="produitId"
+                [options]="produitOptions" optionLabel="label" optionValue="value"
+                placeholder="Sélectionner un produit" [required]="true" [filter]="true"
+                (onChange)="onProduitChange()" [style]="{ width: '100%' }" />
         </div>
-
         <div class="form-field">
             <label class="field-label">Recette <span class="required">*</span></label>
-            <p-select
-                [(ngModel)]="newRun.recetteId"
-                name="recetteId"
-                [options]="recetteOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Sélectionner une recette"
-                [required]="true"
-                [disabled]="!newRun.produitId"
-                (onChange)="onRecetteChange()"
-                [style]="{ width: '100%' }"
-            />
+            <p-select [(ngModel)]="newRun.recetteId" name="recetteId"
+                [options]="recetteOptions" optionLabel="label" optionValue="value"
+                placeholder="Sélectionner une recette" [required]="true"
+                [disabled]="!newRun.produitId" (onChange)="onRecetteChange()"
+                [style]="{ width: '100%' }" />
         </div>
-
         <div class="form-field">
             <label class="field-label">Nombre de batches <span class="required">*</span></label>
-            <p-inputNumber
-                [(ngModel)]="newRun.batches"
-                name="batches"
-                [required]="true"
-                [min]="1"
-                placeholder="1"
+            <p-inputNumber [(ngModel)]="newRun.batches" name="batches"
+                [required]="true" [min]="1" placeholder="1"
                 [style]="{ width: '100%' }"
-                [inputStyle]="{ width: '100%', 'font-size': '18px', padding: '12px' }"
-            />
+                [inputStyle]="{ width: '100%', 'font-size': '18px', padding: '12px' }" />
             @if (selectedRecette?.quantiteProduite) {
                 <span class="field-hint">
                     Soit {{ (newRun.batches ?? 0) * selectedRecette!.quantiteProduite! }} {{ selectedRecette!.uniteProduite }}
                 </span>
             }
         </div>
-
         <div class="form-field">
-            <label class="field-label">Entrepôt de prélèvement <span class="required">*</span></label>
-            <p-select
-                [(ngModel)]="newRun.entrepotId"
-                name="entrepotId"
-                [options]="entrepotOptions"
-                placeholder="Sélectionner un entrepôt"
-                [required]="true"
-                [style]="{ width: '100%' }"
-            />
+            <label class="field-label">Entrepôt <span class="required">*</span></label>
+            <p-select [(ngModel)]="newRun.entrepotId" name="entrepotId"
+                [options]="entrepotOptions" placeholder="Sélectionner un entrepôt"
+                [required]="true" [style]="{ width: '100%' }" />
         </div>
-
         <div class="form-field">
             <label class="field-label">Notes</label>
-            <input
-                pInputText
-                type="text"
-                [(ngModel)]="newRun.notes"
-                name="notes"
-                placeholder="Notes optionnelles..."
-                class="text-input"
-            />
+            <input pInputText type="text" [(ngModel)]="newRun.notes" name="notes"
+                placeholder="Notes optionnelles..." class="text-input" />
         </div>
-
         <div class="dialog-actions">
-            <button pButton type="button" label="Annuler" class="p-button-text" (click)="showLancerDialog = false"></button>
-            <button
-                pButton
-                type="submit"
-                label="Lancer"
-                icon="pi pi-play"
-                [loading]="launching"
-                [disabled]="lancerForm.invalid || !newRun.recetteId || !newRun.batches || !newRun.entrepotId"
-            ></button>
+            <button pButton type="button" label="Annuler" class="p-button-text"
+                (click)="showPlanifierDialog = false"></button>
+            <button pButton type="submit" label="Planifier" icon="pi pi-calendar-plus"
+                [loading]="planning"
+                [disabled]="planifierForm.invalid || !newRun.recetteId || !newRun.batches || !newRun.entrepotId">
+            </button>
         </div>
     </form>
 </p-dialog>
 
-<!-- Clôturer dialog -->
+<!-- Dialog Clôturer -->
 <p-dialog
     [(visible)]="showCloturerDialog"
     header="Clôturer le run"
@@ -192,30 +252,30 @@
                 </div>
             </div>
 
-            @if (closingRun.lots && closingRun.lots.length > 0) {
+            @if (closingRun.lots  && closingRun.lots .length > 0) {
                 <p-divider />
-                <p class="section-label">Matières consommées</p>
-                @for (lot of closingRun.lots; track lot.materiauNom) {
+                <p class="section-label">Matières réservées à consommer</p>
+                @for (lot of closingRun.lots ; track lot.materiauNom) {
                     <div class="lot-row">
-                        <span class="lot-nom">{{ lot.materiauNom }}</span>
+                        <div class="lot-left">
+                            <span class="lot-nom">{{ lot.materiauNom }}</span>
+                            @if (lot.numeroLot) {
+                                <span class="lot-numero">{{ lot.numeroLot }}</span>
+                            }
+                        </div>
                         <span class="lot-qty">{{ lot.quantiteConsommee }}</span>
                     </div>
                 }
             }
 
             <p-divider />
-            <p class="confirm-text">Confirmer la clôture de ce run ? Cette action est irréversible.</p>
-
+            <p class="confirm-text">Confirmer la clôture ? Les matières seront déduites du stock.</p>
             <div class="dialog-actions">
-                <button pButton label="Annuler" class="p-button-text" (click)="showCloturerDialog = false"></button>
-                <button
-                    pButton
-                    label="Valider la clôture"
-                    icon="pi pi-check"
-                    class="p-button-success"
-                    [loading]="closing"
-                    (click)="cloturerRun()"
-                ></button>
+                <button pButton label="Annuler" class="p-button-text"
+                    (click)="showCloturerDialog = false"></button>
+                <button pButton label="Valider la clôture" icon="pi pi-check"
+                    class="p-button-success" [loading]="closing"
+                    (click)="cloturerRun()"></button>
             </div>
         </div>
     }

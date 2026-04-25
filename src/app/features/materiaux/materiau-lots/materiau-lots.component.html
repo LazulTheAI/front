@@ -65,7 +65,7 @@
 }
 
 <div class="card">
-  <p-table
+<p-table
     [value]="lotsFiltres"
     [loading]="loading"
     [showGridlines]="true"
@@ -73,144 +73,234 @@
     dataKey="id"
     [sortField]="'expiresAt'"
     [sortOrder]="1"
-  >
+>
     <ng-template pTemplate="header">
-      <tr>
-        <th style="width:140px" pSortableColumn="numeroLot">
-          {{ 'lots.lot_number' | transloco }} <p-sortIcon field="numeroLot" />
-        </th>
-        <th style="width:130px">{{ 'common.warehouse' | transloco }}</th>
-        <th style="width:150px" pSortableColumn="expiresAt">
-          {{ 'lots.dlc' | transloco }} <p-sortIcon field="expiresAt" />
-        </th>
-        <th style="width:160px" class="text-right" pSortableColumn="quantiteRestante">
-          {{ 'lots.remaining' | transloco }} <p-sortIcon field="quantiteRestante" />
-        </th>
-        <th style="width:140px" class="text-right" pSortableColumn="quantiteInitiale">
-          {{ 'lots.initial' | transloco }} <p-sortIcon field="quantiteInitiale" />
-        </th>
-        <th style="width:130px" class="text-right">
-          {{ 'lots.unit_cost' | transloco }}
-        </th>
-        <th style="width:150px" pSortableColumn="createdAt">
-          {{ 'lots.entry_date' | transloco }} <p-sortIcon field="createdAt" />
-        </th>
-        <th style="width:100px" class="text-center">{{ 'common.actions' | transloco }}</th>
-      </tr>
+        <tr>
+            <th style="width:40px"></th>
+            <th style="width:140px" pSortableColumn="numeroLot">
+                {{ 'lots.lot_number' | transloco }} <p-sortIcon field="numeroLot" />
+            </th>
+            <th style="width:130px">{{ 'common.warehouse' | transloco }}</th>
+            <th style="width:150px" pSortableColumn="expiresAt">
+                {{ 'lots.dlc' | transloco }} <p-sortIcon field="expiresAt" />
+            </th>
+            <th style="width:150px" class="text-right" pSortableColumn="quantiteRestante">
+                {{ 'lots.remaining' | transloco }} <p-sortIcon field="quantiteRestante" />
+            </th>
+            <th style="width:130px" class="text-right">
+                {{ 'lots.reserved' | transloco }}
+            </th>
+            <th style="width:130px" class="text-right">
+                {{ 'lots.available' | transloco }}
+            </th>
+            <th style="width:140px" class="text-right" pSortableColumn="quantiteInitiale">
+                {{ 'lots.initial' | transloco }} <p-sortIcon field="quantiteInitiale" />
+            </th>
+            <th style="width:130px" class="text-right">{{ 'lots.unit_cost' | transloco }}</th>
+            <th style="width:150px" pSortableColumn="createdAt">
+                {{ 'lots.entry_date' | transloco }} <p-sortIcon field="createdAt" />
+            </th>
+            <th style="width:100px" class="text-center">{{ 'common.actions' | transloco }}</th>
+        </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-lot>
-      <tr >
+    <ng-template pTemplate="body" let-lot let-expanded="expanded">
+        <tr>
+            <!-- Expand toggle — uniquement si réservations actives -->
+            <td class="text-center">
+                @if (lot.reservations?.length > 0) {
+                    <p-button
+                        [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                        [pRowToggler]="lot"
+                        [text]="true"
+                        size="small"
+                        severity="secondary"
+                    />
+                }
+            </td>
 
-        <td>
-          @if (lot.numeroLot) {
-            <span class="font-mono text-sm bg-gray-100 px-2 py-1 border-round text-700">
-              {{ lot.numeroLot }}
-            </span>
-          } @else {
-            <span class="text-400 text-sm font-italic">{{ 'lots.no_lot_number' | transloco }}</span>
-          }
-        </td>
+            <td>
+                @if (lot.numeroLot) {
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 border-round text-700">
+                        {{ lot.numeroLot }}
+                    </span>
+                } @else {
+                    <span class="text-400 text-sm font-italic">{{ 'lots.no_lot_number' | transloco }}</span>
+                }
+            </td>
 
-        <td>
-          <span class="text-sm text-900">{{ lot.entrepotNom }}</span>
-        </td>
+            <td><span class="text-sm text-900">{{ lot.entrepotNom }}</span></td>
 
-        <td>
-          @if (lot.expiresAt) {
-            <div class="flex align-items-center gap-2">
-              <p-tag
-                [value]="lot.expiresAt | date:'dd/MM/yyyy'"
-                [severity]="getDlcSeverity(lot)"
-              />
-              @if (lot.estExpire) {
-                <i class="pi pi-exclamation-circle text-red-500 text-sm"
-                  [pTooltip]="'lots.expired' | transloco"></i>
-              } @else if (lot.dlcProche) {
-                <i class="pi pi-exclamation-triangle text-orange-500 text-sm"
-                  [pTooltip]="'lots.dlc_soon' | transloco"></i>
-              }
-            </div>
-          } @else {
-            <span class="text-400 text-sm">{{ 'lots.no_dlc' | transloco }}</span>
-          }
-        </td>
+            <td>
+                @if (lot.expiresAt) {
+                    <div class="flex align-items-center gap-2">
+                        <p-tag [value]="lot.expiresAt | date:'dd/MM/yyyy'" [severity]="getDlcSeverity(lot)" />
+                        @if (lot.estExpire) {
+                            <i class="pi pi-exclamation-circle text-red-500 text-sm" [pTooltip]="'lots.expired' | transloco"></i>
+                        } @else if (lot.dlcProche) {
+                            <i class="pi pi-exclamation-triangle text-orange-500 text-sm" [pTooltip]="'lots.dlc_soon' | transloco"></i>
+                        }
+                    </div>
+                } @else {
+                    <span class="text-400 text-sm">{{ 'lots.no_dlc' | transloco }}</span>
+                }
+            </td>
 
-        <td class="text-right">
-          <div class="flex align-items-center justify-content-end gap-2">
-            <span class="font-mono font-semibold text-900 text-sm">
-              {{ lot.quantiteRestante | number:'1.0-4' }}
-            </span>
-            <span class="text-400 text-xs">{{ materiau?.unite }}</span>
-          </div>
-          <div class="mt-1 bg-gray-200 border-round" style="height:4px">
-            <div class="border-round"
-              [style.width.%]="lot.quantiteInitiale > 0
-                ? (lot.quantiteRestante / lot.quantiteInitiale * 100) : 0"
-              [style.background]="lot.estExpire ? '#ef4444'
-                : lot.dlcProche ? '#f97316' : '#22c55e'"
-              style="height:4px; transition:width 0.3s">
-            </div>
-          </div>
-        </td>
+            <!-- Restante -->
+            <td class="text-right">
+                <div class="flex align-items-center justify-content-end gap-2">
+                    <span class="font-mono font-semibold text-900 text-sm">
+                        {{ lot.quantiteRestante | number:'1.0-4' }}
+                    </span>
+                    <span class="text-400 text-xs">{{ materiau?.unite }}</span>
+                </div>
 
-        <td class="text-right">
-          <span class="font-mono text-sm text-500">
-            {{ lot.quantiteInitiale | number:'1.0-4' }} {{ materiau?.unite }}
-          </span>
-        </td>
+                <!-- Barre segmentée : disponible + réservé -->
+                <div class="mt-1 bg-gray-200 border-round overflow-hidden" style="height:6px; display:flex">
+                    <!-- Segment disponible -->
+                    <div
+                        [style.width.%]="lot.quantiteInitiale > 0 ? (lot.quantiteDisponible / lot.quantiteInitiale * 100) : 0"
+                        [style.background]="lot.estExpire ? '#ef4444' : lot.dlcProche ? '#f97316' : '#22c55e'"
+                        style="height:6px; transition:width 0.3s">
+                    </div>
+                    <!-- Segment réservé -->
+                    <div
+                        [style.width.%]="lot.quantiteInitiale > 0 ? (lot.quantiteReservee / lot.quantiteInitiale * 100) : 0"
+                        style="height:6px; background:#f97316; opacity:0.6; transition:width 0.3s">
+                    </div>
+                </div>
 
-        <td class="text-right">
-          @if (lot.coutUnitaire != null) {
-            <span class="font-mono text-sm text-900">
-              {{ lot.coutUnitaire | currency:appCurrency:'symbol':'1.2-4' }}
-            </span>
-          } @else {
-            <span class="text-400">—</span>
-          }
-        </td>
+                <!-- Légende sous la barre si réservations -->
+                @if (lot.quantiteReservee > 0) {
+                    <div class="flex justify-content-end gap-2 mt-1">
+                        <span class="text-xs text-orange-500">
+                            <i class="pi pi-lock" style="font-size:0.6rem"></i>
+                            {{ lot.quantiteReservee | number:'1.0-2' }} réservé
+                        </span>
+                    </div>
+                }
+            </td>
 
-        <td>
-          <span class="text-sm text-500">
-            {{ lot.createdAt | date:'dd/MM/yyyy HH:mm' }}
-          </span>
-        </td>
+            <!-- Réservée -->
+            <td class="text-right">
+                @if (lot.quantiteReservee > 0) {
+                    <span class="font-mono text-sm font-semibold text-orange-600">
+                        {{ lot.quantiteReservee | number:'1.0-4' }}
+                        <span class="text-400 text-xs ml-1">{{ materiau?.unite }}</span>
+                    </span>
+                } @else {
+                    <span class="text-400 text-sm">—</span>
+                }
+            </td>
 
-        <td class="text-center">
-          <div class="flex align-items-center justify-content-center gap-1">
-            <p-button
-              icon="pi pi-arrow-right-arrow-left"
-              severity="info"
-              [text]="true"
-              size="small"
-              [pTooltip]="'lots.transfer_tooltip' | transloco"
-              [disabled]="lot.quantiteRestante <= 0"
-              (onClick)="openTransferer(lot)"
-            />
-            <p-button
-              icon="pi pi-minus-circle"
-              severity="warn"
-              [text]="true"
-              size="small"
-              [pTooltip]="'lots.degrever_tooltip' | transloco"
-              [disabled]="lot.quantiteRestante <= 0"
-              (onClick)="openDegrever(lot)"
-            />
-          </div>
-        </td>
+            <!-- Disponible -->
+            <td class="text-right">
+                <span class="font-mono text-sm font-semibold"
+                    [class.text-green-600]="lot.quantiteDisponible > 0"
+                    [class.text-red-500]="lot.quantiteDisponible <= 0">
+                    {{ lot.quantiteDisponible | number:'1.0-4' }}
+                    <span class="text-400 text-xs ml-1">{{ materiau?.unite }}</span>
+                </span>
+            </td>
 
-      </tr>
+            <td class="text-right">
+                <span class="font-mono text-sm text-500">
+                    {{ lot.quantiteInitiale | number:'1.0-4' }} {{ materiau?.unite }}
+                </span>
+            </td>
+
+            <td class="text-right">
+                @if (lot.coutUnitaire != null) {
+                    <span class="font-mono text-sm text-900">
+                        {{ lot.coutUnitaire | currency:appCurrency:'symbol':'1.2-4' }}
+                    </span>
+                } @else {
+                    <span class="text-400">—</span>
+                }
+            </td>
+
+            <td>
+                <span class="text-sm text-500">{{ lot.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </td>
+
+            <td class="text-center">
+                <div class="flex align-items-center justify-content-center gap-1">
+                    <p-button icon="pi pi-arrow-right-arrow-left" severity="info" [text]="true" size="small"
+                        [pTooltip]="'lots.transfer_tooltip' | transloco"
+                        [disabled]="lot.quantiteRestante <= 0"
+                        (onClick)="openTransferer(lot)" />
+                    <p-button icon="pi pi-minus-circle" severity="warn" [text]="true" size="small"
+                        [pTooltip]="'lots.degrever_tooltip' | transloco"
+                        [disabled]="lot.quantiteRestante <= 0"
+                        (onClick)="openDegrever(lot)" />
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+
+    <!-- Détail réservations -->
+    <ng-template pTemplate="rowexpansion" let-lot>
+        <tr>
+            <td colspan="11" class="p-0">
+                <div class="p-3 surface-50 border-left-3 border-orange-400">
+                    <div class="flex align-items-center gap-2 mb-3">
+                        <i class="pi pi-lock text-orange-500"></i>
+                        <span class="font-semibold text-800">
+                            {{ lot.reservations.length }} réservation(s) active(s)
+                        </span>
+                    </div>
+                    <p-table [value]="lot.reservations" [showGridlines]="false" styleClass="p-datatable-sm">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width:120px">Run #</th>
+                                <th style="width:160px">N° lot</th>
+                                <th style="width:150px" class="text-right">Qté réservée</th>
+                                <th style="width:180px">Réservé le</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-r>
+                            <tr>
+                                <td>
+                                    <span class="font-mono text-sm text-primary font-semibold">
+                                        #{{ r.runId }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (r.numeroLot) {
+                                        <span class="font-mono text-sm bg-gray-100 px-2 py-1 border-round">
+                                            {{ r.numeroLot }}
+                                        </span>
+                                    } @else {
+                                        <span class="text-400">—</span>
+                                    }
+                                </td>
+                                <td class="text-right">
+                                    <span class="font-mono font-semibold text-orange-600">
+                                        {{ r.quantiteReservee | number:'1.0-4' }} {{ materiau?.unite }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-sm text-500">
+                                        {{ r.reserveeLe | date:'dd/MM/yyyy HH:mm' }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </td>
+        </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="8" class="text-center py-6 text-400">
-          <i class="pi pi-box text-4xl block mb-3 opacity-30"></i>
-          {{ 'lots.no_lots' | transloco }}
-        </td>
-      </tr>
+        <tr>
+            <td colspan="11" class="text-center py-6 text-400">
+                <i class="pi pi-box text-4xl block mb-3 opacity-30"></i>
+                {{ 'lots.no_lots' | transloco }}
+            </td>
+        </tr>
     </ng-template>
-  </p-table>
+</p-table>
 </div>
 
 <app-degrever-lot-dialog
